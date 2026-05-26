@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Model Viewer TERMINATE Animation</title>
+
+  <script
+    type="module"
+    src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js">
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background: #111;
+    }
+
+    model-viewer {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #f4f4f4;
+      z-index: 1;
+    }
+
+    .Hotspot {
+      display: block;
+      position: relative;
+      width: 27px;
+      height: 27px;
+      border-radius: 50%;
+      border: 2px solid white;
+      background: red;
+      box-shadow: 0 0 14px rgba(255, 0, 0, 1);
+      cursor: pointer;
+      transform: translate(-50%, -50%);
+      z-index: 999;
+      padding: 0;
+    }
+
+    .Hotspot::before {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+      background: white;
+      opacity: 0.9;
+    }
+
+    .Hotspot::after {
+      content: "";
+      position: absolute;
+      inset: -7px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 0, 0, 0.55);
+      animation: hotspotPulse 1.4s infinite;
+    }
+
+    .HotspotAnnotation {
+      position: absolute;
+      left: 50%;
+      bottom: 40px;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      padding: 7px 10px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+
+    .InfoHotspot {
+      display: block;
+      position: relative;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 0;
+      background: rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      transform: translate(-50%, -50%);
+      padding: 0;
+      z-index: 999;
+    }
+
+    .InfoHotspot::before {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-sizing: border-box;
+    }
+
+    .InfoHotspot::after {
+      content: "i";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -54%);
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    .hiddenUntilTerminate {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .showInfoHotspots .hiddenUntilTerminate {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @keyframes hotspotPulse {
+      0% {
+        transform: scale(0.7);
+        opacity: 0.85;
+      }
+
+      100% {
+        transform: scale(1.7);
+        opacity: 0;
+      }
+    }
+
+    .progress-bar {
+      display: block;
+      width: 33%;
+      height: 10%;
+      max-height: 2%;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate3d(-50%, -50%, 0);
+      border-radius: 25px;
+      box-shadow:
+        0 3px 10px 3px rgba(0, 0, 0, 0.5),
+        0 0 5px 1px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 10;
+    }
+
+    .progress-bar.hide {
+      visibility: hidden;
+      transition: visibility 0.3s;
+    }
+
+    .update-bar {
+      background-color: rgba(255, 255, 255, 0.9);
+      width: 0%;
+      height: 100%;
+      border-radius: 25px;
+      float: left;
+      transition: width 0.3s;
+    }
+
+    .infoOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      box-sizing: border-box;
+      background: transparent;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s ease;
+    }
+
+    .infoOverlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .infoWindow {
+      position: relative;
+      width: min(920px, 90vw);
+      height: min(520px, 76vh);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 24px;
+      box-sizing: border-box;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+
+    .infoCloseButton {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      z-index: 5;
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.65);
+      color: black;
+      font-size: 23px;
+      line-height: 32px;
+      font-weight: 400;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .infoCloseButton:hover {
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .sequencePanel,
+    .lottiePanel {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.22);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sequencePanel {
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .sequencePanel.dragging {
+      cursor: grabbing;
+    }
+
+    #sequenceImage {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    #infoLottie {
+      width: 100%;
+      height: 100%;
+    }
+
+    .sequenceHint {
+      position: absolute;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%);
+      color: rgba(0, 0, 0, 0.65);
+      padding: 0;
+      border-radius: 0;
+      font-size: 10px;
+      letter-spacing: 0.02em;
+      pointer-events: none;
+      opacity: 0.9;
+      white-space: nowrap;
+      text-align: center;
+      background: transparent;
+    }
+
+    @media (max-width: 800px) {
+      .infoWindow {
+        grid-template-columns: 1fr;
+        height: min(700px, 84vh);
+        gap: 14px;
+        padding: 20px;
+      }
+
+      .sequencePanel,
+      .lottiePanel {
+        min-height: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <model-viewer
+    id="viewer"
+    src="RP-TRIM GUIDE test 17.glb"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    camera-controls
+    tone-mapping="neutral"
+    poster="poster.webp"
+    shadow-intensity="1"
+    exposure="1"
+
+    camera-orbit="-35.62141deg 60.17364deg 6.30660m"
+    camera-target="0.41971m 0.32003m -0.01002m"
+    field-of-view="15.06401deg"
+
+    min-camera-orbit="auto auto 0.03m"
+    max-camera-orbit="auto auto 20m"
+    min-field-of-view="8deg"
+    max-field-of-view="60deg"
+
+    interpolation-decay="120"
+    animation-crossfade-duration="0"
+  >
+
+    <button
+      id="terminateHotspot"
+      class="Hotspot"
+      slot="hotspot-1"
+      data-position="-0.54622m 0.26164m -0.74322m"
+      data-normal="0.00000m -0.00000m 1.00000m"
+    >
+      <div class="HotspotAnnotation" id="hotspotLabel">TERMINATE</div>
+    </button>
+
+    <button
+      id="infoHotspot1"
+      class="InfoHotspot hiddenUntilTerminate"
+      slot="hotspot-info-1"
+      data-position="-0.54020m 0.42399m -0.76583m"
+      data-normal="0.00000m 0.00000m 1.00000m"
+      aria-label="Info hotspot 1"
+    ></button>
+
+    <div class="progress-bar hide" slot="progress-bar">
+      <div class="update-bar"></div>
+    </div>
+
+  </model-viewer>
+
+  <div class="infoOverlay" id="infoOverlay" aria-hidden="true">
+    <div class="infoWindow" role="dialog" aria-modal="true" aria-label="Trim information window">
+      <button class="infoCloseButton" id="infoCloseButton" aria-label="Close info window">×</button>
+
+      <div class="sequencePanel" id="sequencePanel">
+        <img
+          id="sequenceImage"
+          src="sequences/2pc_J-trim/2pc_Jtrim000.png"
+          alt="2 piece J trim rotating view"
+          draggable="false"
+        />
+        <div class="sequenceHint">Drag left or right to rotate</div>
+      </div>
+
+      <div class="lottiePanel">
+        <div id="infoLottie"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modelViewer = document.querySelector("#viewer");
+    const terminateHotspot = document.querySelector("#terminateHotspot");
+    const hotspotLabel = document.querySelector("#hotspotLabel");
+    const infoHotspot1 = document.querySelector("#infoHotspot1");
+    const progressBar = document.querySelector(".progress-bar");
+    const updateBar = document.querySelector(".update-bar");
+
+    const infoOverlay = document.querySelector("#infoOverlay");
+    const infoCloseButton = document.querySelector("#infoCloseButton");
+    const sequencePanel = document.querySelector("#sequencePanel");
+    const sequenceImage = document.querySelector("#sequenceImage");
+    const infoLottieContainer = document.querySelector("#infoLottie");
+
+    const ANIMATION_NAME = "TERMINATE";
+
+    const DEFAULT_CAMERA_VIEW = {
+      orbit: "-35.62141deg 60.17364deg 6.30660m",
+      target: "0.41971m 0.32003m -0.01002m",
+      fov: "15.06401deg"
+    };
+
+    const TERMINATE_CAMERA_VIEW = {
+      orbit: "-38.69358deg 68.85205deg 2.31473m",
+      target: "-0.40122m 0.32012m -0.77093m",
+      fov: "10.32461deg"
+    };
+
+    const END_PADDING = 0.04;
+    const REVERSE_SPEED = 1.0;
+
+    let duration = 0;
+    let safeEndTime = 0;
+    let isOpen = false;
+    let isPlaying = false;
+    let forwardFrameId = null;
+    let reverseFrameId = null;
+    let lastReverseTimestamp = null;
+
+    const SEQUENCE_FOLDER = "sequences/2pc_J-trim/";
+    const SEQUENCE_PREFIX = "2pc_Jtrim";
+    const SEQUENCE_EXTENSION = ".png";
+    const SEQUENCE_FIRST_FRAME = 0;
+    const SEQUENCE_LAST_FRAME = 100;
+
+    const INFO_LOTTIE_PATH = "lottie/2pc_J-trim-drawing.json";
+
+    let currentSequenceFrame = 0;
+    let sequenceAutoTimer = null;
+    let sequenceHasUserInteracted = false;
+    let isDraggingSequence = false;
+    let lastDragX = 0;
+    let dragAccumulator = 0;
+    let infoLottieAnimation = null;
+
+    modelViewer.addEventListener("progress", (event) => {
+      const progress = event.detail.totalProgress;
+      updateBar.style.width = `${progress * 100}%`;
+
+      if (progress === 1) {
+        progressBar.classList.add("hide");
+      } else {
+        progressBar.classList.remove("hide");
+      }
+    });
+
+    modelViewer.addEventListener("load", () => {
+      const availableAnimations = modelViewer.availableAnimations || [];
+
+      console.log("Model loaded.");
+      console.log("Available animations:", availableAnimations);
+
+      moveCameraToDefaultView(false);
+
+      if (!availableAnimations.includes(ANIMATION_NAME)) {
+        console.warn(`Animation "${ANIMATION_NAME}" was not found.`);
+        console.warn("Available animations:", availableAnimations);
+        return;
+      }
+
+      modelViewer.animationName = ANIMATION_NAME;
+      modelViewer.pause();
+      modelViewer.currentTime = 0;
+      modelViewer.timeScale = 1;
+      modelViewer.classList.remove("showInfoHotspots");
+
+      preloadSequenceFrames();
+
+      setTimeout(() => {
+        duration = modelViewer.duration || 0;
+        safeEndTime = Math.max(0, duration - END_PADDING);
+
+        console.log("TERMINATE duration:", duration);
+        console.log("Safe end time:", safeEndTime);
+      }, 300);
+    });
+
+    terminateHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      if (isPlaying) return;
+
+      if (!duration) {
+        duration = modelViewer.duration || 0;
+        safeEndTime = Math.max(0, duration - END_PADDING);
+      }
+
+      if (!duration) {
+        console.warn("Animation duration is not ready yet.");
+        return;
+      }
+
+      if (!isOpen) {
+        playForwardAndHold();
+      } else {
+        playBackwardByScrubbing();
+      }
+    });
+
+    infoHotspot1.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openInfoWindow();
+    });
+
+    infoCloseButton.addEventListener("click", closeInfoWindow);
+
+    infoOverlay.addEventListener("click", (event) => {
+      if (event.target === infoOverlay) {
+        closeInfoWindow();
+      }
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && infoOverlay.classList.contains("open")) {
+        closeInfoWindow();
+      }
+    });
+
+    sequencePanel.addEventListener("pointerdown", startSequenceDrag);
+    sequencePanel.addEventListener("pointermove", moveSequenceDrag);
+    sequencePanel.addEventListener("pointerup", endSequenceDrag);
+    sequencePanel.addEventListener("pointercancel", endSequenceDrag);
+    sequencePanel.addEventListener("pointerleave", endSequenceDrag);
+
+    function moveCameraToView(view, animate = true) {
+      if (animate) {
+        modelViewer.setAttribute("interpolation-decay", "120");
+      } else {
+        modelViewer.setAttribute("interpolation-decay", "1000");
+      }
+
+      modelViewer.cameraOrbit = view.orbit;
+      modelViewer.cameraTarget = view.target;
+      modelViewer.fieldOfView = view.fov;
+
+      if (!animate) {
+        requestAnimationFrame(() => {
+          modelViewer.setAttribute("interpolation-decay", "120");
+        });
+      }
+    }
+
+    function moveCameraToDefaultView(animate = true) {
+      moveCameraToView(DEFAULT_CAMERA_VIEW, animate);
+    }
+
+    function moveCameraToTerminateView(animate = true) {
+      moveCameraToView(TERMINATE_CAMERA_VIEW, animate);
+    }
+
+    function playForwardAndHold() {
+      stopAllMonitors();
+
+      isPlaying = true;
+      isOpen = false;
+
+      modelViewer.classList.remove("showInfoHotspots");
+      moveCameraToTerminateView(true);
+
+      modelViewer.animationName = ANIMATION_NAME;
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = 0;
+      modelViewer.play();
+
+      hotspotLabel.textContent = "BACK";
+
+      monitorForward();
+    }
+
+    function playBackwardByScrubbing() {
+      stopAllMonitors();
+      closeInfoWindow();
+
+      isPlaying = true;
+      isOpen = true;
+
+      modelViewer.classList.remove("showInfoHotspots");
+      moveCameraToDefaultView(true);
+
+      modelViewer.animationName = ANIMATION_NAME;
+      modelViewer.pause();
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = safeEndTime;
+
+      hotspotLabel.textContent = "TERMINATE";
+
+      lastReverseTimestamp = null;
+      reverseFrameId = requestAnimationFrame(scrubBackwardFrame);
+    }
+
+    function monitorForward() {
+      if (modelViewer.currentTime >= safeEndTime) {
+        modelViewer.pause();
+        modelViewer.timeScale = 1;
+        modelViewer.currentTime = safeEndTime;
+
+        isPlaying = false;
+        isOpen = true;
+
+        modelViewer.classList.add("showInfoHotspots");
+
+        stopAllMonitors();
+        return;
+      }
+
+      forwardFrameId = requestAnimationFrame(monitorForward);
+    }
+
+    function scrubBackwardFrame(timestamp) {
+      if (lastReverseTimestamp === null) {
+        lastReverseTimestamp = timestamp;
+      }
+
+      const deltaSeconds = (timestamp - lastReverseTimestamp) / 1000;
+      lastReverseTimestamp = timestamp;
+
+      const nextTime = modelViewer.currentTime - deltaSeconds * REVERSE_SPEED;
+
+      if (nextTime <= 0) {
+        modelViewer.currentTime = 0;
+        modelViewer.pause();
+        modelViewer.timeScale = 1;
+
+        isPlaying = false;
+        isOpen = false;
+
+        modelViewer.classList.remove("showInfoHotspots");
+
+        stopAllMonitors();
+        return;
+      }
+
+      modelViewer.currentTime = nextTime;
+      reverseFrameId = requestAnimationFrame(scrubBackwardFrame);
+    }
+
+    function stopAllMonitors() {
+      if (forwardFrameId) {
+        cancelAnimationFrame(forwardFrameId);
+        forwardFrameId = null;
+      }
+
+      if (reverseFrameId) {
+        cancelAnimationFrame(reverseFrameId);
+        reverseFrameId = null;
+      }
+
+      lastReverseTimestamp = null;
+    }
+
+    function openInfoWindow() {
+      infoOverlay.classList.add("open");
+      infoOverlay.setAttribute("aria-hidden", "false");
+
+      sequenceHasUserInteracted = false;
+      setSequenceFrame(0);
+      startSequenceAutoPlay();
+      playInfoLottie();
+    }
+
+    function closeInfoWindow() {
+      infoOverlay.classList.remove("open");
+      infoOverlay.setAttribute("aria-hidden", "true");
+
+      stopSequenceAutoPlay();
+      isDraggingSequence = false;
+      sequencePanel.classList.remove("dragging");
+
+      if (infoLottieAnimation) {
+        infoLottieAnimation.stop();
+      }
+    }
+
+    function getSequenceFramePath(frameNumber) {
+      const paddedFrame = String(frameNumber).padStart(3, "0");
+      return `${SEQUENCE_FOLDER}${SEQUENCE_PREFIX}${paddedFrame}${SEQUENCE_EXTENSION}`;
+    }
+
+    function setSequenceFrame(frameNumber) {
+      const totalFrames = SEQUENCE_LAST_FRAME - SEQUENCE_FIRST_FRAME + 1;
+      let normalizedFrame = frameNumber;
+
+      while (normalizedFrame > SEQUENCE_LAST_FRAME) {
+        normalizedFrame -= totalFrames;
+      }
+
+      while (normalizedFrame < SEQUENCE_FIRST_FRAME) {
+        normalizedFrame += totalFrames;
+      }
+
+      currentSequenceFrame = normalizedFrame;
+      sequenceImage.src = getSequenceFramePath(currentSequenceFrame);
+    }
+
+    function preloadSequenceFrames() {
+      for (let i = SEQUENCE_FIRST_FRAME; i <= SEQUENCE_LAST_FRAME; i++) {
+        const img = new Image();
+        img.src = getSequenceFramePath(i);
+      }
+    }
+
+    function startSequenceAutoPlay() {
+      stopSequenceAutoPlay();
+
+      sequenceAutoTimer = setInterval(() => {
+        if (sequenceHasUserInteracted) {
+          stopSequenceAutoPlay();
+          return;
+        }
+
+        setSequenceFrame(currentSequenceFrame + 1);
+      }, 110);
+    }
+
+    function stopSequenceAutoPlay() {
+      if (sequenceAutoTimer) {
+        clearInterval(sequenceAutoTimer);
+        sequenceAutoTimer = null;
+      }
+    }
+
+    function startSequenceDrag(event) {
+      sequenceHasUserInteracted = true;
+      stopSequenceAutoPlay();
+
+      isDraggingSequence = true;
+      lastDragX = event.clientX;
+      dragAccumulator = 0;
+
+      sequencePanel.classList.add("dragging");
+      sequencePanel.setPointerCapture(event.pointerId);
+
+      event.preventDefault();
+    }
+
+    function moveSequenceDrag(event) {
+      if (!isDraggingSequence) return;
+
+      const deltaX = event.clientX - lastDragX;
+      lastDragX = event.clientX;
+
+      dragAccumulator += deltaX;
+
+      const pixelsPerFrame = 5;
+
+      if (Math.abs(dragAccumulator) >= pixelsPerFrame) {
+        const frameStep = Math.trunc(dragAccumulator / pixelsPerFrame);
+
+        setSequenceFrame(currentSequenceFrame + frameStep);
+
+        dragAccumulator = dragAccumulator % pixelsPerFrame;
+      }
+
+      event.preventDefault();
+    }
+
+    function endSequenceDrag(event) {
+      if (!isDraggingSequence) return;
+
+      isDraggingSequence = false;
+      dragAccumulator = 0;
+      sequencePanel.classList.remove("dragging");
+
+      try {
+        sequencePanel.releasePointerCapture(event.pointerId);
+      } catch (error) {
+        // Pointer may already be released.
+      }
+    }
+
+    function playInfoLottie() {
+      if (!window.lottie) {
+        console.warn("Lottie/bodymovin is not loaded.");
+        return;
+      }
+
+      if (infoLottieAnimation) {
+        infoLottieAnimation.destroy();
+        infoLottieAnimation = null;
+      }
+
+      infoLottieContainer.innerHTML = "";
+
+      infoLottieAnimation = lottie.loadAnimation({
+        container: infoLottieContainer,
+        renderer: "svg",
+        loop: false,
+        autoplay: true,
+        path: INFO_LOTTIE_PATH
+      });
+
+      infoLottieAnimation.addEventListener("complete", () => {
+        infoLottieAnimation.goToAndStop(infoLottieAnimation.totalFrames, true);
+      });
+    }
+
+    modelViewer.addEventListener("error", (event) => {
+      console.error("Model-viewer error:", event);
+    });
+  </script>
+
+</body>
+</html>
