@@ -1485,6 +1485,7 @@
       <div class="sequencePanel" id="sequencePanel">
         <img
           id="sequenceImage"
+          class="sequenceHidden"
           src="sequences/2pc_J-trim/2pc_Jtrim000.png"
           alt="2 piece J trim rotating view"
           draggable="false"
@@ -3901,12 +3902,20 @@
         sequenceFadeTimer = null;
       }
 
+      // Prevent the first PNG frame from flashing before the intentional delay.
+      sequenceImage.style.transition = "none";
       sequenceImage.classList.add("sequenceHidden");
+      sequenceImage.offsetHeight;
+
+      requestAnimationFrame(() => {
+        sequenceImage.style.transition = "";
+      });
 
       sequenceFadeTimer = setTimeout(() => {
         sequenceFadeTimer = null;
 
         if (infoOverlay.classList.contains("open")) {
+          sequenceImage.style.transition = "";
           sequenceImage.classList.remove("sequenceHidden");
 
           const sequenceFadeInDuration = 750;
@@ -4820,11 +4829,15 @@
       returnCameraViewAfterInfoClose = getCurrentHotspotCameraView();
       moveCameraToDefaultView(true);
 
+      sequenceHasUserInteracted = false;
+      sequenceImage.style.transition = "none";
+      sequenceImage.classList.add("sequenceHidden");
+      setSequenceFrame(currentSequenceFrame);
+      sequenceImage.offsetHeight;
+
       infoOverlay.classList.add("open");
       infoOverlay.setAttribute("aria-hidden", "false");
 
-      sequenceHasUserInteracted = false;
-      setSequenceFrame(currentSequenceFrame);
       hideAndDelaySequenceImage();
       playInfoLottie();
       updateModalControlsVisibility();
@@ -4837,7 +4850,8 @@
       infoOverlay.setAttribute("aria-hidden", "true");
 
       clearSequenceFadeTimer();
-      sequenceImage.classList.remove("sequenceHidden");
+      sequenceImage.style.transition = "none";
+      sequenceImage.classList.add("sequenceHidden");
 
       stopTouchGuideDemo();
       isDraggingSequence = false;
