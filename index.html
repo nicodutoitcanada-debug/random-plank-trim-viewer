@@ -36,42 +36,29 @@
     .Hotspot {
       display: block;
       position: relative;
-      width: 27px;
-      height: 27px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
-      border: 2px solid white;
-      background: red;
-      box-shadow: 0 0 14px rgba(255, 0, 0, 1);
+      border: 0;
+      background: transparent;
       cursor: pointer;
       transform: translate(-50%, -50%);
       z-index: 999;
       padding: 0;
+      overflow: visible;
+      transition: opacity 0.75s ease;
     }
 
-    .Hotspot::before {
-      content: "";
-      position: absolute;
-      inset: 6px;
-      border-radius: 50%;
-      background: white;
-      opacity: 0.9;
-    }
-
-    .Hotspot::after {
-      content: "";
-      position: absolute;
-      inset: -7px;
-      border-radius: 50%;
-      border: 2px solid rgba(255, 0, 0, 0.55);
-      animation: hotspotPulse 1.4s infinite;
+    model-viewer.guideDimmingHotspots .Hotspot {
+      opacity: 0.2;
     }
 
     .HotspotAnnotation {
       position: absolute;
       left: 50%;
-      bottom: 40px;
+      bottom: 48px;
       transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 0, 0, 0.5);
       color: white;
       padding: 7px 10px;
       border-radius: 7px;
@@ -79,43 +66,48 @@
       font-weight: bold;
       white-space: nowrap;
       pointer-events: none;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+    }
+
+    .hotspotLottie {
+      width: 100%;
+      height: 100%;
+      transform-origin: 50% 50%;
+      will-change: transform;
+      pointer-events: none;
+    }
+
+    .hotspotLottie.isBack {
+      transform: rotate(180deg);
+    }
+
+    .hotspotLottie.flipToBack {
+      animation: flipToBack 0.72s cubic-bezier(0.2, 0.9, 0.25, 1.15) forwards;
+    }
+
+    .hotspotLottie.flipToTerminate {
+      animation: flipToTerminate 0.72s cubic-bezier(0.2, 0.9, 0.25, 1.15) forwards;
     }
 
     .InfoHotspot {
       display: block;
       position: relative;
-      width: 34px;
-      height: 34px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       border: 0;
-      background: rgba(0, 0, 0, 0.5);
+      background: transparent;
       cursor: pointer;
       transform: translate(-50%, -50%);
       padding: 0;
       z-index: 999;
+      overflow: visible;
     }
 
-    .InfoHotspot::before {
-      content: "";
-      position: absolute;
-      inset: 7px;
-      border-radius: 50%;
-      border: 2px solid white;
-      box-sizing: border-box;
-    }
-
-    .InfoHotspot::after {
-      content: "i";
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -54%);
-      color: white;
-      font-family: Arial, sans-serif;
-      font-size: 12px;
-      font-weight: bold;
-      line-height: 1;
+    .infoHotspotLottie {
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
     }
 
     .hiddenUntilTerminate {
@@ -124,20 +116,577 @@
       transition: opacity 0.35s ease;
     }
 
-    .showInfoHotspots .hiddenUntilTerminate {
+    .hiddenUntilTerminate.isVisible {
       opacity: 1;
       pointer-events: auto;
     }
 
-    @keyframes hotspotPulse {
+    .hiddenUntilOsEndEnd {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .hiddenUntilOsEndEnd.isVisible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .hiddenUntilIsStartStart {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .hiddenUntilIsStartStart.isVisible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .hiddenUntilBoxBase {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .hiddenUntilBoxBase.isVisible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .hiddenUntilOsStartStart {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .hiddenUntilOsStartStart.isVisible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .hiddenUntilIsEndStart {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .hiddenUntilIsEndStart.isVisible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .hiddenUntilIsEndEnd {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .hiddenUntilIsEndEnd.isVisible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .hiddenUntilOsStartEnd {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .hiddenUntilOsStartEnd.isVisible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .hiddenUntilStarter {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .hiddenUntilStarter.isVisible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .hiddenVideoHotspot {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .hiddenVideoHotspot.isVisible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .videoHotspotLottie {
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    #terminateVideoHotspot,
+    #osEndEndVideoHotspot,
+    #isStartStartVideoHotspot,
+    #boxBaseVideoHotspot,
+    #osStartStartVideoHotspot,
+    #isEndStartVideoHotspot,
+    #isEndEndVideoHotspot,
+    #osStartEndVideoHotspot,
+    #starterVideoHotspot {
+      width: 210px;
+      height: 210px;
+    }
+
+    .videoOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      box-sizing: border-box;
+      background: transparent;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s ease;
+    }
+
+    .videoOverlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .videoWindow {
+      position: relative;
+      width: min(920px, 90vw);
+      height: min(560px, 78vh);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 20px;
+      padding: 24px;
+      box-sizing: border-box;
+      border-radius: 24px;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(9px);
+      -webkit-backdrop-filter: blur(9px);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+
+    .videoFrameWrap {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      border-radius: 20px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.55);
+    }
+
+    #youtubeFrame {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+
+    @keyframes flipToBack {
       0% {
-        transform: scale(0.7);
-        opacity: 0.85;
+        transform: rotate(0deg);
+      }
+
+      64% {
+        transform: rotate(206deg);
+      }
+
+      84% {
+        transform: rotate(171deg);
       }
 
       100% {
-        transform: scale(1.7);
-        opacity: 0;
+        transform: rotate(180deg);
+      }
+    }
+
+    @keyframes flipToTerminate {
+      0% {
+        transform: rotate(180deg);
+      }
+
+      64% {
+        transform: rotate(-26deg);
+      }
+
+      84% {
+        transform: rotate(9deg);
+      }
+
+      100% {
+        transform: rotate(0deg);
+      }
+    }
+
+    .hotspotSummaryWindow {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      z-index: 9999996;
+      width: min(360px, calc(100vw - 48px));
+      padding: 22px 22px 20px;
+      border-radius: 22px;
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      box-sizing: border-box;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+      opacity: 0;
+      transform: translateY(-10px);
+      pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .hotspotSummaryWindow.open {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .hotspotSummaryWindow.open.isHiddenBehindInfo {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .hotspotSummaryCloseButton {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 24px;
+      height: 24px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      font-size: 18px;
+      line-height: 24px;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .hotspotSummaryTitle {
+      padding-right: 28px;
+      font-size: 18px;
+      line-height: 1.12;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .hotspotSummaryBody {
+      font-size: 13px;
+      line-height: 1.45;
+      font-weight: 400;
+      opacity: 0.94;
+      margin-bottom: 0;
+    }
+
+    .hotspotSummaryVideoButton {
+      display: block;
+      width: 192px;
+      height: 192px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      padding: 0;
+      margin: -54px 0 -78px -18px;
+      cursor: pointer;
+    }
+
+    .hotspotSummaryVideoLottie {
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .bottomControlBar {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 32px 10px 32px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.5);
+      box-sizing: border-box;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      opacity: 1;
+      pointer-events: auto;
+      transition: opacity 0.28s ease;
+    }
+
+    .bottomControlBar.isWindowOpen {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .bottomControlButton {
+      position: relative;
+      width: 23px;
+      height: 23px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+      box-sizing: border-box;
+      transition: transform 0.18s ease, opacity 0.18s ease;
+    }
+
+    .bottomControlButton:hover {
+      transform: translateY(-2px);
+      opacity: 0.85;
+    }
+
+    .bottomControlButton:active {
+      transform: translateY(0) scale(0.96);
+    }
+
+    .bottomControlButton img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .bottomControlTooltip {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 13px);
+      transform: translateX(-50%) translateY(6px);
+      padding: 6px 9px;
+      border-radius: 7px;
+      background: rgba(0, 0, 0, 0.66);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      transition-delay: 0s;
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+    }
+
+    .bottomControlButton:hover .bottomControlTooltip,
+    .bottomControlButton:focus-visible .bottomControlTooltip {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      transition-delay: 1s;
+    }
+
+    .bottomControlButton:not(:hover):not(:focus-visible) .bottomControlTooltip {
+      transition-delay: 0s;
+    }
+
+    #resetCameraButton {
+      width: 29px;
+      height: 29px;
+      padding: 2px;
+    }
+
+    .howToOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999998;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.28s ease;
+    }
+
+    .howToOverlay.open {
+      opacity: 1;
+    }
+
+    .customGuideIconWrap {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(124px, 20vw);
+      height: min(124px, 20vw);
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      filter: drop-shadow(0 16px 26px rgba(0, 0, 0, 0.35));
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .howToOverlay.open .customGuideIconWrap {
+      opacity: 1;
+    }
+
+    .customGuideIcon {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .customGuideIcon.isHidden {
+      opacity: 0 !important;
+      animation: none !important;
+    }
+
+    .customGuideIcon.guidePan {
+      animation: guidePanMotion 4.2s ease-in-out both;
+    }
+
+    .customGuideIcon.guideRotate {
+      animation: guideRotateMotion 4.2s ease-in-out both;
+    }
+
+    .customGuideIcon.guideScroll {
+      animation: guideScrollMotion 4.2s ease-in-out both;
+    }
+
+    .mouseInfoMini {
+      position: fixed;
+      right: 24px;
+      bottom: 104px;
+      width: min(300px, 40vw);
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .mouseInfoMini.isVisible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .mouseInfoMini img {
+      width: 100%;
+      height: auto;
+      display: block;
+      user-select: none;
+      pointer-events: none;
+      filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.34));
+    }
+
+    .mouseInfoCloseButton {
+      position: absolute;
+      right: -8px;
+      top: -10px;
+      width: 22px;
+      height: 22px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.68);
+      color: #fff;
+      line-height: 22px;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0;
+      z-index: 2;
+    }
+
+    @keyframes guidePanMotion {
+      0% { transform: translateX(0) scale(0.96); opacity: 0; }
+      12% { opacity: 1; }
+      28% { transform: translateX(56px) scale(1); }
+      55% { transform: translateX(-56px) scale(1); }
+      82% { transform: translateX(34px) scale(1); opacity: 1; }
+      100% { transform: translateX(0) scale(0.96); opacity: 0; }
+    }
+
+    @keyframes guideRotateMotion {
+      0% { transform: translateX(0) rotate(0deg) scale(0.96); opacity: 0; }
+      12% { opacity: 1; }
+      28% { transform: translateX(-58px) rotate(-7deg) scale(1); }
+      55% { transform: translateX(58px) rotate(7deg) scale(1); }
+      82% { transform: translateX(-34px) rotate(-4deg) scale(1); opacity: 1; }
+      100% { transform: translateX(0) rotate(0deg) scale(0.96); opacity: 0; }
+    }
+
+    @keyframes guideScrollMotion {
+      0% { transform: translateY(0) scale(0.96); opacity: 0; }
+      12% { opacity: 1; }
+      28% { transform: translateY(-34px) scale(1.04); }
+      52% { transform: translateY(34px) scale(0.96); }
+      76% { transform: translateY(-18px) scale(1.02); opacity: 1; }
+      100% { transform: translateY(0) scale(0.96); opacity: 0; }
+    }
+
+    @media (max-width: 720px) {
+      .hotspotSummaryWindow {
+        top: 14px;
+        left: 14px;
+        width: min(330px, calc(100vw - 28px));
+        padding: 18px 18px 16px;
+        border-radius: 18px;
+      }
+
+      .hotspotSummaryTitle {
+        font-size: 16px;
+      }
+
+      .hotspotSummaryBody {
+        font-size: 12px;
+      }
+
+      .hotspotSummaryVideoButton {
+        width: 157px;
+        height: 157px;
+        margin: -44px 0 -64px -14px;
+      }
+
+      .bottomControlBar {
+        right: 14px;
+        bottom: 14px;
+        gap: 6px;
+        padding: 8px 24px 8px 24px;
+      }
+
+      .bottomControlButton {
+        width: 20px;
+        height: 20px;
+        padding: 2px;
+      }
+
+      #resetCameraButton {
+        width: 25px;
+        height: 25px;
+        padding: 2px;
+      }
+
+      .customGuideIconWrap {
+        width: min(100px, 26vw);
+        height: min(100px, 26vw);
+      }
+
+      .mouseInfoMini {
+        right: 14px;
+        bottom: 84px;
+        width: min(230px, 50vw);
       }
     }
 
@@ -196,18 +745,41 @@
     .infoWindow {
       position: relative;
       width: min(920px, 90vw);
-      height: min(520px, 76vh);
+      height: min(560px, 78vh);
       display: grid;
       grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr;
       gap: 20px;
       padding: 24px;
       box-sizing: border-box;
       border-radius: 24px;
-      background: rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(9px);
+      -webkit-backdrop-filter: blur(9px);
       box-shadow: 0 18px 60px rgba(0, 0, 0, 0.22);
       overflow: hidden;
+    }
+
+    .infoHeader {
+      grid-column: 1 / -1;
+      padding: 0 48px 0 4px;
+      color: white;
+      line-height: 1.15;
+      pointer-events: none;
+    }
+
+    .infoTitle {
+      font-size: clamp(20px, 2.6vw, 30px);
+      font-weight: 800;
+      letter-spacing: 0.01em;
+    }
+
+    .infoSubtitle {
+      margin-top: 5px;
+      font-size: clamp(12px, 1.35vw, 16px);
+      font-weight: 300;
+      letter-spacing: 0.025em;
+      opacity: 0.88;
     }
 
     .infoCloseButton {
@@ -241,14 +813,20 @@
       min-width: 0;
       min-height: 0;
       border-radius: 20px;
-      background: rgba(255, 255, 255, 0.22);
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
+    .lottiePanel {
+      order: 1;
+      background: rgba(255, 255, 255, 0.8);
+    }
+
     .sequencePanel {
+      order: 2;
+      background: transparent;
       cursor: grab;
       user-select: none;
       touch-action: none;
@@ -265,6 +843,27 @@
       pointer-events: none;
       user-select: none;
       -webkit-user-drag: none;
+      opacity: 1;
+      transition: opacity 0.75s ease;
+    }
+
+    #sequenceImage.sequenceHidden {
+      opacity: 0;
+    }
+
+    .touchGuide {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: clamp(49px, 7.65vw, 82px);
+      height: auto;
+      transform: translate3d(-50%, -50%, 0);
+      opacity: 0;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.35));
+      will-change: transform, opacity;
     }
 
     #infoLottie {
@@ -272,27 +871,12 @@
       height: 100%;
     }
 
-    .sequenceHint {
-      position: absolute;
-      left: 50%;
-      bottom: 14px;
-      transform: translateX(-50%);
-      color: rgba(0, 0, 0, 0.65);
-      padding: 0;
-      border-radius: 0;
-      font-size: 10px;
-      letter-spacing: 0.02em;
-      pointer-events: none;
-      opacity: 0.9;
-      white-space: nowrap;
-      text-align: center;
-      background: transparent;
-    }
 
     @media (max-width: 800px) {
       .infoWindow {
         grid-template-columns: 1fr;
-        height: min(700px, 84vh);
+        grid-template-rows: auto 1fr 1fr;
+        height: min(740px, 86vh);
         gap: 14px;
         padding: 20px;
       }
@@ -322,13 +906,14 @@
     camera-target="0.41971m 0.32003m -0.01002m"
     field-of-view="15.06401deg"
 
-    min-camera-orbit="auto auto 0.03m"
-    max-camera-orbit="auto auto 20m"
+    min-camera-orbit="-80deg 30deg 0.35m"
+    max-camera-orbit="80deg 88deg 7m"
     min-field-of-view="8deg"
     max-field-of-view="60deg"
 
     interpolation-decay="120"
     animation-crossfade-duration="0"
+    interaction-prompt="none"
   >
 
     <button
@@ -338,7 +923,96 @@
       data-position="-0.54622m 0.26164m -0.74322m"
       data-normal="0.00000m -0.00000m 1.00000m"
     >
+      <div class="hotspotLottie" id="terminateHotspotLottie" aria-hidden="true"></div>
       <div class="HotspotAnnotation" id="hotspotLabel">TERMINATE</div>
+    </button>
+
+    <button
+      id="osEndEndHotspot"
+      class="Hotspot"
+      slot="hotspot-os-end-end"
+      data-position="-0.04363m 0.31524m -0.02159m"
+      data-normal="-1.00000m 0.00000m 0.00000m"
+    >
+      <div class="hotspotLottie" id="osEndEndHotspotLottie" aria-hidden="true"></div>
+      <div class="HotspotAnnotation" id="osEndEndHotspotLabel">OS END END</div>
+    </button>
+
+    <button
+      id="isStartStartHotspot"
+      class="Hotspot"
+      slot="hotspot-is-start-start"
+      data-position="-0.06267m 0.23102m -0.75201m"
+      data-normal="-1.00000m 0.00000m -0.00000m"
+    >
+      <div class="hotspotLottie" id="isStartStartHotspotLottie" aria-hidden="true"></div>
+      <div class="HotspotAnnotation" id="isStartStartHotspotLabel">IS START START</div>
+    </button>
+
+    <button
+      id="boxBaseHotspot"
+      class="Hotspot"
+      slot="hotspot-box-base"
+      data-position="0.10759m -0.19868m 0.01376m"
+      data-normal="0.00000m 0.00000m 1.00000m"
+    >
+      <div class="hotspotLottie" id="boxBaseHotspotLottie" aria-hidden="true"></div>
+      <div class="HotspotAnnotation" id="boxBaseHotspotLabel">BOX BASE</div>
+    </button>
+
+    <button
+      id="osStartStartHotspot"
+      class="Hotspot"
+      slot="hotspot-os-start-start"
+      data-position="0.65771m 0.23408m 0.00990m"
+      data-normal="0.00000m 0.00000m 1.00000m"
+    >
+      <div class="hotspotLottie" id="osStartStartHotspotLottie" aria-hidden="true"></div>
+      <div class="HotspotAnnotation" id="osStartStartHotspotLabel">OS START START</div>
+    </button>
+
+    <button
+      id="isEndStartHotspot"
+      class="Hotspot"
+      slot="hotspot-is-end-start"
+      data-position="0.74125m 0.24143m -0.69707m"
+      data-normal="0.99987m 0.00000m 0.01594m"
+    >
+      <div class="hotspotLottie" id="isEndStartHotspotLottie" aria-hidden="true"></div>
+      <div class="HotspotAnnotation" id="isEndStartHotspotLabel">IS END START</div>
+    </button>
+
+    <button
+      id="isEndEndHotspot"
+      class="Hotspot"
+      slot="hotspot-is-end-end"
+      data-position="1.49419m 0.27900m -0.74731m"
+      data-normal="0.00000m 0.00000m 1.00000m"
+    >
+      <div class="hotspotLottie" id="isEndEndHotspotLottie" aria-hidden="true"></div>
+      <div class="HotspotAnnotation" id="isEndEndHotspotLabel">IS END END</div>
+    </button>
+
+    <button
+      id="osStartEndHotspot"
+      class="Hotspot"
+      slot="hotspot-os-start-end"
+      data-position="1.56942m 0.28096m 0.01820m"
+      data-normal="0.00000m -0.00000m 1.00000m"
+    >
+      <div class="hotspotLottie" id="osStartEndHotspotLottie" aria-hidden="true"></div>
+      <div class="HotspotAnnotation" id="osStartEndHotspotLabel">OS START END</div>
+    </button>
+
+    <button
+      id="starterHotspot"
+      class="Hotspot"
+      slot="hotspot-starter"
+      data-position="2.32584m 0.28700m 0.01355m"
+      data-normal="-0.00000m -0.00000m 1.00000m"
+    >
+      <div class="hotspotLottie" id="starterHotspotLottie" aria-hidden="true"></div>
+      <div class="HotspotAnnotation" id="starterHotspotLabel">STARTER</div>
     </button>
 
     <button
@@ -348,7 +1022,406 @@
       data-position="-0.54020m 0.42399m -0.76583m"
       data-normal="0.00000m 0.00000m 1.00000m"
       aria-label="Info hotspot 1"
-    ></button>
+      data-info-key="twoPieceJChannel"
+    >
+      <div class="infoHotspotLottie" id="infoHotspotLottie1" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="infoHotspot2"
+      class="InfoHotspot hiddenUntilTerminate"
+      slot="hotspot-info-2"
+      data-position="-0.53554m 0.34181m -0.74744m"
+      data-normal="0.00000m -0.00000m 1.00000m"
+      aria-label="Info hotspot 2"
+      data-info-key="zSupport"
+    >
+      <div class="infoHotspotLottie" id="infoHotspotLottie2" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="terminateVideoHotspot"
+      class="InfoHotspot hiddenVideoHotspot hiddenUntilTerminateVideo"
+      slot="hotspot-terminate-video"
+      data-position="-0.54193m 0.45002m -0.76621m"
+      data-normal="-0.00000m -0.00000m 1.00000m"
+      aria-label="TERMINATE installation video"
+      data-video-key="terminate"
+    >
+      <div class="videoHotspotLottie" id="terminateVideoHotspotLottie" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="isStartStartInfoHotspot1"
+      class="InfoHotspot hiddenUntilIsStartStart"
+      slot="hotspot-is-start-start-info-1"
+      data-position="-0.06853m 0.46294m -0.76885m"
+      data-normal="0.00000m -0.00000m 1.00000m"
+      aria-label="IS START START info hotspot 1"
+      data-info-key="zSupport"
+    >
+      <div class="infoHotspotLottie" id="isStartStartInfoHotspotLottie1" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="isStartStartInfoHotspot2"
+      class="InfoHotspot hiddenUntilIsStartStart"
+      slot="hotspot-is-start-start-info-2"
+      data-position="-0.06267m 0.35784m -0.67528m"
+      data-normal="-1.00000m 0.00000m -0.00000m"
+      aria-label="IS START START info hotspot 2"
+      data-info-key="twoPieceJChannel"
+    >
+      <div class="infoHotspotLottie" id="isStartStartInfoHotspotLottie2" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="isStartStartVideoHotspot"
+      class="InfoHotspot hiddenVideoHotspot hiddenUntilIsStartStartVideo"
+      slot="hotspot-is-start-start-video"
+      data-position="-0.06304m 0.48407m -0.57910m"
+      data-normal="-1.00000m 0.00000m -0.00000m"
+      aria-label="IS START START installation video"
+      data-video-key="isStartStart"
+    >
+      <div class="videoHotspotLottie" id="isStartStartVideoHotspotLottie" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="boxBaseInfoHotspot1"
+      class="InfoHotspot hiddenUntilBoxBase"
+      slot="hotspot-box-base-info-1"
+      data-position="0.24268m -0.14079m 0.08531m"
+      data-normal="-0.00000m -0.00000m 1.00000m"
+      aria-label="BOX BASE info hotspot 1"
+      data-info-key="boxBaseInfo1"
+    >
+      <div class="infoHotspotLottie" id="boxBaseInfoHotspotLottie1" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="boxBaseInfoHotspot2"
+      class="InfoHotspot hiddenUntilBoxBase"
+      slot="hotspot-box-base-info-2"
+      data-position="0.43692m -0.21554m 0.08742m"
+      data-normal="0.00000m 0.00000m 1.00000m"
+      aria-label="BOX BASE info hotspot 2"
+      data-info-key="boxBaseInfo2"
+    >
+      <div class="infoHotspotLottie" id="boxBaseInfoHotspotLottie2" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="boxBaseVideoHotspot"
+      class="InfoHotspot hiddenVideoHotspot hiddenUntilBoxBaseVideo"
+      slot="hotspot-box-base-video"
+      data-position="0.22355m -0.08214m 0.00991m"
+      data-normal="0.00000m 0.00000m 1.00000m"
+      aria-label="BOX BASE installation video"
+      data-video-key="boxBase"
+    >
+      <div class="videoHotspotLottie" id="boxBaseVideoHotspotLottie" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="osStartStartInfoHotspot5"
+      class="InfoHotspot hiddenUntilOsStartStart"
+      slot="hotspot-os-start-start-info-5"
+      data-position="0.65333m 0.35475m -0.00865m"
+      data-normal="-0.08713m 0.00000m 0.99620m"
+      aria-label="OS START START info hotspot 5"
+      data-info-key="osStartStartInfo5"
+    >
+      <div class="infoHotspotLottie" id="osStartStartInfoHotspotLottie5" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="osStartStartInfoHotspot6"
+      class="InfoHotspot hiddenUntilOsStartStart"
+      slot="hotspot-os-start-start-info-6"
+      data-position="0.72176m 0.42157m -0.06136m"
+      data-normal="1.00000m 0.00000m 0.00000m"
+      aria-label="OS START START info hotspot 6"
+      data-info-key="osStartStartInfo6"
+    >
+      <div class="infoHotspotLottie" id="osStartStartInfoHotspotLottie6" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="osStartStartVideoHotspot"
+      class="InfoHotspot hiddenVideoHotspot hiddenUntilOsStartStartVideo"
+      slot="hotspot-os-start-start-video"
+      data-position="0.73930m 0.29624m -0.18317m"
+      data-normal="1.00000m 0.00000m 0.00000m"
+      aria-label="OS START START installation video"
+      data-video-key="osStartStart"
+    >
+      <div class="videoHotspotLottie" id="osStartStartVideoHotspotLottie" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="isEndStartInfoHotspot1"
+      class="InfoHotspot hiddenUntilIsEndStart"
+      slot="hotspot-is-end-start-info-1"
+      data-position="0.74044m 0.36001m -0.74403m"
+      data-normal="1.00000m 0.00000m -0.00000m"
+      aria-label="IS END START info hotspot 1"
+      data-info-key="isEndStartInfo1"
+    >
+      <div class="infoHotspotLottie" id="isEndStartInfoHotspotLottie1" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="isEndStartInfoHotspot2"
+      class="InfoHotspot hiddenUntilIsEndStart"
+      slot="hotspot-is-end-start-info-2"
+      data-position="0.72166m 0.43651m -0.75583m"
+      data-normal="1.00000m 0.00000m -0.00000m"
+      aria-label="IS END START info hotspot 2"
+      data-info-key="isEndStartInfo2"
+    >
+      <div class="infoHotspotLottie" id="isEndStartInfoHotspotLottie2" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="isEndStartInfoHotspot3"
+      class="InfoHotspot hiddenUntilIsEndStart"
+      slot="hotspot-is-end-start-info-3"
+      data-position="0.78967m 0.41631m -0.77035m"
+      data-normal="0.00000m -0.00000m 1.00000m"
+      aria-label="IS END START info hotspot 3"
+      data-info-key="isEndStartInfo3"
+    >
+      <div class="infoHotspotLottie" id="isEndStartInfoHotspotLottie3" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="isEndStartVideoHotspot"
+      class="InfoHotspot hiddenVideoHotspot hiddenUntilIsEndStartVideo"
+      slot="hotspot-is-end-start-video"
+      data-position="0.90408m 0.29307m -0.75266m"
+      data-normal="0.00000m -0.00000m 1.00000m"
+      aria-label="IS END START installation video"
+      data-video-key="isEndStart"
+    >
+      <div class="videoHotspotLottie" id="isEndStartVideoHotspotLottie" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="isEndEndInfoHotspot1"
+      class="InfoHotspot hiddenUntilIsEndEnd"
+      slot="hotspot-is-end-end-info-1"
+      data-position="1.47207m 0.36085m -0.75164m"
+      data-normal="0.00000m 0.00000m 1.00000m"
+      aria-label="IS END END info hotspot 1"
+      data-info-key="isEndEndInfo1"
+    >
+      <div class="infoHotspotLottie" id="isEndEndInfoHotspotLottie1" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="isEndEndInfoHotspot2"
+      class="InfoHotspot hiddenUntilIsEndEnd"
+      slot="hotspot-is-end-end-info-2"
+      data-position="1.47385m 0.43668m -0.77106m"
+      data-normal="0.00000m 0.00000m 1.00000m"
+      aria-label="IS END END info hotspot 2"
+      data-info-key="isEndEndInfo2"
+    >
+      <div class="infoHotspotLottie" id="isEndEndInfoHotspotLottie2" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="isEndEndInfoHotspot3"
+      class="InfoHotspot hiddenUntilIsEndEnd"
+      slot="hotspot-is-end-end-info-3"
+      data-position="1.53566m 0.48328m -0.77225m"
+      data-normal="0.00000m -0.00000m 1.00000m"
+      aria-label="IS END END info hotspot 3"
+      data-info-key="isEndEndInfo3"
+    >
+      <div class="infoHotspotLottie" id="isEndEndInfoHotspotLottie3" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="isEndEndInfoHotspot4"
+      class="InfoHotspot hiddenUntilIsEndEnd"
+      slot="hotspot-is-end-end-info-4"
+      data-position="1.55475m 0.41119m -0.73502m"
+      data-normal="-1.00000m -0.00000m -0.00000m"
+      aria-label="IS END END info hotspot 4"
+      data-info-key="isEndEndInfo4"
+    >
+      <div class="infoHotspotLottie" id="isEndEndInfoHotspotLottie4" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="isEndEndInfoHotspot5"
+      class="InfoHotspot hiddenUntilIsEndEnd"
+      slot="hotspot-is-end-end-info-5"
+      data-position="1.53532m 0.35228m -0.74046m"
+      data-normal="-1.00000m -0.00000m -0.00000m"
+      aria-label="IS END END info hotspot 5"
+      data-info-key="isEndEndInfo5"
+    >
+      <div class="infoHotspotLottie" id="isEndEndInfoHotspotLottie5" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="isEndEndVideoHotspot"
+      class="InfoHotspot hiddenVideoHotspot hiddenUntilIsEndEndVideo"
+      slot="hotspot-is-end-end-video"
+      data-position="1.53625m 0.26167m -0.59139m"
+      data-normal="-0.99987m 0.00000m 0.01594m"
+      aria-label="IS END END installation video"
+      data-video-key="isEndEnd"
+    >
+      <div class="videoHotspotLottie" id="isEndEndVideoHotspotLottie" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="osStartEndInfoHotspot1"
+      class="InfoHotspot hiddenUntilOsStartEnd"
+      slot="hotspot-os-start-end-info-1"
+      data-position="1.55418m 0.51697m -0.04972m"
+      data-normal="-1.00000m 0.00000m 0.00000m"
+      aria-label="OS START END info hotspot 1"
+      data-info-key="osStartEndInfo1"
+    >
+      <div class="infoHotspotLottie" id="osStartEndInfoHotspotLottie1" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="osStartEndInfoHotspot2"
+      class="InfoHotspot hiddenUntilOsStartEnd"
+      slot="hotspot-os-start-end-info-2"
+      data-position="1.59874m 0.41983m -0.00543m"
+      data-normal="-0.00000m -0.00000m 1.00000m"
+      aria-label="OS START END info hotspot 2"
+      data-info-key="osStartEndInfo2"
+    >
+      <div class="infoHotspotLottie" id="osStartEndInfoHotspotLottie2" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="osStartEndVideoHotspot"
+      class="InfoHotspot hiddenVideoHotspot hiddenUntilOsStartEndVideo"
+      slot="hotspot-os-start-end-video"
+      data-position="1.53656m 0.30666m -0.14804m"
+      data-normal="-1.00000m 0.00000m 0.00000m"
+      aria-label="OS START END installation video"
+      data-video-key="osStartEnd"
+    >
+      <div class="videoHotspotLottie" id="osStartEndVideoHotspotLottie" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="starterInfoHotspot6"
+      class="InfoHotspot hiddenUntilStarter"
+      slot="hotspot-starter-info-6"
+      data-position="2.26642m 0.34946m -0.00600m"
+      data-normal="-0.08591m -0.00000m 0.99630m"
+      aria-label="STARTER info hotspot 6"
+      data-info-key="starterInfo6"
+    >
+      <div class="infoHotspotLottie" id="starterInfoHotspotLottie6" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="starterInfoHotspot7"
+      class="InfoHotspot hiddenUntilStarter"
+      slot="hotspot-starter-info-7"
+      data-position="2.32267m 0.43942m -0.00955m"
+      data-normal="0.00000m 0.00000m 1.00000m"
+      aria-label="STARTER info hotspot 7"
+      data-info-key="starterInfo7"
+    >
+      <div class="infoHotspotLottie" id="starterInfoHotspotLottie7" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="starterVideoHotspot"
+      class="InfoHotspot hiddenVideoHotspot hiddenUntilStarterVideo"
+      slot="hotspot-starter-video"
+      data-position="2.17255m 0.28896m 0.01279m"
+      data-normal="0.00000m 0.00000m 1.00000m"
+      aria-label="STARTER installation video"
+      data-video-key="starter"
+    >
+      <div class="videoHotspotLottie" id="starterVideoHotspotLottie" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="osEndEndInfoHotspot1"
+      class="InfoHotspot hiddenUntilOsEndEnd"
+      slot="hotspot-os-end-end-info-1"
+      data-position="-0.06370m 0.34224m -0.05550m"
+      data-normal="-1.00000m 0.00000m -0.00000m"
+      aria-label="OS END END info hotspot 1"
+      data-info-key="zSupport"
+    >
+      <div class="infoHotspotLottie" id="osEndEndInfoHotspotLottie1" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="osEndEndInfoHotspot2"
+      class="InfoHotspot hiddenUntilOsEndEnd"
+      slot="hotspot-os-end-end-info-2"
+      data-position="-0.04428m 0.43156m -0.06313m"
+      data-normal="-1.00000m 0.00000m 0.00000m"
+      aria-label="OS END END info hotspot 2"
+      data-info-key="twoPieceJChannel"
+    >
+      <div class="infoHotspotLottie" id="osEndEndInfoHotspotLottie2" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="osEndEndInfoHotspot3"
+      class="InfoHotspot hiddenUntilOsEndEnd"
+      slot="hotspot-os-end-end-info-3"
+      data-position="-0.04045m 0.48493m -0.00958m"
+      data-normal="0.00000m 0.00000m 1.00000m"
+      aria-label="OS END END info hotspot 3"
+      data-info-key="osEndEndInfo3"
+    >
+      <div class="infoHotspotLottie" id="osEndEndInfoHotspotLottie3" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="osEndEndInfoHotspot4"
+      class="InfoHotspot hiddenUntilOsEndEnd"
+      slot="hotspot-os-end-end-info-4"
+      data-position="-0.01580m 0.39713m -0.00767m"
+      data-normal="-0.00000m -0.00000m 1.00000m"
+      aria-label="OS END END info hotspot 4"
+      data-info-key="twoPieceJChannel"
+    >
+      <div class="infoHotspotLottie" id="osEndEndInfoHotspotLottie4" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="osEndEndInfoHotspot5"
+      class="InfoHotspot hiddenUntilOsEndEnd"
+      slot="hotspot-os-end-end-info-5"
+      data-position="-0.03036m 0.34182m 0.01110m"
+      data-normal="0.00000m -0.00000m 1.00000m"
+      aria-label="OS END END info hotspot 5"
+      data-info-key="zSupport"
+    >
+      <div class="infoHotspotLottie" id="osEndEndInfoHotspotLottie5" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="osEndEndVideoHotspot"
+      class="InfoHotspot hiddenVideoHotspot hiddenUntilOsEndEndVideo"
+      slot="hotspot-os-end-end-video"
+      data-position="-0.04363m 0.50002m -0.04697m"
+      data-normal="-1.00000m 0.00000m 0.00000m"
+      aria-label="OS END END installation video"
+      data-video-key="osEndEnd"
+    >
+      <div class="videoHotspotLottie" id="osEndEndVideoHotspotLottie" aria-hidden="true"></div>
+    </button>
 
     <div class="progress-bar hide" slot="progress-bar">
       <div class="update-bar"></div>
@@ -356,9 +1429,57 @@
 
   </model-viewer>
 
+  <div class="howToOverlay" id="howToOverlay" aria-hidden="true">
+    <div class="customGuideIconWrap" aria-hidden="true">
+      <img class="customGuideIcon" id="customGuideIcon" src="mouse right.png" alt="" draggable="false" />
+    </div>
+
+    <div class="mouseInfoMini" id="mouseInfoMini" aria-hidden="true">
+      <button class="mouseInfoCloseButton" id="howToCloseButton" aria-label="Close how-to guide">×</button>
+      <img src="mouse info.png" alt="Mouse controls" draggable="false" />
+    </div>
+  </div>
+
+  <div class="hotspotSummaryWindow" id="hotspotSummaryWindow" aria-hidden="true">
+    <button class="hotspotSummaryCloseButton" id="hotspotSummaryCloseButton" aria-label="Close hotspot information">×</button>
+    <div class="hotspotSummaryTitle" id="hotspotSummaryTitle"></div>
+    <div class="hotspotSummaryBody" id="hotspotSummaryBody"></div>
+    <button class="hotspotSummaryVideoButton" id="hotspotSummaryVideoButton" aria-label="Open installation video">
+      <div class="hotspotSummaryVideoLottie" id="hotspotSummaryVideoLottie" aria-hidden="true"></div>
+    </button>
+  </div>
+
+  <div class="bottomControlBar" id="bottomControlBar" aria-label="Viewer controls">
+    <button class="bottomControlButton" id="zoomOutButton" aria-label="Zoom out">
+      <img src="zoom out.png" alt="" draggable="false" />
+      <span class="bottomControlTooltip">Zoom out</span>
+    </button>
+    <button class="bottomControlButton" id="zoomInButton" aria-label="Zoom in">
+      <img src="zoom in.png" alt="" draggable="false" />
+      <span class="bottomControlTooltip">Zoom in</span>
+    </button>
+    <button class="bottomControlButton" id="resetCameraButton" aria-label="Reset camera">
+      <img src="reset camera.png" alt="" draggable="false" />
+      <span class="bottomControlTooltip">Reset camera</span>
+    </button>
+    <button class="bottomControlButton" id="howToButton" aria-label="How to use">
+      <img src="01 HOW TO.png" alt="" draggable="false" />
+      <span class="bottomControlTooltip">How to use</span>
+    </button>
+    <button class="bottomControlButton" id="fullscreenButton" aria-label="Enter fullscreen">
+      <img id="fullscreenButtonIcon" src="ENTER FULLSCREEN.png" alt="" draggable="false" />
+      <span class="bottomControlTooltip" id="fullscreenTooltip">Fullscreen</span>
+    </button>
+  </div>
+
   <div class="infoOverlay" id="infoOverlay" aria-hidden="true">
     <div class="infoWindow" role="dialog" aria-modal="true" aria-label="Trim information window">
       <button class="infoCloseButton" id="infoCloseButton" aria-label="Close info window">×</button>
+
+      <div class="infoHeader">
+        <div class="infoTitle" id="infoTitle">Two Piece J Channel</div>
+        <div class="infoSubtitle" id="infoSubtitle">10’: #800052 | #810052 (WCNS)</div>
+      </div>
 
       <div class="sequencePanel" id="sequencePanel">
         <img
@@ -367,7 +1488,14 @@
           alt="2 piece J trim rotating view"
           draggable="false"
         />
-        <div class="sequenceHint">Drag left or right to rotate</div>
+        <img
+          id="touchGuide"
+          class="touchGuide"
+          src="touch.png"
+          alt=""
+          aria-hidden="true"
+          draggable="false"
+        />
       </div>
 
       <div class="lottiePanel">
@@ -376,11 +1504,173 @@
     </div>
   </div>
 
+  <div class="videoOverlay" id="videoOverlay" aria-hidden="true">
+    <div class="videoWindow" role="dialog" aria-modal="true" aria-label="Installation video window">
+      <button class="infoCloseButton" id="videoCloseButton" aria-label="Close video window">×</button>
+
+      <div class="infoHeader">
+        <div class="infoTitle" id="videoTitle">OS END END</div>
+        <div class="infoSubtitle" id="videoSubtitle">RANDOM PLANK INSTALLATION</div>
+      </div>
+
+      <div class="videoFrameWrap">
+        <iframe
+          id="youtubeFrame"
+          title="Random plank installation video"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        ></iframe>
+      </div>
+
+    </div>
+  </div>
+
   <script>
     const modelViewer = document.querySelector("#viewer");
+    const bottomControlBar = document.querySelector("#bottomControlBar");
+    const hotspotSummaryWindow = document.querySelector("#hotspotSummaryWindow");
+    const hotspotSummaryCloseButton = document.querySelector("#hotspotSummaryCloseButton");
+    const hotspotSummaryTitle = document.querySelector("#hotspotSummaryTitle");
+    const hotspotSummaryBody = document.querySelector("#hotspotSummaryBody");
+    const hotspotSummaryVideoButton = document.querySelector("#hotspotSummaryVideoButton");
+    const hotspotSummaryVideoLottie = document.querySelector("#hotspotSummaryVideoLottie");
+    const howToOverlay = document.querySelector("#howToOverlay");
+    const howToButton = document.querySelector("#howToButton");
+    const howToCloseButton = document.querySelector("#howToCloseButton");
+    const customGuideIcon = document.querySelector("#customGuideIcon");
+    const mouseInfoMini = document.querySelector("#mouseInfoMini");
+    const zoomInButton = document.querySelector("#zoomInButton");
+    const zoomOutButton = document.querySelector("#zoomOutButton");
+    const resetCameraButton = document.querySelector("#resetCameraButton");
+    const fullscreenButton = document.querySelector("#fullscreenButton");
+    const fullscreenButtonIcon = document.querySelector("#fullscreenButtonIcon");
     const terminateHotspot = document.querySelector("#terminateHotspot");
+    const terminateHotspotLottie = document.querySelector("#terminateHotspotLottie");
     const hotspotLabel = document.querySelector("#hotspotLabel");
+    const terminateVideoHotspot = document.querySelector("#terminateVideoHotspot");
+    const terminateVideoHotspotLottie = document.querySelector("#terminateVideoHotspotLottie");
+    const osEndEndHotspot = document.querySelector("#osEndEndHotspot");
+    const osEndEndHotspotLottie = document.querySelector("#osEndEndHotspotLottie");
+    const osEndEndHotspotLabel = document.querySelector("#osEndEndHotspotLabel");
+    const osEndEndVideoHotspot = document.querySelector("#osEndEndVideoHotspot");
+    const osEndEndVideoHotspotLottie = document.querySelector("#osEndEndVideoHotspotLottie");
+    const isStartStartHotspot = document.querySelector("#isStartStartHotspot");
+    const isStartStartHotspotLottie = document.querySelector("#isStartStartHotspotLottie");
+    const isStartStartHotspotLabel = document.querySelector("#isStartStartHotspotLabel");
+    const isStartStartVideoHotspot = document.querySelector("#isStartStartVideoHotspot");
+    const isStartStartVideoHotspotLottie = document.querySelector("#isStartStartVideoHotspotLottie");
+    const boxBaseHotspot = document.querySelector("#boxBaseHotspot");
+    const boxBaseHotspotLottie = document.querySelector("#boxBaseHotspotLottie");
+    const boxBaseHotspotLabel = document.querySelector("#boxBaseHotspotLabel");
+    const boxBaseVideoHotspot = document.querySelector("#boxBaseVideoHotspot");
+    const boxBaseVideoHotspotLottie = document.querySelector("#boxBaseVideoHotspotLottie");
+    const osStartStartHotspot = document.querySelector("#osStartStartHotspot");
+    const osStartStartHotspotLottie = document.querySelector("#osStartStartHotspotLottie");
+    const osStartStartHotspotLabel = document.querySelector("#osStartStartHotspotLabel");
+    const osStartStartVideoHotspot = document.querySelector("#osStartStartVideoHotspot");
+    const osStartStartVideoHotspotLottie = document.querySelector("#osStartStartVideoHotspotLottie");
+    const isEndStartHotspot = document.querySelector("#isEndStartHotspot");
+    const isEndStartHotspotLottie = document.querySelector("#isEndStartHotspotLottie");
+    const isEndStartHotspotLabel = document.querySelector("#isEndStartHotspotLabel");
+    const isEndStartVideoHotspot = document.querySelector("#isEndStartVideoHotspot");
+    const isEndStartVideoHotspotLottie = document.querySelector("#isEndStartVideoHotspotLottie");
+    const isEndEndHotspot = document.querySelector("#isEndEndHotspot");
+    const isEndEndHotspotLottie = document.querySelector("#isEndEndHotspotLottie");
+    const isEndEndHotspotLabel = document.querySelector("#isEndEndHotspotLabel");
+    const isEndEndVideoHotspot = document.querySelector("#isEndEndVideoHotspot");
+    const isEndEndVideoHotspotLottie = document.querySelector("#isEndEndVideoHotspotLottie");
+    const osStartEndHotspot = document.querySelector("#osStartEndHotspot");
+    const osStartEndHotspotLottie = document.querySelector("#osStartEndHotspotLottie");
+    const osStartEndHotspotLabel = document.querySelector("#osStartEndHotspotLabel");
+    const osStartEndVideoHotspot = document.querySelector("#osStartEndVideoHotspot");
+    const osStartEndVideoHotspotLottie = document.querySelector("#osStartEndVideoHotspotLottie");
+    const starterHotspot = document.querySelector("#starterHotspot");
+    const starterHotspotLottie = document.querySelector("#starterHotspotLottie");
+    const starterHotspotLabel = document.querySelector("#starterHotspotLabel");
+    const starterVideoHotspot = document.querySelector("#starterVideoHotspot");
+    const starterVideoHotspotLottie = document.querySelector("#starterVideoHotspotLottie");
     const infoHotspot1 = document.querySelector("#infoHotspot1");
+    const infoHotspot2 = document.querySelector("#infoHotspot2");
+    const infoHotspotLottie1 = document.querySelector("#infoHotspotLottie1");
+    const infoHotspotLottie2 = document.querySelector("#infoHotspotLottie2");
+    const osEndEndInfoHotspots = [
+      document.querySelector("#osEndEndInfoHotspot1"),
+      document.querySelector("#osEndEndInfoHotspot2"),
+      document.querySelector("#osEndEndInfoHotspot3"),
+      document.querySelector("#osEndEndInfoHotspot4"),
+      document.querySelector("#osEndEndInfoHotspot5")
+    ];
+    const osEndEndInfoHotspotLotties = [
+      document.querySelector("#osEndEndInfoHotspotLottie1"),
+      document.querySelector("#osEndEndInfoHotspotLottie2"),
+      document.querySelector("#osEndEndInfoHotspotLottie3"),
+      document.querySelector("#osEndEndInfoHotspotLottie4"),
+      document.querySelector("#osEndEndInfoHotspotLottie5")
+    ];
+    const isStartStartInfoHotspots = [
+      document.querySelector("#isStartStartInfoHotspot1"),
+      document.querySelector("#isStartStartInfoHotspot2")
+    ];
+    const isStartStartInfoHotspotLotties = [
+      document.querySelector("#isStartStartInfoHotspotLottie1"),
+      document.querySelector("#isStartStartInfoHotspotLottie2")
+    ];
+    const boxBaseInfoHotspots = [
+      document.querySelector("#boxBaseInfoHotspot1"),
+      document.querySelector("#boxBaseInfoHotspot2")
+    ];
+    const boxBaseInfoHotspotLotties = [
+      document.querySelector("#boxBaseInfoHotspotLottie1"),
+      document.querySelector("#boxBaseInfoHotspotLottie2")
+    ];
+    const osStartStartInfoHotspots = [
+      document.querySelector("#osStartStartInfoHotspot5"),
+      document.querySelector("#osStartStartInfoHotspot6")
+    ];
+    const osStartStartInfoHotspotLotties = [
+      document.querySelector("#osStartStartInfoHotspotLottie5"),
+      document.querySelector("#osStartStartInfoHotspotLottie6")
+    ];
+    const isEndStartInfoHotspots = [
+      document.querySelector("#isEndStartInfoHotspot1"),
+      document.querySelector("#isEndStartInfoHotspot2"),
+      document.querySelector("#isEndStartInfoHotspot3")
+    ];
+    const isEndStartInfoHotspotLotties = [
+      document.querySelector("#isEndStartInfoHotspotLottie1"),
+      document.querySelector("#isEndStartInfoHotspotLottie2"),
+      document.querySelector("#isEndStartInfoHotspotLottie3")
+    ];
+    const isEndEndInfoHotspots = [
+      document.querySelector("#isEndEndInfoHotspot1"),
+      document.querySelector("#isEndEndInfoHotspot2"),
+      document.querySelector("#isEndEndInfoHotspot3"),
+      document.querySelector("#isEndEndInfoHotspot4"),
+      document.querySelector("#isEndEndInfoHotspot5")
+    ];
+    const isEndEndInfoHotspotLotties = [
+      document.querySelector("#isEndEndInfoHotspotLottie1"),
+      document.querySelector("#isEndEndInfoHotspotLottie2"),
+      document.querySelector("#isEndEndInfoHotspotLottie3"),
+      document.querySelector("#isEndEndInfoHotspotLottie4"),
+      document.querySelector("#isEndEndInfoHotspotLottie5")
+    ];
+    const osStartEndInfoHotspots = [
+      document.querySelector("#osStartEndInfoHotspot1"),
+      document.querySelector("#osStartEndInfoHotspot2")
+    ];
+    const osStartEndInfoHotspotLotties = [
+      document.querySelector("#osStartEndInfoHotspotLottie1"),
+      document.querySelector("#osStartEndInfoHotspotLottie2")
+    ];
+    const starterInfoHotspots = [
+      document.querySelector("#starterInfoHotspot6"),
+      document.querySelector("#starterInfoHotspot7")
+    ];
+    const starterInfoHotspotLotties = [
+      document.querySelector("#starterInfoHotspotLottie6"),
+      document.querySelector("#starterInfoHotspotLottie7")
+    ];
     const progressBar = document.querySelector(".progress-bar");
     const updateBar = document.querySelector(".update-bar");
 
@@ -388,9 +1678,25 @@
     const infoCloseButton = document.querySelector("#infoCloseButton");
     const sequencePanel = document.querySelector("#sequencePanel");
     const sequenceImage = document.querySelector("#sequenceImage");
+    const touchGuide = document.querySelector("#touchGuide");
     const infoLottieContainer = document.querySelector("#infoLottie");
+    const infoTitle = document.querySelector("#infoTitle");
+    const infoSubtitle = document.querySelector("#infoSubtitle");
+    const videoOverlay = document.querySelector("#videoOverlay");
+    const videoCloseButton = document.querySelector("#videoCloseButton");
+    const videoTitle = document.querySelector("#videoTitle");
+    const videoSubtitle = document.querySelector("#videoSubtitle");
+    const youtubeFrame = document.querySelector("#youtubeFrame");
 
-    const ANIMATION_NAME = "TERMINATE";
+    const TERMINATE_ANIMATION_NAME = "TERMINATE";
+    const OS_END_END_ANIMATION_NAME = "OS END END";
+    const IS_START_START_ANIMATION_NAME = "IS START START";
+    const BOX_BASE_ANIMATION_NAME = "BOX BASE";
+    const OS_START_START_ANIMATION_NAME = "OS START START";
+    const IS_END_START_ANIMATION_NAME = "IS END START";
+    const IS_END_END_ANIMATION_NAME = "IS END END";
+    const OS_START_END_ANIMATION_NAME = "OS START END";
+    const STARTER_ANIMATION_NAME = "STARTER";
 
     const DEFAULT_CAMERA_VIEW = {
       orbit: "-35.62141deg 60.17364deg 6.30660m",
@@ -404,32 +1710,403 @@
       fov: "10.32461deg"
     };
 
+    const OS_END_END_CAMERA_VIEW = {
+      animationName: "OS END END",
+      orbit: "-50.79554deg 76.36363deg 1.67294m",
+      target: "-0.04396m 0.44696m -0.00358m",
+      fov: "10.32461deg"
+    };
+
+    const IS_START_START_CAMERA_VIEW = {
+      animationName: "IS START START",
+      orbit: "-47.04542deg 68.18181deg 2.44476m",
+      target: "-0.06611m 0.36209m -0.76885m",
+      fov: "10.32461deg"
+    };
+
+    const BOX_BASE_CAMERA_VIEW = {
+      animationName: "BOX BASE",
+      orbit: "-32.04543deg 70.56820deg 1.92808m",
+      target: "0.27413m -0.10584m 0.08531m",
+      fov: "10.32461deg"
+    };
+
+    const OS_START_START_CAMERA_VIEW = {
+      animationName: "OS START START",
+      orbit: "46.36362deg 64.09090deg 2.07703m",
+      target: "0.71913m 0.38975m -0.03458m",
+      fov: "10.32461deg"
+    };
+
+    const IS_END_START_CAMERA_VIEW = {
+      animationName: "IS END START",
+      orbit: "41.59096deg 71.25001deg 1.96405m",
+      target: "0.74044m 0.33115m -0.76875m",
+      fov: "10.32461deg"
+    };
+
+    const IS_END_END_CAMERA_VIEW = {
+      animationName: "IS END END",
+      orbit: "-44.31816deg 72.27274deg 2.48345m",
+      target: "1.53482m 0.35646m -0.76680m",
+      fov: "10.32461deg"
+    };
+
+    const OS_START_END_CAMERA_VIEW = {
+      animationName: "OS START END",
+      orbit: "-55.27202deg 58.63636deg 2.00778m",
+      target: "1.55586m 0.42333m -0.00139m",
+      fov: "10.32461deg"
+    };
+
+    const STARTER_CAMERA_VIEW = {
+      animationName: "STARTER",
+      orbit: "-14.36293deg 58.63636deg 1.88262m",
+      target: "2.18034m 0.32411m -0.02644m",
+      fov: "9.65875deg"
+    };
+
     const END_PADDING = 0.04;
     const REVERSE_SPEED = 1.0;
 
     let duration = 0;
     let safeEndTime = 0;
     let isOpen = false;
+    let osEndEndDuration = 0;
+    let osEndEndSafeEndTime = 0;
+    let isOsEndEndOpen = false;
+    let isStartStartDuration = 0;
+    let isStartStartSafeEndTime = 0;
+    let isIsStartStartOpen = false;
+    let boxBaseDuration = 0;
+    let boxBaseSafeEndTime = 0;
+    let isBoxBaseOpen = false;
+    let osStartStartDuration = 0;
+    let osStartStartSafeEndTime = 0;
+    let isOsStartStartOpen = false;
+    let isEndStartDuration = 0;
+    let isEndStartSafeEndTime = 0;
+    let isIsEndStartOpen = false;
+    let isEndEndDuration = 0;
+    let isEndEndSafeEndTime = 0;
+    let isIsEndEndOpen = false;
+    let osStartEndDuration = 0;
+    let osStartEndSafeEndTime = 0;
+    let isOsStartEndOpen = false;
+    let starterDuration = 0;
+    let starterSafeEndTime = 0;
+    let isStarterOpen = false;
+    let activeMainHotspot = null;
     let isPlaying = false;
     let forwardFrameId = null;
     let reverseFrameId = null;
     let lastReverseTimestamp = null;
 
-    const SEQUENCE_FOLDER = "sequences/2pc_J-trim/";
-    const SEQUENCE_PREFIX = "2pc_Jtrim";
     const SEQUENCE_EXTENSION = ".png";
     const SEQUENCE_FIRST_FRAME = 0;
     const SEQUENCE_LAST_FRAME = 100;
 
-    const INFO_LOTTIE_PATH = "lottie/2pc_J-trim-drawing.json";
+    const INFO_CONTENT = {
+      twoPieceJChannel: {
+        title: "Two Piece J Channel",
+        subtitle: "10’: #800052 | #810052 (WCNS)",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      },
+      zSupport: {
+        title: "Z-Support",
+        subtitle: "10’: #800066 | #810066 (WCNS)",
+        sequenceFolder: "sequences/Z_support/",
+        sequencePrefix: "Z_support",
+        drawingLottiePath: "lottie/Z_support.json"
+      },
+      osEndEndInfo3: {
+        title: "OS END END",
+        subtitle: "Info hotspot 3",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      },
+      boxBaseInfo1: {
+        title: "BOX BASE",
+        subtitle: "Info hotspot 1",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      },
+      boxBaseInfo2: {
+        title: "BOX BASE",
+        subtitle: "Info hotspot 2",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      },
+      osStartStartInfo5: {
+        title: "OS START START",
+        subtitle: "Info hotspot 5",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      },
+      osStartStartInfo6: {
+        title: "OS START START",
+        subtitle: "Info hotspot 6",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      },
+      isEndStartInfo1: {
+        title: "IS END START",
+        subtitle: "Info hotspot 1",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      },
+      isEndStartInfo2: {
+        title: "IS END START",
+        subtitle: "Info hotspot 2",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      },
+      isEndStartInfo3: {
+        title: "IS END START",
+        subtitle: "Info hotspot 3",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      },
+      isEndEndInfo1: {
+        title: "IS END END",
+        subtitle: "Info hotspot 1",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      },
+      isEndEndInfo2: {
+        title: "IS END END",
+        subtitle: "Info hotspot 2",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      },
+      isEndEndInfo3: {
+        title: "IS END END",
+        subtitle: "Info hotspot 3",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      },
+      isEndEndInfo4: {
+        title: "IS END END",
+        subtitle: "Info hotspot 4",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      },
+      isEndEndInfo5: {
+        title: "IS END END",
+        subtitle: "Info hotspot 5",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      },
+      osStartEndInfo1: {
+        title: "OS START END",
+        subtitle: "Info hotspot 1",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      },
+      osStartEndInfo2: {
+        title: "OS START END",
+        subtitle: "Info hotspot 2",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      },
+      starterInfo6: {
+        title: "STARTER",
+        subtitle: "Info hotspot 6",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      },
+      starterInfo7: {
+        title: "STARTER",
+        subtitle: "Info hotspot 7",
+        sequenceFolder: "sequences/2pc_J-trim/",
+        sequencePrefix: "2pc_Jtrim",
+        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+      }
+
+    };
+
+    let activeInfoKey = "twoPieceJChannel";
+    let activeInfoContent = INFO_CONTENT[activeInfoKey];
+
+    const TERMINATE_HOTSPOT_LOTTIE_PATH = "lottie/play.json";
+    const INFO_HOTSPOT_LOTTIE_PATH = "lottie/info.json";
+    const VIDEO_HOTSPOT_LOTTIE_PATH = "lottie/video.json";
+
+    const VIDEO_CONTENT = {
+      terminate: {
+        title: "TERMINATE",
+        subtitle: "RANDOM PLANK INSTALLATION",
+        youtubeWatchUrl: "https://www.youtube.com/watch?v=buwJ3zKkNAY&t=64s",
+        youtubeEmbedUrl: "https://www.youtube.com/embed/buwJ3zKkNAY?start=64&autoplay=1&mute=1&playsinline=1&rel=0&iv_load_policy=3&modestbranding=1&fs=1&controls=1"
+      },
+      osEndEnd: {
+        title: "OS END END",
+        subtitle: "RANDOM PLANK INSTALLATION",
+        youtubeWatchUrl: "https://www.youtube.com/watch?v=buwJ3zKkNAY&t=64s",
+        youtubeEmbedUrl: "https://www.youtube.com/embed/buwJ3zKkNAY?start=64&autoplay=1&mute=1&playsinline=1&rel=0&iv_load_policy=3&modestbranding=1&fs=1&controls=1"
+      },
+      isStartStart: {
+        title: "IS START START",
+        subtitle: "RANDOM PLANK INSTALLATION",
+        youtubeWatchUrl: "https://www.youtube.com/watch?v=buwJ3zKkNAY&t=326s",
+        youtubeEmbedUrl: "https://www.youtube.com/embed/buwJ3zKkNAY?start=326&autoplay=1&mute=1&playsinline=1&rel=0&iv_load_policy=3&modestbranding=1&fs=1&controls=1"
+      },
+      boxBase: {
+        title: "BOX BASE",
+        subtitle: "RANDOM PLANK INSTALLATION",
+        youtubeWatchUrl: "https://www.youtube.com/watch?v=buwJ3zKkNAY&t=24s",
+        youtubeEmbedUrl: "https://www.youtube.com/embed/buwJ3zKkNAY?start=24&autoplay=1&mute=1&playsinline=1&rel=0&iv_load_policy=3&modestbranding=1&fs=1&controls=1"
+      },
+      osStartStart: {
+        title: "OS START START",
+        subtitle: "RANDOM PLANK INSTALLATION",
+        youtubeWatchUrl: "https://www.youtube.com/watch?v=buwJ3zKkNAY&t=235s",
+        youtubeEmbedUrl: "https://www.youtube.com/embed/buwJ3zKkNAY?start=235&autoplay=1&mute=1&playsinline=1&rel=0&iv_load_policy=3&modestbranding=1&fs=1&controls=1"
+      },
+      isEndStart: {
+        title: "IS END START",
+        subtitle: "RANDOM PLANK INSTALLATION",
+        youtubeWatchUrl: "https://www.youtube.com/watch?v=buwJ3zKkNAY&t=138s",
+        youtubeEmbedUrl: "https://www.youtube.com/embed/buwJ3zKkNAY?start=138&autoplay=1&mute=1&playsinline=1&rel=0&iv_load_policy=3&modestbranding=1&fs=1&controls=1"
+      },
+      isEndEnd: {
+        title: "IS END END",
+        subtitle: "RANDOM PLANK INSTALLATION",
+        youtubeWatchUrl: "https://www.youtube.com/watch?v=buwJ3zKkNAY&t=64s",
+        youtubeEmbedUrl: "https://www.youtube.com/embed/buwJ3zKkNAY?start=64&autoplay=1&mute=1&playsinline=1&rel=0&iv_load_policy=3&modestbranding=1&fs=1&controls=1"
+      },
+      osStartEnd: {
+        title: "OS START END",
+        subtitle: "RANDOM PLANK INSTALLATION",
+        youtubeWatchUrl: "https://www.youtube.com/watch?v=buwJ3zKkNAY&t=64s",
+        youtubeEmbedUrl: "https://www.youtube.com/embed/buwJ3zKkNAY?start=64&autoplay=1&mute=1&playsinline=1&rel=0&iv_load_policy=3&modestbranding=1&fs=1&controls=1"
+      },
+      starter: {
+        title: "STARTER",
+        subtitle: "RANDOM PLANK INSTALLATION",
+        youtubeWatchUrl: "https://www.youtube.com/watch?v=buwJ3zKkNAY&t=39s",
+        youtubeEmbedUrl: "https://www.youtube.com/embed/buwJ3zKkNAY?start=39&autoplay=1&mute=1&playsinline=1&rel=0&iv_load_policy=3&modestbranding=1&fs=1&controls=1"
+      }
+    };
+
+    const HOTSPOT_SUMMARY_CONTENT = {
+      terminate: {
+        title: "TERMINATE",
+        body: "Use this configuration to terminate a panel run."
+      },
+      isStartStart: {
+        title: "IS START START",
+        body: "Use this configuration when an inside corner of your Random Plank starts in two directions at a 90-degree angle."
+      },
+      osEndEnd: {
+        title: "OS END END",
+        body: "Use this configuration when an outside corner of your Random Plank ends from both directions."
+      },
+      boxBase: {
+        title: "BOX BASE",
+        body: "The Box Base and U-Support are key components of LUX Random Plank that provide a solid foundation ensuring there is no distortion or sliding of the panel."
+      },
+      osStartStart: {
+        title: "OS START START",
+        body: "Use this configuration when an outside corner of your Random Plank starts in two directions at a 90-degree angle."
+      },
+      isEndStart: {
+        title: "IS END START",
+        body: "Use this configuration when an inside corner of your Random Plank terminates and you need to start again in another direction."
+      },
+      isEndEnd: {
+        title: "IS END END",
+        body: "Use this configuration when an inside corner of your Random Plank project ends from both directions."
+      },
+      osStartEnd: {
+        title: "OS START END",
+        body: "Use this configuration when an outside corner of your Random Plank starts in two directions at a 90-degree angle."
+      },
+      starter: {
+        title: "STARTER",
+        body: "This method is for a single start point either on single-wall applications or following a termination."
+      }
+    };
+
+    const TOUCH_GUIDE_MAX_OFFSET = 56;
+    const TOUCH_GUIDE_FRAME_SWING = 8;
+    const TOUCH_GUIDE_SWIPES = 2;
+    const TOUCH_GUIDE_SWIPE_DURATION = 850;
+    const TOUCH_GUIDE_INITIAL_DELAY = 4000;
+    const TOUCH_GUIDE_REPEAT_DELAY = 4000;
+    const TOUCH_GUIDE_FADE_IN_DURATION = 1000;
+    const INFO_HOTSPOT_REVEAL_STAGGER = 100;
+    const CAMERA_ZOOM_FACTOR = 0.82;
+    const CAMERA_WHEEL_ZOOM_FACTOR = 1.08;
+    const CAMERA_MIN_RADIUS = 0.35;
+    const CAMERA_MAX_RADIUS = 7;
+    const CAMERA_MIN_THETA = -80;
+    const CAMERA_MAX_THETA = 80;
+    const CAMERA_MIN_PHI = 30;
+    const CAMERA_MAX_PHI = 88;
+    const GUIDE_STEP_DURATION = 4200;
+    const GUIDE_STEP_GAP = 350;
+    const GUIDE_AUTO_REPLAY_DELAY = 7000;
+    const GUIDE_PRE_START_CAMERA_DELAY = 1300;
 
     let currentSequenceFrame = 0;
-    let sequenceAutoTimer = null;
+    let touchGuideFrameId = null;
+    let touchGuideRepeatTimer = null;
+    let sequenceFadeTimer = null;
+    let returnCameraViewAfterInfoClose = null;
+    let infoHotspotRevealTimers = [];
+    let videoHotspotRevealTimers = [];
+    let returnCameraViewAfterVideoClose = null;
+    let touchGuideStartFrame = 0;
+    let touchGuideLastFrame = 0;
     let sequenceHasUserInteracted = false;
     let isDraggingSequence = false;
     let lastDragX = 0;
     let dragAccumulator = 0;
+    let terminateHotspotLottieAnimation = null;
+    let osEndEndHotspotLottieAnimation = null;
+    let isStartStartHotspotLottieAnimation = null;
+    let boxBaseHotspotLottieAnimation = null;
+    let osStartStartHotspotLottieAnimation = null;
+    let isEndStartHotspotLottieAnimation = null;
+    let isEndEndHotspotLottieAnimation = null;
+    let osStartEndHotspotLottieAnimation = null;
+    let starterHotspotLottieAnimation = null;
+    let videoHotspotLottieAnimations = [];
+    let customGuideTimers = [];
+    let customGuideActive = false;
+    let customGuideInvokedByHowTo = false;
+    let customGuideReturnCameraView = null;
+    let customGuideHasPlayedAutomatically = false;
+    let customGuideReplayTimer = null;
+    let customGuideStoppedByUser = false;
+    let customGuideCameraFrameId = null;
+    let customGuideStartTimer = null;
+    let infoHotspotLottieAnimations = [];
     let infoLottieAnimation = null;
+    let hotspotSummaryVideoLottieAnimation = null;
+    let activeHotspotSummaryVideoKey = "terminate";
+    let hotspotSummaryWasOpenBeforeInfo = false;
+
+    loadHotspotLotties();
 
     modelViewer.addEventListener("progress", (event) => {
       const progress = event.detail.totalProgress;
@@ -443,6 +2120,8 @@
     });
 
     modelViewer.addEventListener("load", () => {
+      modelViewer.setAttribute("min-camera-orbit", "-80deg 30deg 0.35m");
+      modelViewer.setAttribute("max-camera-orbit", "80deg 88deg 7m");
       const availableAnimations = modelViewer.availableAnimations || [];
 
       console.log("Model loaded.");
@@ -450,26 +2129,129 @@
 
       moveCameraToDefaultView(false);
 
-      if (!availableAnimations.includes(ANIMATION_NAME)) {
-        console.warn(`Animation "${ANIMATION_NAME}" was not found.`);
+      if (!availableAnimations.includes(TERMINATE_ANIMATION_NAME)) {
+        console.warn(`Animation "${TERMINATE_ANIMATION_NAME}" was not found.`);
         console.warn("Available animations:", availableAnimations);
         return;
       }
 
-      modelViewer.animationName = ANIMATION_NAME;
+      modelViewer.animationName = TERMINATE_ANIMATION_NAME;
       modelViewer.pause();
       modelViewer.currentTime = 0;
       modelViewer.timeScale = 1;
-      modelViewer.classList.remove("showInfoHotspots");
+      hideAllInfoHotspots();
+      terminateHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
+      osEndEndHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
+      isStartStartHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
+      boxBaseHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
+      osStartStartHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
+      isEndStartHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
+      isEndEndHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
+      osStartEndHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
+      starterHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
 
-      preloadSequenceFrames();
+      preloadAllSequenceFrames();
 
       setTimeout(() => {
+        modelViewer.animationName = TERMINATE_ANIMATION_NAME;
+        modelViewer.pause();
+        modelViewer.currentTime = 0;
         duration = modelViewer.duration || 0;
         safeEndTime = Math.max(0, duration - END_PADDING);
 
+        if (availableAnimations.includes(OS_END_END_ANIMATION_NAME)) {
+          modelViewer.animationName = OS_END_END_ANIMATION_NAME;
+          modelViewer.pause();
+          modelViewer.currentTime = 0;
+          osEndEndDuration = modelViewer.duration || 0;
+          osEndEndSafeEndTime = Math.max(0, osEndEndDuration - END_PADDING);
+        } else {
+          console.warn(`Animation "${OS_END_END_ANIMATION_NAME}" was not found.`);
+        }
+
+        if (availableAnimations.includes(IS_START_START_ANIMATION_NAME)) {
+          modelViewer.animationName = IS_START_START_ANIMATION_NAME;
+          modelViewer.pause();
+          modelViewer.currentTime = 0;
+          isStartStartDuration = modelViewer.duration || 0;
+          isStartStartSafeEndTime = Math.max(0, isStartStartDuration - END_PADDING);
+        } else {
+          console.warn(`Animation "${IS_START_START_ANIMATION_NAME}" was not found.`);
+        }
+
+        if (availableAnimations.includes(BOX_BASE_ANIMATION_NAME)) {
+          modelViewer.animationName = BOX_BASE_ANIMATION_NAME;
+          modelViewer.pause();
+          modelViewer.currentTime = 0;
+          boxBaseDuration = modelViewer.duration || 0;
+          boxBaseSafeEndTime = Math.max(0, boxBaseDuration - END_PADDING);
+        } else {
+          console.warn(`Animation "${BOX_BASE_ANIMATION_NAME}" was not found.`);
+        }
+
+        if (availableAnimations.includes(OS_START_START_ANIMATION_NAME)) {
+          modelViewer.animationName = OS_START_START_ANIMATION_NAME;
+          modelViewer.pause();
+          modelViewer.currentTime = 0;
+          osStartStartDuration = modelViewer.duration || 0;
+          osStartStartSafeEndTime = Math.max(0, osStartStartDuration - END_PADDING);
+        } else {
+          console.warn(`Animation "${OS_START_START_ANIMATION_NAME}" was not found.`);
+        }
+
+        if (availableAnimations.includes(IS_END_START_ANIMATION_NAME)) {
+          modelViewer.animationName = IS_END_START_ANIMATION_NAME;
+          modelViewer.pause();
+          modelViewer.currentTime = 0;
+          isEndStartDuration = modelViewer.duration || 0;
+          isEndStartSafeEndTime = Math.max(0, isEndStartDuration - END_PADDING);
+        } else {
+          console.warn(`Animation "${IS_END_START_ANIMATION_NAME}" was not found.`);
+        }
+
+        if (availableAnimations.includes(IS_END_END_ANIMATION_NAME)) {
+          modelViewer.animationName = IS_END_END_ANIMATION_NAME;
+          modelViewer.pause();
+          modelViewer.currentTime = 0;
+          isEndEndDuration = modelViewer.duration || 0;
+          isEndEndSafeEndTime = Math.max(0, isEndEndDuration - END_PADDING);
+        } else {
+          console.warn(`Animation "${IS_END_END_ANIMATION_NAME}" was not found.`);
+        }
+
+        if (availableAnimations.includes(OS_START_END_ANIMATION_NAME)) {
+          modelViewer.animationName = OS_START_END_ANIMATION_NAME;
+          modelViewer.pause();
+          modelViewer.currentTime = 0;
+          osStartEndDuration = modelViewer.duration || 0;
+          osStartEndSafeEndTime = Math.max(0, osStartEndDuration - END_PADDING);
+        } else {
+          console.warn(`Animation "${OS_START_END_ANIMATION_NAME}" was not found.`);
+        }
+
+        if (availableAnimations.includes(STARTER_ANIMATION_NAME)) {
+          modelViewer.animationName = STARTER_ANIMATION_NAME;
+          modelViewer.pause();
+          modelViewer.currentTime = 0;
+          starterDuration = modelViewer.duration || 0;
+          starterSafeEndTime = Math.max(0, starterDuration - END_PADDING);
+        } else {
+          console.warn(`Animation "${STARTER_ANIMATION_NAME}" was not found.`);
+        }
+
+        modelViewer.animationName = TERMINATE_ANIMATION_NAME;
+        modelViewer.pause();
+        modelViewer.currentTime = 0;
+
         console.log("TERMINATE duration:", duration);
-        console.log("Safe end time:", safeEndTime);
+        console.log("TERMINATE safe end time:", safeEndTime);
+        console.log("OS END END duration:", osEndEndDuration);
+        console.log("OS END END safe end time:", osEndEndSafeEndTime);
+
+        scheduleCustomGuideStep(() => {
+          customGuideStoppedByUser = false;
+          startCustomGuide({ showMouseInfo: false, auto: true });
+        }, 900);
       }, 300);
     });
 
@@ -479,6 +2261,9 @@
       if (isPlaying) return;
 
       if (!duration) {
+        modelViewer.animationName = TERMINATE_ANIMATION_NAME;
+        modelViewer.pause();
+        modelViewer.currentTime = 0;
         duration = modelViewer.duration || 0;
         safeEndTime = Math.max(0, duration - END_PADDING);
       }
@@ -495,10 +2280,1041 @@
       }
     });
 
+    osEndEndHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      if (isPlaying) return;
+
+      if (!osEndEndDuration) {
+        modelViewer.animationName = OS_END_END_ANIMATION_NAME;
+        modelViewer.pause();
+        modelViewer.currentTime = 0;
+        osEndEndDuration = modelViewer.duration || 0;
+        osEndEndSafeEndTime = Math.max(0, osEndEndDuration - END_PADDING);
+      }
+
+      if (!osEndEndDuration) {
+        console.warn(`Animation "${OS_END_END_ANIMATION_NAME}" duration is not ready yet.`);
+        return;
+      }
+
+      if (!isOsEndEndOpen) {
+        playOsEndEndForwardAndHold();
+      } else {
+        playOsEndEndBackwardByScrubbing();
+      }
+    });
+
+    isStartStartHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      if (isPlaying) return;
+
+      if (!isStartStartDuration) {
+        modelViewer.animationName = IS_START_START_ANIMATION_NAME;
+        modelViewer.pause();
+        modelViewer.currentTime = 0;
+        isStartStartDuration = modelViewer.duration || 0;
+        isStartStartSafeEndTime = Math.max(0, isStartStartDuration - END_PADDING);
+      }
+
+      if (!isStartStartDuration) {
+        console.warn(`Animation "${IS_START_START_ANIMATION_NAME}" duration is not ready yet.`);
+        return;
+      }
+
+      if (!isIsStartStartOpen) {
+        playIsStartStartForwardAndHold();
+      } else {
+        playIsStartStartBackwardByScrubbing();
+      }
+    });
+
+    boxBaseHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      if (isPlaying) return;
+
+      if (!boxBaseDuration) {
+        modelViewer.animationName = BOX_BASE_ANIMATION_NAME;
+        modelViewer.pause();
+        modelViewer.currentTime = 0;
+        boxBaseDuration = modelViewer.duration || 0;
+        boxBaseSafeEndTime = Math.max(0, boxBaseDuration - END_PADDING);
+      }
+
+      if (!boxBaseDuration) {
+        console.warn(`Animation "${BOX_BASE_ANIMATION_NAME}" duration is not ready yet.`);
+        return;
+      }
+
+      if (!isBoxBaseOpen) {
+        playBoxBaseForwardAndHold();
+      } else {
+        playBoxBaseBackwardByScrubbing();
+      }
+    });
+
+    osStartStartHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      if (isPlaying) return;
+
+      if (!osStartStartDuration) {
+        modelViewer.animationName = OS_START_START_ANIMATION_NAME;
+        modelViewer.pause();
+        modelViewer.currentTime = 0;
+        osStartStartDuration = modelViewer.duration || 0;
+        osStartStartSafeEndTime = Math.max(0, osStartStartDuration - END_PADDING);
+      }
+
+      if (!osStartStartDuration) {
+        console.warn(`Animation "${OS_START_START_ANIMATION_NAME}" duration is not ready yet.`);
+        return;
+      }
+
+      if (!isOsStartStartOpen) {
+        playOsStartStartForwardAndHold();
+      } else {
+        playOsStartStartBackwardByScrubbing();
+      }
+    });
+
+    isEndStartHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      if (isPlaying) return;
+
+      if (!isEndStartDuration) {
+        modelViewer.animationName = IS_END_START_ANIMATION_NAME;
+        modelViewer.pause();
+        modelViewer.currentTime = 0;
+        isEndStartDuration = modelViewer.duration || 0;
+        isEndStartSafeEndTime = Math.max(0, isEndStartDuration - END_PADDING);
+      }
+
+      if (!isEndStartDuration) {
+        console.warn(`Animation "${IS_END_START_ANIMATION_NAME}" duration is not ready yet.`);
+        return;
+      }
+
+      if (!isIsEndStartOpen) {
+        playIsEndStartForwardAndHold();
+      } else {
+        playIsEndStartBackwardByScrubbing();
+      }
+    });
+
+    isEndEndHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      if (isPlaying) return;
+
+      if (!isEndEndDuration) {
+        modelViewer.animationName = IS_END_END_ANIMATION_NAME;
+        modelViewer.pause();
+        modelViewer.currentTime = 0;
+        isEndEndDuration = modelViewer.duration || 0;
+        isEndEndSafeEndTime = Math.max(0, isEndEndDuration - END_PADDING);
+      }
+
+      if (!isEndEndDuration) {
+        console.warn(`Animation "${IS_END_END_ANIMATION_NAME}" duration is not ready yet.`);
+        return;
+      }
+
+      if (!isIsEndEndOpen) {
+        playIsEndEndForwardAndHold();
+      } else {
+        playIsEndEndBackwardByScrubbing();
+      }
+    });
+
+    osStartEndHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      if (isPlaying) return;
+
+      if (!osStartEndDuration) {
+        modelViewer.animationName = OS_START_END_ANIMATION_NAME;
+        modelViewer.pause();
+        modelViewer.currentTime = 0;
+        osStartEndDuration = modelViewer.duration || 0;
+        osStartEndSafeEndTime = Math.max(0, osStartEndDuration - END_PADDING);
+      }
+
+      if (!osStartEndDuration) {
+        console.warn(`Animation "${OS_START_END_ANIMATION_NAME}" duration is not ready yet.`);
+        return;
+      }
+
+      if (!isOsStartEndOpen) {
+        playOsStartEndForwardAndHold();
+      } else {
+        playOsStartEndBackwardByScrubbing();
+      }
+    });
+
+    starterHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      if (isPlaying) return;
+
+      if (!starterDuration) {
+        modelViewer.animationName = STARTER_ANIMATION_NAME;
+        modelViewer.pause();
+        modelViewer.currentTime = 0;
+        starterDuration = modelViewer.duration || 0;
+        starterSafeEndTime = Math.max(0, starterDuration - END_PADDING);
+      }
+
+      if (!starterDuration) {
+        console.warn(`Animation "${STARTER_ANIMATION_NAME}" duration is not ready yet.`);
+        return;
+      }
+
+      if (!isStarterOpen) {
+        playStarterForwardAndHold();
+      } else {
+        playStarterBackwardByScrubbing();
+      }
+    });
+
     infoHotspot1.addEventListener("click", (event) => {
       event.stopPropagation();
-      openInfoWindow();
+      openInfoWindow(infoHotspot1.dataset.infoKey);
     });
+
+    infoHotspot2.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openInfoWindow(infoHotspot2.dataset.infoKey);
+    });
+
+    osEndEndInfoHotspots.forEach((hotspot) => {
+      if (!hotspot) return;
+
+      hotspot.addEventListener("click", (event) => {
+        event.stopPropagation();
+        openInfoWindow(hotspot.dataset.infoKey);
+      });
+    });
+
+    isStartStartInfoHotspots.forEach((hotspot) => {
+      if (!hotspot) return;
+
+      hotspot.addEventListener("click", (event) => {
+        event.stopPropagation();
+        openInfoWindow(hotspot.dataset.infoKey);
+      });
+    });
+
+    boxBaseInfoHotspots.forEach((hotspot) => {
+      if (!hotspot) return;
+
+      hotspot.addEventListener("click", (event) => {
+        event.stopPropagation();
+        openInfoWindow(hotspot.dataset.infoKey);
+      });
+    });
+
+    osStartStartInfoHotspots.forEach((hotspot) => {
+      if (!hotspot) return;
+
+      hotspot.addEventListener("click", (event) => {
+        event.stopPropagation();
+        openInfoWindow(hotspot.dataset.infoKey);
+      });
+    });
+
+    isEndStartInfoHotspots.forEach((hotspot) => {
+      if (!hotspot) return;
+
+      hotspot.addEventListener("click", (event) => {
+        event.stopPropagation();
+        openInfoWindow(hotspot.dataset.infoKey);
+      });
+    });
+
+    isEndEndInfoHotspots.forEach((hotspot) => {
+      if (!hotspot) return;
+
+      hotspot.addEventListener("click", (event) => {
+        event.stopPropagation();
+        openInfoWindow(hotspot.dataset.infoKey);
+      });
+    });
+
+    osStartEndInfoHotspots.forEach((hotspot) => {
+      if (!hotspot) return;
+
+      hotspot.addEventListener("click", (event) => {
+        event.stopPropagation();
+        openInfoWindow(hotspot.dataset.infoKey);
+      });
+    });
+
+    starterInfoHotspots.forEach((hotspot) => {
+      if (!hotspot) return;
+
+      hotspot.addEventListener("click", (event) => {
+        event.stopPropagation();
+        openInfoWindow(hotspot.dataset.infoKey);
+      });
+    });
+
+    terminateVideoHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openVideoWindow(terminateVideoHotspot.dataset.videoKey);
+    });
+
+    osEndEndVideoHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openVideoWindow(osEndEndVideoHotspot.dataset.videoKey);
+    });
+
+    isStartStartVideoHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openVideoWindow(isStartStartVideoHotspot.dataset.videoKey);
+    });
+
+    boxBaseVideoHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openVideoWindow(boxBaseVideoHotspot.dataset.videoKey);
+    });
+
+    osStartStartVideoHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openVideoWindow(osStartStartVideoHotspot.dataset.videoKey);
+    });
+
+    isEndStartVideoHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openVideoWindow(isEndStartVideoHotspot.dataset.videoKey);
+    });
+
+    isEndEndVideoHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openVideoWindow(isEndEndVideoHotspot.dataset.videoKey);
+    });
+
+    osStartEndVideoHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openVideoWindow(osStartEndVideoHotspot.dataset.videoKey);
+    });
+
+    starterVideoHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openVideoWindow(starterVideoHotspot.dataset.videoKey);
+    });
+
+    function parseCameraOrbit(orbitValue) {
+      const orbit = String(orbitValue || modelViewer.cameraOrbit || "");
+      const parts = orbit.trim().split(/\s+/);
+
+      const thetaPart = parts[0] || "0deg";
+      const phiPart = parts[1] || "75deg";
+      const radiusPart = parts[2] || "6.30660m";
+
+      const theta = parseFloat(thetaPart);
+      const phi = parseFloat(phiPart);
+      const radius = parseFloat(radiusPart);
+
+      if (!Number.isFinite(theta) || !Number.isFinite(phi) || !Number.isFinite(radius)) {
+        return null;
+      }
+
+      return {
+        theta,
+        phi,
+        radius,
+        thetaUnit: thetaPart.replace(String(theta), "") || "deg",
+        phiUnit: phiPart.replace(String(phi), "") || "deg",
+        radiusUnit: radiusPart.replace(String(radius), "") || "m"
+      };
+    }
+
+    function getClampedCameraOrbit(nextOrbit = modelViewer.cameraOrbit) {
+      const parsed = parseCameraOrbit(nextOrbit);
+      if (!parsed) return null;
+
+      return {
+        theta: Math.max(CAMERA_MIN_THETA, Math.min(CAMERA_MAX_THETA, parsed.theta)),
+        phi: Math.max(CAMERA_MIN_PHI, Math.min(CAMERA_MAX_PHI, parsed.phi)),
+        radius: Math.max(CAMERA_MIN_RADIUS, Math.min(CAMERA_MAX_RADIUS, parsed.radius)),
+        thetaUnit: parsed.thetaUnit,
+        phiUnit: parsed.phiUnit,
+        radiusUnit: parsed.radiusUnit
+      };
+    }
+
+    function applyCameraOrbit(orbit) {
+      if (!orbit) return;
+
+      modelViewer.setAttribute("interpolation-decay", "120");
+      modelViewer.cameraOrbit = `${orbit.theta.toFixed(5)}${orbit.thetaUnit} ${orbit.phi.toFixed(5)}${orbit.phiUnit} ${orbit.radius.toFixed(5)}${orbit.radiusUnit}`;
+    }
+
+    function clampCameraOrbit() {
+      const parsed = parseCameraOrbit(modelViewer.cameraOrbit);
+      const clamped = getClampedCameraOrbit(modelViewer.cameraOrbit);
+
+      if (!parsed || !clamped) return;
+
+      const changed =
+        Math.abs(parsed.theta - clamped.theta) > 0.001 ||
+        Math.abs(parsed.phi - clamped.phi) > 0.001 ||
+        Math.abs(parsed.radius - clamped.radius) > 0.001;
+
+      if (changed) {
+        applyCameraOrbit(clamped);
+      }
+    }
+
+    function hardClampCameraRadius() {
+      const parsed = parseCameraOrbit(modelViewer.cameraOrbit);
+      if (!parsed) return;
+
+      if (parsed.radius > CAMERA_MAX_RADIUS) {
+        setCameraRadius(CAMERA_MAX_RADIUS);
+      } else if (parsed.radius < CAMERA_MIN_RADIUS) {
+        setCameraRadius(CAMERA_MIN_RADIUS);
+      }
+    }
+
+    function clampCameraAfterWheel() {
+      hardClampCameraRadius();
+      requestAnimationFrame(() => {
+        hardClampCameraRadius();
+        clampCameraOrbit();
+      });
+
+      setTimeout(() => {
+        hardClampCameraRadius();
+        clampCameraOrbit();
+      }, 80);
+    }
+
+    function setCameraRadius(nextRadius) {
+      const parsed = getClampedCameraOrbit(modelViewer.cameraOrbit);
+      if (!parsed) return;
+
+      parsed.radius = Math.max(CAMERA_MIN_RADIUS, Math.min(CAMERA_MAX_RADIUS, nextRadius));
+      applyCameraOrbit(parsed);
+    }
+
+    function zoomCamera(direction, factor = CAMERA_ZOOM_FACTOR) {
+      const parsed = parseCameraOrbit(modelViewer.cameraOrbit);
+      if (!parsed) return;
+
+      const nextRadius = direction === "in"
+        ? parsed.radius * factor
+        : parsed.radius / factor;
+
+      setCameraRadius(nextRadius);
+    }
+
+    function zoomCameraWithWheel(deltaY) {
+      const parsed = parseCameraOrbit(modelViewer.cameraOrbit);
+      if (!parsed) return;
+
+      const wheelStrength = Math.min(4, Math.max(0.35, Math.abs(deltaY) / 100));
+      const wheelFactor = Math.pow(CAMERA_WHEEL_ZOOM_FACTOR, wheelStrength);
+      const unclampedRadius = deltaY < 0
+        ? parsed.radius / wheelFactor
+        : parsed.radius * wheelFactor;
+
+      const nextRadius = Math.max(CAMERA_MIN_RADIUS, Math.min(CAMERA_MAX_RADIUS, unclampedRadius));
+      setCameraRadius(nextRadius);
+    }
+
+    function formatHotspotSummaryTitle(title) {
+      if (title.startsWith("IS ")) {
+        return `INSIDE ${title.slice(3)}`;
+      }
+
+      if (title.startsWith("OS ")) {
+        return `OUTSIDE ${title.slice(3)}`;
+      }
+
+      return title;
+    }
+
+    function ensureHotspotSummaryVideoLottie() {
+      if (hotspotSummaryVideoLottieAnimation) return;
+
+      hotspotSummaryVideoLottieAnimation = lottie.loadAnimation({
+        container: hotspotSummaryVideoLottie,
+        renderer: "svg",
+        loop: false,
+        autoplay: false,
+        path: VIDEO_HOTSPOT_LOTTIE_PATH
+      });
+
+      hotspotSummaryVideoLottieAnimation.addEventListener("complete", () => {
+        const finalFrame = Math.max(0, hotspotSummaryVideoLottieAnimation.totalFrames - 1);
+        hotspotSummaryVideoLottieAnimation.goToAndStop(finalFrame, true);
+      });
+    }
+
+    function openHotspotSummaryWindow(summaryKey) {
+      const content = HOTSPOT_SUMMARY_CONTENT[summaryKey];
+      if (!content) return;
+
+      activeHotspotSummaryVideoKey = summaryKey;
+      hotspotSummaryTitle.textContent = formatHotspotSummaryTitle(content.title);
+      hotspotSummaryBody.textContent = content.body;
+
+      ensureHotspotSummaryVideoLottie();
+
+      if (hotspotSummaryVideoLottieAnimation) {
+        hotspotSummaryVideoLottieAnimation.goToAndPlay(0, true);
+      }
+
+      hotspotSummaryWindow.classList.add("open");
+      hotspotSummaryWindow.setAttribute("aria-hidden", "false");
+    }
+
+    function closeHotspotSummaryWindow() {
+      hotspotSummaryWasOpenBeforeInfo = false;
+      hotspotSummaryWindow.classList.remove("open", "isHiddenBehindInfo");
+      hotspotSummaryWindow.setAttribute("aria-hidden", "true");
+
+      if (hotspotSummaryVideoLottieAnimation) {
+        hotspotSummaryVideoLottieAnimation.goToAndStop(0, true);
+      }
+    }
+
+    function temporarilyHideHotspotSummaryForInfo() {
+      hotspotSummaryWasOpenBeforeInfo = hotspotSummaryWindow.classList.contains("open");
+
+      if (hotspotSummaryWasOpenBeforeInfo) {
+        hotspotSummaryWindow.classList.add("isHiddenBehindInfo");
+      }
+    }
+
+    function restoreHotspotSummaryAfterInfo() {
+      if (hotspotSummaryWasOpenBeforeInfo && hotspotSummaryWindow.classList.contains("open")) {
+        hotspotSummaryWindow.classList.remove("isHiddenBehindInfo");
+      }
+
+      hotspotSummaryWasOpenBeforeInfo = false;
+    }
+
+    function updateModalControlsVisibility() {
+      const anyWindowOpen =
+        infoOverlay.classList.contains("open") ||
+        videoOverlay.classList.contains("open");
+
+      bottomControlBar.classList.toggle("isWindowOpen", anyWindowOpen);
+    }
+
+    function getCurrentCameraViewSnapshot() {
+      return {
+        orbit: modelViewer.cameraOrbit,
+        target: modelViewer.cameraTarget,
+        fov: modelViewer.fieldOfView
+      };
+    }
+
+    function clearCustomGuideTimers() {
+      customGuideTimers.forEach((timer) => clearTimeout(timer));
+      customGuideTimers = [];
+
+      if (customGuideCameraFrameId) {
+        cancelAnimationFrame(customGuideCameraFrameId);
+        customGuideCameraFrameId = null;
+      }
+
+      if (customGuideStartTimer) {
+        clearTimeout(customGuideStartTimer);
+        customGuideStartTimer = null;
+      }
+    }
+
+    function clearCustomGuideReplayTimer() {
+      if (customGuideReplayTimer) {
+        clearTimeout(customGuideReplayTimer);
+        customGuideReplayTimer = null;
+      }
+    }
+
+    function scheduleCustomGuideStep(callback, delay) {
+      const timer = setTimeout(callback, delay);
+      customGuideTimers.push(timer);
+      return timer;
+    }
+
+    function setCustomGuideIcon(src, className) {
+      customGuideIcon.classList.remove("guidePan", "guideRotate", "guideScroll", "isHidden");
+      customGuideIcon.src = src;
+
+      void customGuideIcon.offsetWidth;
+      customGuideIcon.classList.add(className);
+    }
+
+    function setGuideCameraView(orbit, target = DEFAULT_CAMERA_VIEW.target, fov = DEFAULT_CAMERA_VIEW.fov) {
+      modelViewer.setAttribute("interpolation-decay", "0");
+      modelViewer.cameraOrbit = orbit;
+      modelViewer.cameraTarget = target;
+      modelViewer.fieldOfView = fov;
+    }
+
+    function setMouseInfoVisible(isVisible) {
+      mouseInfoMini.classList.toggle("isVisible", isVisible);
+      mouseInfoMini.setAttribute("aria-hidden", isVisible ? "false" : "true");
+    }
+
+    function easeInOutSine(progress) {
+      return -(Math.cos(Math.PI * progress) - 1) / 2;
+    }
+
+    function parseMetersVector(vectorString) {
+      return String(vectorString)
+        .trim()
+        .split(/\s+/)
+        .map((part) => parseFloat(part));
+    }
+
+    function formatMetersVector(values) {
+      return `${values[0].toFixed(5)}m ${values[1].toFixed(5)}m ${values[2].toFixed(5)}m`;
+    }
+
+    function lerpNumber(start, end, progress) {
+      return start + (end - start) * progress;
+    }
+
+    function lerpMetersVector(startString, endString, progress) {
+      const start = parseMetersVector(startString);
+      const end = parseMetersVector(endString);
+
+      return formatMetersVector([
+        lerpNumber(start[0], end[0], progress),
+        lerpNumber(start[1], end[1], progress),
+        lerpNumber(start[2], end[2], progress)
+      ]);
+    }
+
+    function formatOrbit(theta, phi, radius) {
+      return `${theta.toFixed(5)}deg ${phi.toFixed(5)}deg ${radius.toFixed(5)}m`;
+    }
+
+    function animateGuideCamera(keyframes, duration = GUIDE_STEP_DURATION) {
+      if (customGuideCameraFrameId) {
+        cancelAnimationFrame(customGuideCameraFrameId);
+        customGuideCameraFrameId = null;
+      }
+
+      const startTime = performance.now();
+
+      function applyFrame(now) {
+        if (!customGuideActive) {
+          customGuideCameraFrameId = null;
+          return;
+        }
+
+        const rawProgress = Math.min(1, (now - startTime) / duration);
+        const progress = easeInOutSine(rawProgress);
+        const segmentSize = 1 / (keyframes.length - 1);
+        const segmentIndex = Math.min(keyframes.length - 2, Math.floor(progress / segmentSize));
+        const segmentStartProgress = segmentIndex * segmentSize;
+        const localProgress = easeInOutSine((progress - segmentStartProgress) / segmentSize);
+
+        const from = keyframes[segmentIndex];
+        const to = keyframes[segmentIndex + 1];
+
+        const theta = lerpNumber(from.theta, to.theta, localProgress);
+        const phi = lerpNumber(from.phi, to.phi, localProgress);
+        const radius = lerpNumber(from.radius, to.radius, localProgress);
+        const target = lerpMetersVector(from.target, to.target, localProgress);
+        const fov = `${lerpNumber(from.fov, to.fov, localProgress).toFixed(5)}deg`;
+
+        setGuideCameraView(formatOrbit(theta, phi, radius), target, fov);
+
+        if (rawProgress < 1) {
+          customGuideCameraFrameId = requestAnimationFrame(applyFrame);
+        } else {
+          customGuideCameraFrameId = null;
+        }
+      }
+
+      customGuideCameraFrameId = requestAnimationFrame(applyFrame);
+    }
+
+    function showCustomGuideStep(type) {
+      if (!customGuideActive) return;
+
+      if (type === "pan") {
+        setCustomGuideIcon("mouse right.png", "guidePan");
+
+        // These target offsets move along the camera's screen-right vector, so the model appears
+        // to pan horizontally across the viewport instead of diagonally in world space.
+        animateGuideCamera([
+          { theta: -35.62141, phi: 60.17364, radius: 6.30660, target: DEFAULT_CAMERA_VIEW.target, fov: 15.06401 },
+          { theta: -35.62141, phi: 60.17364, radius: 6.30660, target: "0.27200m 0.32003m -0.11300m", fov: 15.06401 },
+          { theta: -35.62141, phi: 60.17364, radius: 6.30660, target: "0.56800m 0.32003m 0.09200m", fov: 15.06401 },
+          { theta: -35.62141, phi: 60.17364, radius: 6.30660, target: DEFAULT_CAMERA_VIEW.target, fov: 15.06401 }
+        ]);
+      }
+
+      if (type === "rotate") {
+        setCustomGuideIcon("mouse left.png", "guideRotate");
+
+        animateGuideCamera([
+          { theta: -35.62141, phi: 60.17364, radius: 6.30660, target: DEFAULT_CAMERA_VIEW.target, fov: 15.06401 },
+          { theta: -48.00000, phi: 60.17364, radius: 6.30660, target: DEFAULT_CAMERA_VIEW.target, fov: 15.06401 },
+          { theta: -23.00000, phi: 60.17364, radius: 6.30660, target: DEFAULT_CAMERA_VIEW.target, fov: 15.06401 },
+          { theta: -35.62141, phi: 60.17364, radius: 6.30660, target: DEFAULT_CAMERA_VIEW.target, fov: 15.06401 }
+        ]);
+      }
+
+      if (type === "scroll") {
+        setCustomGuideIcon("mouse scroll.png", "guideScroll");
+
+        animateGuideCamera([
+          { theta: -35.62141, phi: 60.17364, radius: 6.30660, target: DEFAULT_CAMERA_VIEW.target, fov: 15.06401 },
+          { theta: -35.62141, phi: 60.17364, radius: 5.45000, target: DEFAULT_CAMERA_VIEW.target, fov: 15.06401 },
+          { theta: -35.62141, phi: 60.17364, radius: 6.85000, target: DEFAULT_CAMERA_VIEW.target, fov: 15.06401 },
+          { theta: -35.62141, phi: 60.17364, radius: 6.30660, target: DEFAULT_CAMERA_VIEW.target, fov: 15.06401 }
+        ]);
+      }
+    }
+
+    function canAutoReplayGuide() {
+      return !customGuideStoppedByUser &&
+        !activeMainHotspot &&
+        !infoOverlay.classList.contains("open") &&
+        !videoOverlay.classList.contains("open");
+    }
+
+    function finishCustomGuideCycle() {
+      const wasInvokedByHowTo = customGuideInvokedByHowTo;
+      const cameraViewToRestore = customGuideReturnCameraView;
+
+      clearCustomGuideTimers();
+      customGuideActive = false;
+      customGuideIcon.classList.remove("guidePan", "guideRotate", "guideScroll");
+      customGuideIcon.classList.add("isHidden");
+
+      if (wasInvokedByHowTo && !customGuideStoppedByUser) {
+        // Keep the overlay and mouse info card visible while the guide loops, so there is no flicker.
+        // Do not restore to the camera position that was active before the guide started; otherwise
+        // a hotspot view can flash back in between guide loops.
+        moveCameraToDefaultView(true);
+        modelViewer.classList.add("guideDimmingHotspots");
+        howToOverlay.classList.add("open");
+        howToOverlay.setAttribute("aria-hidden", "false");
+        setMouseInfoVisible(true);
+
+        customGuideReplayTimer = setTimeout(() => {
+          if (!customGuideStoppedByUser) {
+            startCustomGuide({ showMouseInfo: true, auto: false, preserveReturnView: true });
+          }
+        }, 700);
+        return;
+      }
+
+      if (cameraViewToRestore) {
+        moveCameraToView(cameraViewToRestore, true);
+      }
+
+      customGuideReturnCameraView = null;
+      customGuideInvokedByHowTo = false;
+      howToOverlay.classList.remove("open");
+      howToOverlay.setAttribute("aria-hidden", "true");
+      setMouseInfoVisible(false);
+      modelViewer.classList.remove("guideDimmingHotspots");
+
+      if (canAutoReplayGuide()) {
+        customGuideReplayTimer = setTimeout(() => {
+          if (canAutoReplayGuide()) {
+            startCustomGuide({ showMouseInfo: false, auto: true, preserveReturnView: true });
+          }
+        }, GUIDE_AUTO_REPLAY_DELAY);
+      }
+    }
+
+    function startCustomGuide(options = {}) {
+      const { showMouseInfo = false, auto = false, preserveReturnView = false, returnCameraView = null } = options;
+
+      if (auto && activeMainHotspot) return;
+      if (auto && (infoOverlay.classList.contains("open") || videoOverlay.classList.contains("open"))) return;
+
+      clearCustomGuideReplayTimer();
+
+      if (customGuideActive) {
+        stopCustomGuide(false, false);
+      } else {
+        clearCustomGuideTimers();
+      }
+
+      customGuideActive = true;
+      customGuideIcon.classList.remove("isHidden");
+      customGuideInvokedByHowTo = !auto;
+      customGuideHasPlayedAutomatically = customGuideHasPlayedAutomatically || auto;
+      customGuideReturnCameraView = returnCameraView
+        ? returnCameraView
+        : preserveReturnView && customGuideReturnCameraView
+          ? customGuideReturnCameraView
+          : getCurrentCameraViewSnapshot();
+
+      closeInfoWindow();
+      closeVideoWindow();
+
+      modelViewer.classList.add("guideDimmingHotspots");
+      howToOverlay.classList.add("open");
+      howToOverlay.setAttribute("aria-hidden", "false");
+      setMouseInfoVisible(showMouseInfo);
+
+      showCustomGuideStep("pan");
+      scheduleCustomGuideStep(() => showCustomGuideStep("rotate"), GUIDE_STEP_DURATION + GUIDE_STEP_GAP);
+      scheduleCustomGuideStep(() => showCustomGuideStep("scroll"), (GUIDE_STEP_DURATION + GUIDE_STEP_GAP) * 2);
+      scheduleCustomGuideStep(finishCustomGuideCycle, (GUIDE_STEP_DURATION + GUIDE_STEP_GAP) * 3 + 250);
+    }
+
+    function stopCustomGuide(restoreCamera = true, markAsUserStopped = true) {
+      const cameraViewToRestore = customGuideReturnCameraView;
+
+      clearCustomGuideTimers();
+      clearCustomGuideReplayTimer();
+
+      if (markAsUserStopped) {
+        customGuideStoppedByUser = true;
+      }
+
+      customGuideActive = false;
+      customGuideInvokedByHowTo = false;
+      customGuideReturnCameraView = null;
+
+      customGuideIcon.classList.remove("guidePan", "guideRotate", "guideScroll");
+      customGuideIcon.classList.add("isHidden");
+      howToOverlay.classList.remove("open");
+      howToOverlay.setAttribute("aria-hidden", "true");
+      setMouseInfoVisible(false);
+      modelViewer.classList.remove("guideDimmingHotspots");
+
+      if (restoreCamera && cameraViewToRestore) {
+        moveCameraToView(cameraViewToRestore, true);
+      }
+    }
+
+    function getActiveHotspotReverseDelay() {
+      const activeSafeEndTime =
+        activeMainHotspot === "osEndEnd" ? osEndEndSafeEndTime :
+        activeMainHotspot === "isStartStart" ? isStartStartSafeEndTime :
+        activeMainHotspot === "boxBase" ? boxBaseSafeEndTime :
+        activeMainHotspot === "osStartStart" ? osStartStartSafeEndTime :
+        activeMainHotspot === "isEndStart" ? isEndStartSafeEndTime :
+        activeMainHotspot === "isEndEnd" ? isEndEndSafeEndTime :
+        activeMainHotspot === "osStartEnd" ? osStartEndSafeEndTime :
+        activeMainHotspot === "starter" ? starterSafeEndTime :
+        activeMainHotspot === "terminate" ? safeEndTime :
+        0;
+
+      return Math.max(900, (activeSafeEndTime / REVERSE_SPEED) * 1000 + 250);
+    }
+
+    function closeActiveHotspotForGuide() {
+      if (isPlaying) return 0;
+
+      if (activeMainHotspot === "terminate" && isOpen) {
+        playBackwardByScrubbing();
+        return getActiveHotspotReverseDelay();
+      }
+
+      if (activeMainHotspot === "osEndEnd" && isOsEndEndOpen) {
+        playOsEndEndBackwardByScrubbing();
+        return getActiveHotspotReverseDelay();
+      }
+
+      if (activeMainHotspot === "isStartStart" && isIsStartStartOpen) {
+        playIsStartStartBackwardByScrubbing();
+        return getActiveHotspotReverseDelay();
+      }
+
+      if (activeMainHotspot === "boxBase" && isBoxBaseOpen) {
+        playBoxBaseBackwardByScrubbing();
+        return getActiveHotspotReverseDelay();
+      }
+
+      if (activeMainHotspot === "osStartStart" && isOsStartStartOpen) {
+        playOsStartStartBackwardByScrubbing();
+        return getActiveHotspotReverseDelay();
+      }
+
+      if (activeMainHotspot === "isEndStart" && isIsEndStartOpen) {
+        playIsEndStartBackwardByScrubbing();
+        return getActiveHotspotReverseDelay();
+      }
+
+      if (activeMainHotspot === "isEndEnd" && isIsEndEndOpen) {
+        playIsEndEndBackwardByScrubbing();
+        return getActiveHotspotReverseDelay();
+      }
+
+      if (activeMainHotspot === "osStartEnd" && isOsStartEndOpen) {
+        playOsStartEndBackwardByScrubbing();
+        return getActiveHotspotReverseDelay();
+      }
+
+      if (activeMainHotspot === "starter" && isStarterOpen) {
+        playStarterBackwardByScrubbing();
+        return getActiveHotspotReverseDelay();
+      }
+
+      return 0;
+    }
+
+    function openHowToWindow() {
+      const returnCameraView = getCurrentCameraViewSnapshot();
+
+      customGuideStoppedByUser = false;
+      clearCustomGuideReplayTimer();
+      clearCustomGuideTimers();
+
+      customGuideInvokedByHowTo = true;
+      customGuideReturnCameraView = returnCameraView;
+
+      closeInfoWindow();
+      closeVideoWindow();
+
+      const reverseDelay = closeActiveHotspotForGuide();
+
+      modelViewer.classList.add("guideDimmingHotspots");
+      howToOverlay.classList.add("open");
+      howToOverlay.setAttribute("aria-hidden", "false");
+      customGuideIcon.classList.add("isHidden");
+      setMouseInfoVisible(true);
+
+      if (!reverseDelay) {
+        moveCameraToDefaultView(true);
+      }
+
+      customGuideStartTimer = setTimeout(() => {
+        customGuideStartTimer = null;
+
+        if (!customGuideStoppedByUser) {
+          startCustomGuide({
+            showMouseInfo: true,
+            auto: false,
+            preserveReturnView: true,
+            returnCameraView
+          });
+        }
+      }, reverseDelay || GUIDE_PRE_START_CAMERA_DELAY);
+    }
+
+    function closeHowToWindow() {
+      stopCustomGuide(true, true);
+    }
+
+    function updateFullscreenButton() {
+      const isFullscreen = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+      fullscreenButtonIcon.src = isFullscreen ? "EXIT FULLSCREEN.png" : "ENTER FULLSCREEN.png";
+      fullscreenButton.setAttribute("aria-label", isFullscreen ? "Exit fullscreen" : "Enter fullscreen");
+
+      const fullscreenTooltip = document.querySelector("#fullscreenTooltip");
+      if (fullscreenTooltip) {
+        fullscreenTooltip.textContent = isFullscreen ? "Exit fullscreen" : "Fullscreen";
+      }
+    }
+
+    async function toggleFullscreen() {
+      try {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          const fullscreenTarget = document.documentElement;
+
+          if (fullscreenTarget.requestFullscreen) {
+            await fullscreenTarget.requestFullscreen();
+          } else if (fullscreenTarget.webkitRequestFullscreen) {
+            fullscreenTarget.webkitRequestFullscreen();
+          }
+        } else if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      } catch (error) {
+        console.warn("Fullscreen request failed:", error);
+      }
+
+      updateFullscreenButton();
+    }
+
+    zoomInButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      zoomCamera("in");
+    });
+
+    zoomOutButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      zoomCamera("out");
+    });
+
+    resetCameraButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      if (customGuideActive || customGuideReplayTimer) {
+        stopCustomGuide(false, true);
+      }
+
+      closeInfoWindow();
+      closeVideoWindow();
+
+      const reverseDelay = closeActiveHotspotForGuide();
+
+      if (!reverseDelay) {
+        moveCameraToDefaultView(true);
+      }
+    });
+
+    modelViewer.addEventListener("pointerdown", () => {
+      if (customGuideActive || customGuideReplayTimer) {
+        stopCustomGuide(true, true);
+      }
+    });
+
+    modelViewer.addEventListener("wheel", (event) => {
+      if (customGuideActive || customGuideReplayTimer) {
+        stopCustomGuide(true, true);
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      zoomCameraWithWheel(event.deltaY);
+      clampCameraAfterWheel();
+    }, { passive: false, capture: true });
+
+    modelViewer.addEventListener("camera-change", () => {
+      requestAnimationFrame(clampCameraOrbit);
+    });
+
+    howToButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openHowToWindow();
+    });
+
+    howToCloseButton.addEventListener("click", closeHowToWindow);
+
+    hotspotSummaryCloseButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      closeHotspotSummaryWindow();
+    });
+
+    hotspotSummaryVideoButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openVideoWindow(activeHotspotSummaryVideoKey);
+    });
+
+    fullscreenButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleFullscreen();
+    });
+
+    document.addEventListener("fullscreenchange", updateFullscreenButton);
+    document.addEventListener("webkitfullscreenchange", updateFullscreenButton);
+    updateFullscreenButton();
 
     infoCloseButton.addEventListener("click", closeInfoWindow);
 
@@ -508,9 +3324,25 @@
       }
     });
 
+    videoCloseButton.addEventListener("click", closeVideoWindow);
+
+    videoOverlay.addEventListener("click", (event) => {
+      if (event.target === videoOverlay) {
+        closeVideoWindow();
+      }
+    });
+
     window.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && infoOverlay.classList.contains("open")) {
         closeInfoWindow();
+      }
+
+      if (event.key === "Escape" && videoOverlay.classList.contains("open")) {
+        closeVideoWindow();
+      }
+
+      if (event.key === "Escape" && customGuideActive) {
+        closeHowToWindow();
       }
     });
 
@@ -546,16 +3378,335 @@
       moveCameraToView(TERMINATE_CAMERA_VIEW, animate);
     }
 
+    function moveCameraToOsEndEndView(animate = true) {
+      moveCameraToView(OS_END_END_CAMERA_VIEW, animate);
+    }
+
+    function moveCameraToIsStartStartView(animate = true) {
+      moveCameraToView(IS_START_START_CAMERA_VIEW, animate);
+    }
+
+    function moveCameraToBoxBaseView(animate = true) {
+      moveCameraToView(BOX_BASE_CAMERA_VIEW, animate);
+    }
+
+    function moveCameraToOsStartStartView(animate = true) {
+      moveCameraToView(OS_START_START_CAMERA_VIEW, animate);
+    }
+
+    function moveCameraToIsEndStartView(animate = true) {
+      moveCameraToView(IS_END_START_CAMERA_VIEW, animate);
+    }
+
+    function moveCameraToIsEndEndView(animate = true) {
+      moveCameraToView(IS_END_END_CAMERA_VIEW, animate);
+    }
+
+    function moveCameraToOsStartEndView(animate = true) {
+      moveCameraToView(OS_START_END_CAMERA_VIEW, animate);
+    }
+
+    function moveCameraToStarterView(animate = true) {
+      moveCameraToView(STARTER_CAMERA_VIEW, animate);
+    }
+
+    function clearInfoHotspotRevealTimers() {
+      infoHotspotRevealTimers.forEach((timer) => clearTimeout(timer));
+      infoHotspotRevealTimers = [];
+    }
+
+    function hideInfoHotspots(selector) {
+      document.querySelectorAll(selector).forEach((hotspot) => {
+        hotspot.classList.remove("isVisible");
+      });
+    }
+
+    function hideAllInfoHotspots() {
+      clearInfoHotspotRevealTimers();
+      clearVideoHotspotRevealTimers();
+      hideInfoHotspots(".hiddenUntilTerminate");
+      hideInfoHotspots(".hiddenUntilOsEndEnd");
+      hideInfoHotspots(".hiddenUntilIsStartStart");
+      hideInfoHotspots(".hiddenUntilBoxBase");
+      hideInfoHotspots(".hiddenUntilOsStartStart");
+      hideInfoHotspots(".hiddenUntilIsEndStart");
+      hideInfoHotspots(".hiddenUntilIsEndEnd");
+      hideInfoHotspots(".hiddenUntilOsStartEnd");
+      hideInfoHotspots(".hiddenUntilStarter");
+      hideVideoHotspots(".hiddenVideoHotspot");
+      modelViewer.classList.remove("showInfoHotspots", "showOsEndEndInfoHotspots", "showIsStartStartInfoHotspots", "showBoxBaseInfoHotspots", "showOsStartStartInfoHotspots", "showIsEndStartInfoHotspots", "showIsEndEndInfoHotspots", "showOsStartEndInfoHotspots", "showStarterInfoHotspots");
+    }
+
+    function clearVideoHotspotRevealTimers() {
+      videoHotspotRevealTimers.forEach((timer) => clearTimeout(timer));
+      videoHotspotRevealTimers = [];
+    }
+
+    function getVideoHotspotAnimation(hotspot) {
+      if (hotspot === terminateVideoHotspot) {
+        return videoHotspotLottieAnimations[0] || null;
+      }
+
+      if (hotspot === osEndEndVideoHotspot) {
+        return videoHotspotLottieAnimations[1] || null;
+      }
+
+      if (hotspot === isStartStartVideoHotspot) {
+        return videoHotspotLottieAnimations[2] || null;
+      }
+
+      if (hotspot === boxBaseVideoHotspot) {
+        return videoHotspotLottieAnimations[3] || null;
+      }
+
+      if (hotspot === osStartStartVideoHotspot) {
+        return videoHotspotLottieAnimations[4] || null;
+      }
+
+      if (hotspot === isEndStartVideoHotspot) {
+        return videoHotspotLottieAnimations[5] || null;
+      }
+
+      if (hotspot === isEndEndVideoHotspot) {
+        return videoHotspotLottieAnimations[6] || null;
+      }
+
+      if (hotspot === osStartEndVideoHotspot) {
+        return videoHotspotLottieAnimations[7] || null;
+      }
+
+      if (hotspot === starterVideoHotspot) {
+        return videoHotspotLottieAnimations[8] || null;
+      }
+
+      return null;
+    }
+
+    function hideVideoHotspotsImmediately(selector) {
+      clearVideoHotspotRevealTimers();
+      hideVideoHotspots(selector);
+    }
+
+    function hideVideoHotspots(selector) {
+      document.querySelectorAll(selector).forEach((hotspot) => {
+        hotspot.classList.remove("isVisible");
+
+        const animation = getVideoHotspotAnimation(hotspot);
+        if (animation) {
+          animation.goToAndStop(0, true);
+        }
+      });
+    }
+
+    function revealVideoHotspotsStaggered(selector, startDelay = 0) {
+      // The old in-model YouTube buttons have been replaced by the top-left hotspot summary window.
+      // Keep this cleanup here so any previously visible video hotspots are hidden and reset.
+      clearVideoHotspotRevealTimers();
+
+      const hotspots = Array.from(document.querySelectorAll(selector));
+
+      hotspots.forEach((hotspot) => {
+        hotspot.classList.remove("isVisible");
+
+        const animation = getVideoHotspotAnimation(hotspot);
+        if (animation) {
+          animation.goToAndStop(0, true);
+        }
+      });
+    }
+
+    function revealInfoHotspotsStaggered(selector, showClassName) {
+      clearInfoHotspotRevealTimers();
+
+      const hotspots = Array.from(document.querySelectorAll(selector));
+
+      hotspots.forEach((hotspot) => {
+        hotspot.classList.remove("isVisible");
+      });
+
+      modelViewer.classList.add(showClassName);
+
+      hotspots.forEach((hotspot, index) => {
+        const timer = setTimeout(() => {
+          hotspot.classList.add("isVisible");
+        }, index * INFO_HOTSPOT_REVEAL_STAGGER);
+
+        infoHotspotRevealTimers.push(timer);
+      });
+    }
+
+    function resetMainHotspotStates(exceptHotspot = null) {
+      stopCustomGuide(false, true);
+      closeInfoWindow();
+      closeHotspotSummaryWindow();
+
+      if (exceptHotspot !== "terminate") {
+        isOpen = false;
+        hotspotLabel.textContent = "TERMINATE";
+        terminateHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
+        hideVideoHotspots(".hiddenUntilTerminateVideo");
+        hideInfoHotspots(".hiddenUntilTerminate");
+        modelViewer.classList.remove("showInfoHotspots");
+      }
+
+      if (exceptHotspot !== "osEndEnd") {
+        isOsEndEndOpen = false;
+        osEndEndHotspotLabel.textContent = "OS END END";
+        osEndEndHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
+        hideInfoHotspots(".hiddenUntilOsEndEnd");
+        hideVideoHotspots(".hiddenUntilOsEndEndVideo");
+        modelViewer.classList.remove("showOsEndEndInfoHotspots");
+      }
+
+      if (exceptHotspot !== "isStartStart") {
+        isIsStartStartOpen = false;
+        isStartStartHotspotLabel.textContent = "IS START START";
+        isStartStartHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
+        hideInfoHotspots(".hiddenUntilIsStartStart");
+        hideVideoHotspots(".hiddenUntilIsStartStartVideo");
+        modelViewer.classList.remove("showIsStartStartInfoHotspots");
+      }
+
+      if (exceptHotspot !== "boxBase") {
+        isBoxBaseOpen = false;
+        boxBaseHotspotLabel.textContent = "BOX BASE";
+        boxBaseHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
+        hideInfoHotspots(".hiddenUntilBoxBase");
+        hideVideoHotspots(".hiddenUntilBoxBaseVideo");
+        modelViewer.classList.remove("showBoxBaseInfoHotspots");
+      }
+
+      if (exceptHotspot !== "osStartStart") {
+        isOsStartStartOpen = false;
+        osStartStartHotspotLabel.textContent = "OS START START";
+        osStartStartHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
+        hideInfoHotspots(".hiddenUntilOsStartStart");
+        hideVideoHotspots(".hiddenUntilOsStartStartVideo");
+        modelViewer.classList.remove("showOsStartStartInfoHotspots");
+      }
+
+      if (exceptHotspot !== "isEndStart") {
+        isIsEndStartOpen = false;
+        isEndStartHotspotLabel.textContent = "IS END START";
+        isEndStartHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
+        hideInfoHotspots(".hiddenUntilIsEndStart");
+        hideVideoHotspots(".hiddenUntilIsEndStartVideo");
+        modelViewer.classList.remove("showIsEndStartInfoHotspots");
+      }
+
+      if (exceptHotspot !== "isEndEnd") {
+        isIsEndEndOpen = false;
+        isEndEndHotspotLabel.textContent = "IS END END";
+        isEndEndHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
+        hideInfoHotspots(".hiddenUntilIsEndEnd");
+        hideVideoHotspots(".hiddenUntilIsEndEndVideo");
+        modelViewer.classList.remove("showIsEndEndInfoHotspots");
+      }
+
+      if (exceptHotspot !== "osStartEnd") {
+        isOsStartEndOpen = false;
+        osStartEndHotspotLabel.textContent = "OS START END";
+        osStartEndHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
+        hideInfoHotspots(".hiddenUntilOsStartEnd");
+        hideVideoHotspots(".hiddenUntilOsStartEndVideo");
+        modelViewer.classList.remove("showOsStartEndInfoHotspots");
+      }
+
+      if (exceptHotspot !== "starter") {
+        isStarterOpen = false;
+        starterHotspotLabel.textContent = "STARTER";
+        starterHotspotLottie.classList.remove("isBack", "flipToBack", "flipToTerminate");
+        hideInfoHotspots(".hiddenUntilStarter");
+        hideVideoHotspots(".hiddenUntilStarterVideo");
+        modelViewer.classList.remove("showStarterInfoHotspots");
+      }
+    }
+
+    function getCurrentHotspotCameraView() {
+      if (activeMainHotspot === "starter" || isStarterOpen) {
+        return STARTER_CAMERA_VIEW;
+      }
+
+      if (activeMainHotspot === "osStartEnd" || isOsStartEndOpen) {
+        return OS_START_END_CAMERA_VIEW;
+      }
+
+      if (activeMainHotspot === "isEndEnd" || isIsEndEndOpen) {
+        return IS_END_END_CAMERA_VIEW;
+      }
+
+      if (activeMainHotspot === "isEndStart" || isIsEndStartOpen) {
+        return IS_END_START_CAMERA_VIEW;
+      }
+
+      if (activeMainHotspot === "osStartStart" || isOsStartStartOpen) {
+        return OS_START_START_CAMERA_VIEW;
+      }
+
+      if (activeMainHotspot === "boxBase" || isBoxBaseOpen) {
+        return BOX_BASE_CAMERA_VIEW;
+      }
+
+      if (activeMainHotspot === "isStartStart" || isIsStartStartOpen) {
+        return IS_START_START_CAMERA_VIEW;
+      }
+
+      if (activeMainHotspot === "osEndEnd" || isOsEndEndOpen) {
+        return OS_END_END_CAMERA_VIEW;
+      }
+
+      if (activeMainHotspot === "terminate" || isOpen) {
+        return TERMINATE_CAMERA_VIEW;
+      }
+
+      return null;
+    }
+
+    function hideAndDelaySequenceImage() {
+      if (sequenceFadeTimer) {
+        clearTimeout(sequenceFadeTimer);
+        sequenceFadeTimer = null;
+      }
+
+      sequenceImage.classList.add("sequenceHidden");
+
+      sequenceFadeTimer = setTimeout(() => {
+        sequenceFadeTimer = null;
+
+        if (infoOverlay.classList.contains("open")) {
+          sequenceImage.classList.remove("sequenceHidden");
+
+          const sequenceFadeInDuration = 750;
+          setTimeout(() => {
+            if (!sequenceHasUserInteracted && infoOverlay.classList.contains("open")) {
+              startTouchGuideDemo();
+            }
+          }, sequenceFadeInDuration);
+        }
+      }, 1500);
+    }
+
+    function clearSequenceFadeTimer() {
+      if (sequenceFadeTimer) {
+        clearTimeout(sequenceFadeTimer);
+        sequenceFadeTimer = null;
+      }
+    }
+
     function playForwardAndHold() {
       stopAllMonitors();
+      resetMainHotspotStates("terminate");
 
       isPlaying = true;
       isOpen = false;
+      activeMainHotspot = "terminate";
+      openHotspotSummaryWindow("terminate");
 
-      modelViewer.classList.remove("showInfoHotspots");
+      hideAllInfoHotspots();
+      animateMainHotspotButton(terminateHotspotLottie, true);
       moveCameraToTerminateView(true);
 
-      modelViewer.animationName = ANIMATION_NAME;
+      modelViewer.animationName = TERMINATE_ANIMATION_NAME;
       modelViewer.timeScale = 1;
       modelViewer.currentTime = 0;
       modelViewer.play();
@@ -567,15 +3718,20 @@
 
     function playBackwardByScrubbing() {
       stopAllMonitors();
+      hideVideoHotspotsImmediately(".hiddenUntilTerminateVideo");
       closeInfoWindow();
+      closeHotspotSummaryWindow();
 
       isPlaying = true;
       isOpen = true;
+      activeMainHotspot = "terminate";
 
+      hideInfoHotspots(".hiddenUntilTerminate");
       modelViewer.classList.remove("showInfoHotspots");
+      animateMainHotspotButton(terminateHotspotLottie, false);
       moveCameraToDefaultView(true);
 
-      modelViewer.animationName = ANIMATION_NAME;
+      modelViewer.animationName = TERMINATE_ANIMATION_NAME;
       modelViewer.pause();
       modelViewer.timeScale = 1;
       modelViewer.currentTime = safeEndTime;
@@ -586,16 +3742,479 @@
       reverseFrameId = requestAnimationFrame(scrubBackwardFrame);
     }
 
+    function playOsEndEndForwardAndHold() {
+      stopAllMonitors();
+      resetMainHotspotStates("osEndEnd");
+
+      isPlaying = true;
+      isOsEndEndOpen = false;
+      activeMainHotspot = "osEndEnd";
+      openHotspotSummaryWindow("osEndEnd");
+
+      hideAllInfoHotspots();
+      animateMainHotspotButton(osEndEndHotspotLottie, true);
+      moveCameraToOsEndEndView(true);
+
+      modelViewer.animationName = OS_END_END_ANIMATION_NAME;
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = 0;
+      modelViewer.play();
+
+      osEndEndHotspotLabel.textContent = "BACK";
+
+      monitorForward();
+    }
+
+    function playOsEndEndBackwardByScrubbing() {
+      stopAllMonitors();
+      hideVideoHotspotsImmediately(".hiddenUntilOsEndEndVideo");
+      closeInfoWindow();
+      closeHotspotSummaryWindow();
+
+      isPlaying = true;
+      isOsEndEndOpen = true;
+      activeMainHotspot = "osEndEnd";
+
+      hideInfoHotspots(".hiddenUntilOsEndEnd");
+      modelViewer.classList.remove("showOsEndEndInfoHotspots");
+      animateMainHotspotButton(osEndEndHotspotLottie, false);
+      moveCameraToDefaultView(true);
+
+      modelViewer.animationName = OS_END_END_ANIMATION_NAME;
+      modelViewer.pause();
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = osEndEndSafeEndTime;
+
+      osEndEndHotspotLabel.textContent = "OS END END";
+
+      lastReverseTimestamp = null;
+      reverseFrameId = requestAnimationFrame(scrubBackwardFrame);
+    }
+
+    function playIsStartStartForwardAndHold() {
+      stopAllMonitors();
+      resetMainHotspotStates("isStartStart");
+
+      isPlaying = true;
+      isIsStartStartOpen = false;
+      activeMainHotspot = "isStartStart";
+      openHotspotSummaryWindow("isStartStart");
+
+      hideAllInfoHotspots();
+      animateMainHotspotButton(isStartStartHotspotLottie, true);
+      moveCameraToIsStartStartView(true);
+
+      modelViewer.animationName = IS_START_START_ANIMATION_NAME;
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = 0;
+      modelViewer.play();
+
+      isStartStartHotspotLabel.textContent = "BACK";
+
+      monitorForward();
+    }
+
+    function playIsStartStartBackwardByScrubbing() {
+      stopAllMonitors();
+      hideVideoHotspotsImmediately(".hiddenUntilIsStartStartVideo");
+      closeInfoWindow();
+      closeHotspotSummaryWindow();
+
+      isPlaying = true;
+      isIsStartStartOpen = true;
+      activeMainHotspot = "isStartStart";
+
+      hideInfoHotspots(".hiddenUntilIsStartStart");
+      modelViewer.classList.remove("showIsStartStartInfoHotspots");
+      animateMainHotspotButton(isStartStartHotspotLottie, false);
+      moveCameraToDefaultView(true);
+
+      modelViewer.animationName = IS_START_START_ANIMATION_NAME;
+      modelViewer.pause();
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = isStartStartSafeEndTime;
+
+      isStartStartHotspotLabel.textContent = "IS START START";
+
+      lastReverseTimestamp = null;
+      reverseFrameId = requestAnimationFrame(scrubBackwardFrame);
+    }
+
+    function playBoxBaseForwardAndHold() {
+      stopAllMonitors();
+      resetMainHotspotStates("boxBase");
+
+      isPlaying = true;
+      isBoxBaseOpen = false;
+      activeMainHotspot = "boxBase";
+      openHotspotSummaryWindow("boxBase");
+
+      hideAllInfoHotspots();
+      animateMainHotspotButton(boxBaseHotspotLottie, true);
+      moveCameraToBoxBaseView(true);
+
+      modelViewer.animationName = BOX_BASE_ANIMATION_NAME;
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = 0;
+      modelViewer.play();
+
+      boxBaseHotspotLabel.textContent = "BACK";
+
+      monitorForward();
+    }
+
+    function playBoxBaseBackwardByScrubbing() {
+      stopAllMonitors();
+      hideVideoHotspotsImmediately(".hiddenUntilBoxBaseVideo");
+      closeInfoWindow();
+      closeHotspotSummaryWindow();
+
+      isPlaying = true;
+      isBoxBaseOpen = true;
+      activeMainHotspot = "boxBase";
+
+      hideInfoHotspots(".hiddenUntilBoxBase");
+      modelViewer.classList.remove("showBoxBaseInfoHotspots");
+      animateMainHotspotButton(boxBaseHotspotLottie, false);
+      moveCameraToDefaultView(true);
+
+      modelViewer.animationName = BOX_BASE_ANIMATION_NAME;
+      modelViewer.pause();
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = boxBaseSafeEndTime;
+
+      boxBaseHotspotLabel.textContent = "BOX BASE";
+
+      lastReverseTimestamp = null;
+      reverseFrameId = requestAnimationFrame(scrubBackwardFrame);
+    }
+
+    function playOsStartStartForwardAndHold() {
+      stopAllMonitors();
+      resetMainHotspotStates("osStartStart");
+
+      isPlaying = true;
+      isOsStartStartOpen = false;
+      activeMainHotspot = "osStartStart";
+      openHotspotSummaryWindow("osStartStart");
+
+      hideAllInfoHotspots();
+      animateMainHotspotButton(osStartStartHotspotLottie, true);
+      moveCameraToOsStartStartView(true);
+
+      modelViewer.animationName = OS_START_START_ANIMATION_NAME;
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = 0;
+      modelViewer.play();
+
+      osStartStartHotspotLabel.textContent = "BACK";
+
+      monitorForward();
+    }
+
+    function playOsStartStartBackwardByScrubbing() {
+      stopAllMonitors();
+      hideVideoHotspotsImmediately(".hiddenUntilOsStartStartVideo");
+      closeInfoWindow();
+      closeHotspotSummaryWindow();
+
+      isPlaying = true;
+      isOsStartStartOpen = true;
+      activeMainHotspot = "osStartStart";
+
+      hideInfoHotspots(".hiddenUntilOsStartStart");
+      modelViewer.classList.remove("showOsStartStartInfoHotspots");
+      animateMainHotspotButton(osStartStartHotspotLottie, false);
+      moveCameraToDefaultView(true);
+
+      modelViewer.animationName = OS_START_START_ANIMATION_NAME;
+      modelViewer.pause();
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = osStartStartSafeEndTime;
+
+      osStartStartHotspotLabel.textContent = "OS START START";
+
+      lastReverseTimestamp = null;
+      reverseFrameId = requestAnimationFrame(scrubBackwardFrame);
+    }
+
+    function playIsEndStartForwardAndHold() {
+      stopAllMonitors();
+      resetMainHotspotStates("isEndStart");
+
+      isPlaying = true;
+      isIsEndStartOpen = false;
+      activeMainHotspot = "isEndStart";
+      openHotspotSummaryWindow("isEndStart");
+
+      hideAllInfoHotspots();
+      animateMainHotspotButton(isEndStartHotspotLottie, true);
+      moveCameraToIsEndStartView(true);
+
+      modelViewer.animationName = IS_END_START_ANIMATION_NAME;
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = 0;
+      modelViewer.play();
+
+      isEndStartHotspotLabel.textContent = "BACK";
+
+      monitorForward();
+    }
+
+    function playIsEndStartBackwardByScrubbing() {
+      stopAllMonitors();
+      hideVideoHotspotsImmediately(".hiddenUntilIsEndStartVideo");
+      closeInfoWindow();
+      closeHotspotSummaryWindow();
+
+      isPlaying = true;
+      isIsEndStartOpen = true;
+      activeMainHotspot = "isEndStart";
+
+      hideInfoHotspots(".hiddenUntilIsEndStart");
+      modelViewer.classList.remove("showIsEndStartInfoHotspots");
+      animateMainHotspotButton(isEndStartHotspotLottie, false);
+      moveCameraToDefaultView(true);
+
+      modelViewer.animationName = IS_END_START_ANIMATION_NAME;
+      modelViewer.pause();
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = isEndStartSafeEndTime;
+
+      isEndStartHotspotLabel.textContent = "IS END START";
+
+      lastReverseTimestamp = null;
+      reverseFrameId = requestAnimationFrame(scrubBackwardFrame);
+    }
+
+    function playIsEndEndForwardAndHold() {
+      stopAllMonitors();
+      resetMainHotspotStates("isEndEnd");
+
+      isPlaying = true;
+      isIsEndEndOpen = false;
+      activeMainHotspot = "isEndEnd";
+      openHotspotSummaryWindow("isEndEnd");
+
+      hideAllInfoHotspots();
+      animateMainHotspotButton(isEndEndHotspotLottie, true);
+      moveCameraToIsEndEndView(true);
+
+      modelViewer.animationName = IS_END_END_ANIMATION_NAME;
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = 0;
+      modelViewer.play();
+
+      isEndEndHotspotLabel.textContent = "BACK";
+
+      monitorForward();
+    }
+
+    function playIsEndEndBackwardByScrubbing() {
+      stopAllMonitors();
+      hideVideoHotspotsImmediately(".hiddenUntilIsEndEndVideo");
+      closeInfoWindow();
+      closeHotspotSummaryWindow();
+
+      isPlaying = true;
+      isIsEndEndOpen = true;
+      activeMainHotspot = "isEndEnd";
+
+      hideInfoHotspots(".hiddenUntilIsEndEnd");
+      modelViewer.classList.remove("showIsEndEndInfoHotspots");
+      animateMainHotspotButton(isEndEndHotspotLottie, false);
+      moveCameraToDefaultView(true);
+
+      modelViewer.animationName = IS_END_END_ANIMATION_NAME;
+      modelViewer.pause();
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = isEndEndSafeEndTime;
+
+      isEndEndHotspotLabel.textContent = "IS END END";
+
+      lastReverseTimestamp = null;
+      reverseFrameId = requestAnimationFrame(scrubBackwardFrame);
+    }
+
+    function playOsStartEndForwardAndHold() {
+      stopAllMonitors();
+      resetMainHotspotStates("osStartEnd");
+
+      isPlaying = true;
+      isOsStartEndOpen = false;
+      activeMainHotspot = "osStartEnd";
+      openHotspotSummaryWindow("osStartEnd");
+
+      hideAllInfoHotspots();
+      animateMainHotspotButton(osStartEndHotspotLottie, true);
+      moveCameraToOsStartEndView(true);
+
+      modelViewer.animationName = OS_START_END_ANIMATION_NAME;
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = 0;
+      modelViewer.play();
+
+      osStartEndHotspotLabel.textContent = "BACK";
+
+      monitorForward();
+    }
+
+    function playOsStartEndBackwardByScrubbing() {
+      stopAllMonitors();
+      hideVideoHotspotsImmediately(".hiddenUntilOsStartEndVideo");
+      closeInfoWindow();
+      closeHotspotSummaryWindow();
+
+      isPlaying = true;
+      isOsStartEndOpen = true;
+      activeMainHotspot = "osStartEnd";
+
+      hideInfoHotspots(".hiddenUntilOsStartEnd");
+      modelViewer.classList.remove("showOsStartEndInfoHotspots");
+      animateMainHotspotButton(osStartEndHotspotLottie, false);
+      moveCameraToDefaultView(true);
+
+      modelViewer.animationName = OS_START_END_ANIMATION_NAME;
+      modelViewer.pause();
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = osStartEndSafeEndTime;
+
+      osStartEndHotspotLabel.textContent = "OS START END";
+
+      lastReverseTimestamp = null;
+      reverseFrameId = requestAnimationFrame(scrubBackwardFrame);
+    }
+
+    function playStarterForwardAndHold() {
+      stopAllMonitors();
+      resetMainHotspotStates("starter");
+
+      isPlaying = true;
+      isStarterOpen = false;
+      activeMainHotspot = "starter";
+      openHotspotSummaryWindow("starter");
+
+      hideAllInfoHotspots();
+      animateMainHotspotButton(starterHotspotLottie, true);
+      moveCameraToStarterView(true);
+
+      modelViewer.animationName = STARTER_ANIMATION_NAME;
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = 0;
+      modelViewer.play();
+
+      starterHotspotLabel.textContent = "BACK";
+
+      monitorForward();
+    }
+
+    function playStarterBackwardByScrubbing() {
+      stopAllMonitors();
+      hideVideoHotspotsImmediately(".hiddenUntilStarterVideo");
+      closeInfoWindow();
+      closeHotspotSummaryWindow();
+
+      isPlaying = true;
+      isStarterOpen = true;
+      activeMainHotspot = "starter";
+
+      hideInfoHotspots(".hiddenUntilStarter");
+      modelViewer.classList.remove("showStarterInfoHotspots");
+      animateMainHotspotButton(starterHotspotLottie, false);
+      moveCameraToDefaultView(true);
+
+      modelViewer.animationName = STARTER_ANIMATION_NAME;
+      modelViewer.pause();
+      modelViewer.timeScale = 1;
+      modelViewer.currentTime = starterSafeEndTime;
+
+      starterHotspotLabel.textContent = "STARTER";
+
+      lastReverseTimestamp = null;
+      reverseFrameId = requestAnimationFrame(scrubBackwardFrame);
+    }
+
     function monitorForward() {
-      if (modelViewer.currentTime >= safeEndTime) {
+      const currentSafeEndTime = activeMainHotspot === "osEndEnd"
+        ? osEndEndSafeEndTime
+        : activeMainHotspot === "isStartStart"
+          ? isStartStartSafeEndTime
+          : activeMainHotspot === "boxBase"
+            ? boxBaseSafeEndTime
+            : activeMainHotspot === "osStartStart"
+              ? osStartStartSafeEndTime
+              : activeMainHotspot === "isEndStart"
+                ? isEndStartSafeEndTime
+                : activeMainHotspot === "isEndEnd"
+                  ? isEndEndSafeEndTime
+                  : activeMainHotspot === "osStartEnd"
+                    ? osStartEndSafeEndTime
+                    : activeMainHotspot === "starter"
+                      ? starterSafeEndTime
+                      : safeEndTime;
+
+      if (modelViewer.currentTime >= currentSafeEndTime) {
         modelViewer.pause();
         modelViewer.timeScale = 1;
-        modelViewer.currentTime = safeEndTime;
+        modelViewer.currentTime = currentSafeEndTime;
 
         isPlaying = false;
-        isOpen = true;
 
-        modelViewer.classList.add("showInfoHotspots");
+        if (activeMainHotspot === "osEndEnd") {
+          isOsEndEndOpen = true;
+          revealInfoHotspotsStaggered(".hiddenUntilOsEndEnd", "showOsEndEndInfoHotspots");
+          const osInfoCount = document.querySelectorAll(".hiddenUntilOsEndEnd").length;
+          const videoRevealDelay = osInfoCount * INFO_HOTSPOT_REVEAL_STAGGER;
+          revealVideoHotspotsStaggered(".hiddenUntilOsEndEndVideo", videoRevealDelay);
+        } else if (activeMainHotspot === "isStartStart") {
+          isIsStartStartOpen = true;
+          revealInfoHotspotsStaggered(".hiddenUntilIsStartStart", "showIsStartStartInfoHotspots");
+          const isStartStartInfoCount = document.querySelectorAll(".hiddenUntilIsStartStart").length;
+          const videoRevealDelay = isStartStartInfoCount * INFO_HOTSPOT_REVEAL_STAGGER;
+          revealVideoHotspotsStaggered(".hiddenUntilIsStartStartVideo", videoRevealDelay);
+        } else if (activeMainHotspot === "boxBase") {
+          isBoxBaseOpen = true;
+          revealInfoHotspotsStaggered(".hiddenUntilBoxBase", "showBoxBaseInfoHotspots");
+          const boxBaseInfoCount = document.querySelectorAll(".hiddenUntilBoxBase").length;
+          const videoRevealDelay = boxBaseInfoCount * INFO_HOTSPOT_REVEAL_STAGGER;
+          revealVideoHotspotsStaggered(".hiddenUntilBoxBaseVideo", videoRevealDelay);
+        } else if (activeMainHotspot === "osStartStart") {
+          isOsStartStartOpen = true;
+          revealInfoHotspotsStaggered(".hiddenUntilOsStartStart", "showOsStartStartInfoHotspots");
+          const osStartStartInfoCount = document.querySelectorAll(".hiddenUntilOsStartStart").length;
+          const videoRevealDelay = osStartStartInfoCount * INFO_HOTSPOT_REVEAL_STAGGER;
+          revealVideoHotspotsStaggered(".hiddenUntilOsStartStartVideo", videoRevealDelay);
+        } else if (activeMainHotspot === "isEndStart") {
+          isIsEndStartOpen = true;
+          revealInfoHotspotsStaggered(".hiddenUntilIsEndStart", "showIsEndStartInfoHotspots");
+          const isEndStartInfoCount = document.querySelectorAll(".hiddenUntilIsEndStart").length;
+          const videoRevealDelay = isEndStartInfoCount * INFO_HOTSPOT_REVEAL_STAGGER;
+          revealVideoHotspotsStaggered(".hiddenUntilIsEndStartVideo", videoRevealDelay);
+        } else if (activeMainHotspot === "isEndEnd") {
+          isIsEndEndOpen = true;
+          revealInfoHotspotsStaggered(".hiddenUntilIsEndEnd", "showIsEndEndInfoHotspots");
+          const isEndEndInfoCount = document.querySelectorAll(".hiddenUntilIsEndEnd").length;
+          const videoRevealDelay = isEndEndInfoCount * INFO_HOTSPOT_REVEAL_STAGGER;
+          revealVideoHotspotsStaggered(".hiddenUntilIsEndEndVideo", videoRevealDelay);
+        } else if (activeMainHotspot === "osStartEnd") {
+          isOsStartEndOpen = true;
+          revealInfoHotspotsStaggered(".hiddenUntilOsStartEnd", "showOsStartEndInfoHotspots");
+          const osStartEndInfoCount = document.querySelectorAll(".hiddenUntilOsStartEnd").length;
+          const videoRevealDelay = osStartEndInfoCount * INFO_HOTSPOT_REVEAL_STAGGER;
+          revealVideoHotspotsStaggered(".hiddenUntilOsStartEndVideo", videoRevealDelay);
+        } else if (activeMainHotspot === "starter") {
+          isStarterOpen = true;
+          revealInfoHotspotsStaggered(".hiddenUntilStarter", "showStarterInfoHotspots");
+          const starterInfoCount = document.querySelectorAll(".hiddenUntilStarter").length;
+          const videoRevealDelay = starterInfoCount * INFO_HOTSPOT_REVEAL_STAGGER;
+          revealVideoHotspotsStaggered(".hiddenUntilStarterVideo", videoRevealDelay);
+        } else {
+          isOpen = true;
+          revealInfoHotspotsStaggered(".hiddenUntilTerminate", "showInfoHotspots");
+          const terminateInfoCount = document.querySelectorAll(".hiddenUntilTerminate").length;
+          const videoRevealDelay = terminateInfoCount * INFO_HOTSPOT_REVEAL_STAGGER;
+          revealVideoHotspotsStaggered(".hiddenUntilTerminateVideo", videoRevealDelay);
+        }
 
         stopAllMonitors();
         return;
@@ -620,9 +4239,55 @@
         modelViewer.timeScale = 1;
 
         isPlaying = false;
-        isOpen = false;
 
-        modelViewer.classList.remove("showInfoHotspots");
+        if (activeMainHotspot === "osEndEnd") {
+          isOsEndEndOpen = false;
+          hideInfoHotspots(".hiddenUntilOsEndEnd");
+          hideVideoHotspots(".hiddenUntilOsEndEndVideo");
+          modelViewer.classList.remove("showOsEndEndInfoHotspots");
+        } else if (activeMainHotspot === "isStartStart") {
+          isIsStartStartOpen = false;
+          hideInfoHotspots(".hiddenUntilIsStartStart");
+          hideVideoHotspots(".hiddenUntilIsStartStartVideo");
+          modelViewer.classList.remove("showIsStartStartInfoHotspots");
+        } else if (activeMainHotspot === "boxBase") {
+          isBoxBaseOpen = false;
+          hideInfoHotspots(".hiddenUntilBoxBase");
+          hideVideoHotspots(".hiddenUntilBoxBaseVideo");
+          modelViewer.classList.remove("showBoxBaseInfoHotspots");
+        } else if (activeMainHotspot === "osStartStart") {
+          isOsStartStartOpen = false;
+          hideInfoHotspots(".hiddenUntilOsStartStart");
+          hideVideoHotspots(".hiddenUntilOsStartStartVideo");
+          modelViewer.classList.remove("showOsStartStartInfoHotspots");
+        } else if (activeMainHotspot === "isEndStart") {
+          isIsEndStartOpen = false;
+          hideInfoHotspots(".hiddenUntilIsEndStart");
+          hideVideoHotspots(".hiddenUntilIsEndStartVideo");
+          modelViewer.classList.remove("showIsEndStartInfoHotspots");
+        } else if (activeMainHotspot === "isEndEnd") {
+          isIsEndEndOpen = false;
+          hideInfoHotspots(".hiddenUntilIsEndEnd");
+          hideVideoHotspots(".hiddenUntilIsEndEndVideo");
+          modelViewer.classList.remove("showIsEndEndInfoHotspots");
+        } else if (activeMainHotspot === "osStartEnd") {
+          isOsStartEndOpen = false;
+          hideInfoHotspots(".hiddenUntilOsStartEnd");
+          hideVideoHotspots(".hiddenUntilOsStartEndVideo");
+          modelViewer.classList.remove("showOsStartEndInfoHotspots");
+        } else if (activeMainHotspot === "starter") {
+          isStarterOpen = false;
+          hideInfoHotspots(".hiddenUntilStarter");
+          hideVideoHotspots(".hiddenUntilStarterVideo");
+          modelViewer.classList.remove("showStarterInfoHotspots");
+        } else {
+          isOpen = false;
+          hideVideoHotspots(".hiddenUntilTerminateVideo");
+          hideInfoHotspots(".hiddenUntilTerminate");
+          modelViewer.classList.remove("showInfoHotspots");
+        }
+
+        activeMainHotspot = null;
 
         stopAllMonitors();
         return;
@@ -646,32 +4311,321 @@
       lastReverseTimestamp = null;
     }
 
-    function openInfoWindow() {
+    function loadHotspotLotties() {
+      if (!window.lottie) {
+        console.warn("Lottie/bodymovin is not loaded.");
+        return;
+      }
+
+      if (terminateHotspotLottieAnimation) {
+        terminateHotspotLottieAnimation.destroy();
+      }
+
+      if (osEndEndHotspotLottieAnimation) {
+        osEndEndHotspotLottieAnimation.destroy();
+      }
+
+      if (isStartStartHotspotLottieAnimation) {
+        isStartStartHotspotLottieAnimation.destroy();
+      }
+
+      if (boxBaseHotspotLottieAnimation) {
+        boxBaseHotspotLottieAnimation.destroy();
+      }
+
+      if (osStartStartHotspotLottieAnimation) {
+        osStartStartHotspotLottieAnimation.destroy();
+      }
+
+      if (isEndStartHotspotLottieAnimation) {
+        isEndStartHotspotLottieAnimation.destroy();
+      }
+
+      if (isEndEndHotspotLottieAnimation) {
+        isEndEndHotspotLottieAnimation.destroy();
+      }
+
+      if (osStartEndHotspotLottieAnimation) {
+        osStartEndHotspotLottieAnimation.destroy();
+      }
+
+      if (starterHotspotLottieAnimation) {
+        starterHotspotLottieAnimation.destroy();
+      }
+
+      videoHotspotLottieAnimations.forEach((animation) => {
+        if (animation) animation.destroy();
+      });
+      videoHotspotLottieAnimations = [];
+
+      infoHotspotLottieAnimations.forEach((animation) => {
+        if (animation) animation.destroy();
+      });
+      infoHotspotLottieAnimations = [];
+
+      terminateHotspotLottieAnimation = lottie.loadAnimation({
+        container: terminateHotspotLottie,
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        path: TERMINATE_HOTSPOT_LOTTIE_PATH
+      });
+
+      osEndEndHotspotLottieAnimation = lottie.loadAnimation({
+        container: osEndEndHotspotLottie,
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        path: TERMINATE_HOTSPOT_LOTTIE_PATH
+      });
+
+      isStartStartHotspotLottieAnimation = lottie.loadAnimation({
+        container: isStartStartHotspotLottie,
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        path: TERMINATE_HOTSPOT_LOTTIE_PATH
+      });
+
+      boxBaseHotspotLottieAnimation = lottie.loadAnimation({
+        container: boxBaseHotspotLottie,
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        path: TERMINATE_HOTSPOT_LOTTIE_PATH
+      });
+
+      osStartStartHotspotLottieAnimation = lottie.loadAnimation({
+        container: osStartStartHotspotLottie,
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        path: TERMINATE_HOTSPOT_LOTTIE_PATH
+      });
+
+      isEndStartHotspotLottieAnimation = lottie.loadAnimation({
+        container: isEndStartHotspotLottie,
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        path: TERMINATE_HOTSPOT_LOTTIE_PATH
+      });
+
+      isEndEndHotspotLottieAnimation = lottie.loadAnimation({
+        container: isEndEndHotspotLottie,
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        path: TERMINATE_HOTSPOT_LOTTIE_PATH
+      });
+
+      osStartEndHotspotLottieAnimation = lottie.loadAnimation({
+        container: osStartEndHotspotLottie,
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        path: TERMINATE_HOTSPOT_LOTTIE_PATH
+      });
+
+      starterHotspotLottieAnimation = lottie.loadAnimation({
+        container: starterHotspotLottie,
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        path: TERMINATE_HOTSPOT_LOTTIE_PATH
+      });
+
+      [terminateVideoHotspotLottie, osEndEndVideoHotspotLottie, isStartStartVideoHotspotLottie, boxBaseVideoHotspotLottie, osStartStartVideoHotspotLottie, isEndStartVideoHotspotLottie, isEndEndVideoHotspotLottie, osStartEndVideoHotspotLottie, starterVideoHotspotLottie].forEach((container) => {
+        if (!container) return;
+
+        const animation = lottie.loadAnimation({
+          container,
+          renderer: "svg",
+          loop: false,
+          autoplay: false,
+          path: VIDEO_HOTSPOT_LOTTIE_PATH
+        });
+
+        animation.addEventListener("DOMLoaded", () => {
+          animation.goToAndStop(0, true);
+        });
+
+        animation.addEventListener("complete", () => {
+          animation.goToAndStop(animation.totalFrames, true);
+        });
+
+        videoHotspotLottieAnimations.push(animation);
+      });
+
+      [infoHotspotLottie1, infoHotspotLottie2, ...osEndEndInfoHotspotLotties, ...isStartStartInfoHotspotLotties, ...boxBaseInfoHotspotLotties, ...osStartStartInfoHotspotLotties, ...isEndStartInfoHotspotLotties, ...isEndEndInfoHotspotLotties, ...osStartEndInfoHotspotLotties, ...starterInfoHotspotLotties].forEach((container, index) => {
+        if (!container) return;
+
+        const animation = lottie.loadAnimation({
+          container,
+          renderer: "svg",
+          loop: true,
+          autoplay: false,
+          path: INFO_HOTSPOT_LOTTIE_PATH
+        });
+
+        animation.addEventListener("DOMLoaded", () => {
+          setTimeout(() => {
+            animation.play();
+          }, index * INFO_HOTSPOT_REVEAL_STAGGER);
+        });
+
+        infoHotspotLottieAnimations.push(animation);
+      });
+    }
+
+    function animateMainHotspotButton(lottieElement, toBack) {
+      lottieElement.classList.remove("flipToBack", "flipToTerminate");
+
+      // Force the browser to restart the CSS keyframe animation on repeated clicks.
+      void lottieElement.offsetWidth;
+
+      if (toBack) {
+        lottieElement.classList.remove("isBack");
+        lottieElement.classList.add("flipToBack");
+      } else {
+        lottieElement.classList.add("isBack");
+        lottieElement.classList.add("flipToTerminate");
+      }
+    }
+
+    function handleMainHotspotAnimationEnd(lottieElement) {
+      if (lottieElement.classList.contains("flipToBack")) {
+        lottieElement.classList.remove("flipToBack");
+        lottieElement.classList.add("isBack");
+        return;
+      }
+
+      if (lottieElement.classList.contains("flipToTerminate")) {
+        lottieElement.classList.remove("flipToTerminate", "isBack");
+      }
+    }
+
+    terminateHotspotLottie.addEventListener("animationend", () => {
+      handleMainHotspotAnimationEnd(terminateHotspotLottie);
+    });
+
+    osEndEndHotspotLottie.addEventListener("animationend", () => {
+      handleMainHotspotAnimationEnd(osEndEndHotspotLottie);
+    });
+
+    isStartStartHotspotLottie.addEventListener("animationend", () => {
+      handleMainHotspotAnimationEnd(isStartStartHotspotLottie);
+    });
+
+    boxBaseHotspotLottie.addEventListener("animationend", () => {
+      handleMainHotspotAnimationEnd(boxBaseHotspotLottie);
+    });
+
+    osStartStartHotspotLottie.addEventListener("animationend", () => {
+      handleMainHotspotAnimationEnd(osStartStartHotspotLottie);
+    });
+
+    isEndStartHotspotLottie.addEventListener("animationend", () => {
+      handleMainHotspotAnimationEnd(isEndStartHotspotLottie);
+    });
+
+    isEndEndHotspotLottie.addEventListener("animationend", () => {
+      handleMainHotspotAnimationEnd(isEndEndHotspotLottie);
+    });
+
+    osStartEndHotspotLottie.addEventListener("animationend", () => {
+      handleMainHotspotAnimationEnd(osStartEndHotspotLottie);
+    });
+
+    starterHotspotLottie.addEventListener("animationend", () => {
+      handleMainHotspotAnimationEnd(starterHotspotLottie);
+    });
+
+    function openVideoWindow(videoKey = "terminate") {
+      stopCustomGuide(false, true);
+      const videoContent = VIDEO_CONTENT[videoKey] || VIDEO_CONTENT.terminate;
+      closeHotspotSummaryWindow();
+
+      videoTitle.textContent = videoContent.title;
+      videoSubtitle.textContent = videoContent.subtitle;
+      youtubeFrame.src = videoContent.youtubeEmbedUrl;
+
+      returnCameraViewAfterVideoClose = getCurrentHotspotCameraView();
+      moveCameraToDefaultView(true);
+
+      videoOverlay.classList.add("open");
+      videoOverlay.setAttribute("aria-hidden", "false");
+      updateModalControlsVisibility();
+    }
+
+    function closeVideoWindow() {
+      const cameraViewToRestore = returnCameraViewAfterVideoClose;
+
+      videoOverlay.classList.remove("open");
+      videoOverlay.setAttribute("aria-hidden", "true");
+
+      youtubeFrame.src = "";
+
+      if (cameraViewToRestore) {
+        moveCameraToView(cameraViewToRestore, true);
+      }
+
+      returnCameraViewAfterVideoClose = null;
+      updateModalControlsVisibility();
+    }
+
+    function openInfoWindow(infoKey = "twoPieceJChannel") {
+      stopCustomGuide(false, true);
+      activeInfoKey = INFO_CONTENT[infoKey] ? infoKey : "twoPieceJChannel";
+      activeInfoContent = INFO_CONTENT[activeInfoKey];
+
+      temporarilyHideHotspotSummaryForInfo();
+
+      infoTitle.textContent = activeInfoContent.title;
+      infoSubtitle.textContent = activeInfoContent.subtitle;
+
+      returnCameraViewAfterInfoClose = getCurrentHotspotCameraView();
+      moveCameraToDefaultView(true);
+
       infoOverlay.classList.add("open");
       infoOverlay.setAttribute("aria-hidden", "false");
 
       sequenceHasUserInteracted = false;
-      setSequenceFrame(0);
-      startSequenceAutoPlay();
+      setSequenceFrame(currentSequenceFrame);
+      hideAndDelaySequenceImage();
       playInfoLottie();
+      updateModalControlsVisibility();
     }
 
     function closeInfoWindow() {
+      const cameraViewToRestore = returnCameraViewAfterInfoClose;
+
       infoOverlay.classList.remove("open");
       infoOverlay.setAttribute("aria-hidden", "true");
 
-      stopSequenceAutoPlay();
+      clearSequenceFadeTimer();
+      sequenceImage.classList.remove("sequenceHidden");
+
+      stopTouchGuideDemo();
       isDraggingSequence = false;
       sequencePanel.classList.remove("dragging");
 
       if (infoLottieAnimation) {
         infoLottieAnimation.stop();
       }
+
+      if (cameraViewToRestore) {
+        moveCameraToView(cameraViewToRestore, true);
+      }
+
+      returnCameraViewAfterInfoClose = null;
+      restoreHotspotSummaryAfterInfo();
+      updateModalControlsVisibility();
     }
 
-    function getSequenceFramePath(frameNumber) {
+    function getSequenceFramePath(frameNumber, content = activeInfoContent) {
       const paddedFrame = String(frameNumber).padStart(3, "0");
-      return `${SEQUENCE_FOLDER}${SEQUENCE_PREFIX}${paddedFrame}${SEQUENCE_EXTENSION}`;
+      return `${content.sequenceFolder}${content.sequencePrefix}${paddedFrame}${SEQUENCE_EXTENSION}`;
     }
 
     function setSequenceFrame(frameNumber) {
@@ -690,36 +4644,131 @@
       sequenceImage.src = getSequenceFramePath(currentSequenceFrame);
     }
 
-    function preloadSequenceFrames() {
+    function preloadSequenceFrames(content) {
       for (let i = SEQUENCE_FIRST_FRAME; i <= SEQUENCE_LAST_FRAME; i++) {
         const img = new Image();
-        img.src = getSequenceFramePath(i);
+        img.src = getSequenceFramePath(i, content);
       }
     }
 
-    function startSequenceAutoPlay() {
-      stopSequenceAutoPlay();
+    function preloadAllSequenceFrames() {
+      Object.values(INFO_CONTENT).forEach((content) => {
+        preloadSequenceFrames(content);
+      });
+    }
 
-      sequenceAutoTimer = setInterval(() => {
-        if (sequenceHasUserInteracted) {
-          stopSequenceAutoPlay();
+    function easeInOutSine(value) {
+      return -(Math.cos(Math.PI * value) - 1) / 2;
+    }
+
+    function startTouchGuideDemo() {
+      if (touchGuideFrameId) {
+        cancelAnimationFrame(touchGuideFrameId);
+        touchGuideFrameId = null;
+      }
+
+      if (sequenceHasUserInteracted || !infoOverlay.classList.contains("open")) return;
+
+      touchGuideStartFrame = currentSequenceFrame;
+      touchGuideLastFrame = currentSequenceFrame;
+      touchGuide.style.opacity = "0";
+      touchGuide.style.transition = "opacity 1.1s ease";
+      touchGuide.style.transform = "translate3d(-50%, -50%, 0)";
+
+      const pathOffsets = [0, -TOUCH_GUIDE_MAX_OFFSET, TOUCH_GUIDE_MAX_OFFSET, -TOUCH_GUIDE_MAX_OFFSET, TOUCH_GUIDE_MAX_OFFSET];
+      const totalMotionDuration = (pathOffsets.length - 1) * TOUCH_GUIDE_SWIPE_DURATION;
+      const totalDuration = TOUCH_GUIDE_FADE_IN_DURATION + totalMotionDuration;
+      const startTime = performance.now();
+
+      requestAnimationFrame(() => {
+        touchGuide.style.opacity = "1";
+      });
+
+      function animateTouchGuide(timestamp) {
+        if (sequenceHasUserInteracted || !infoOverlay.classList.contains("open")) {
+          stopTouchGuideDemo();
           return;
         }
 
-        setSequenceFrame(currentSequenceFrame + 1);
-      }, 110);
+        const elapsed = timestamp - startTime;
+        const motionElapsed = Math.max(0, elapsed - TOUCH_GUIDE_FADE_IN_DURATION);
+        const motionComplete = motionElapsed >= totalMotionDuration;
+
+        let travel;
+
+        if (motionComplete) {
+          travel = pathOffsets[pathOffsets.length - 1];
+        } else {
+          const segmentIndex = Math.min(
+            Math.floor(motionElapsed / TOUCH_GUIDE_SWIPE_DURATION),
+            pathOffsets.length - 2
+          );
+          const rawSegmentProgress = Math.min(
+            (motionElapsed % TOUCH_GUIDE_SWIPE_DURATION) / TOUCH_GUIDE_SWIPE_DURATION,
+            1
+          );
+          const easedProgress = easeInOutSine(rawSegmentProgress);
+          const fromOffset = pathOffsets[segmentIndex];
+          const toOffset = pathOffsets[segmentIndex + 1];
+          travel = fromOffset + (toOffset - fromOffset) * easedProgress;
+        }
+
+        const frameOffset = Math.round((travel / TOUCH_GUIDE_MAX_OFFSET) * TOUCH_GUIDE_FRAME_SWING);
+        touchGuideLastFrame = touchGuideStartFrame + frameOffset;
+
+        touchGuide.style.transform = `translate3d(calc(-50% + ${travel}px), -50%, 0)`;
+        setSequenceFrame(touchGuideLastFrame);
+
+        if (elapsed < totalDuration) {
+          touchGuideFrameId = requestAnimationFrame(animateTouchGuide);
+          return;
+        }
+
+        touchGuideFrameId = null;
+        touchGuide.style.transform = `translate3d(calc(-50% + ${pathOffsets[pathOffsets.length - 1]}px), -50%, 0)`;
+        setSequenceFrame(touchGuideLastFrame);
+        touchGuide.style.opacity = "0";
+
+        scheduleTouchGuideDemo(TOUCH_GUIDE_REPEAT_DELAY);
+      }
+
+      touchGuideFrameId = requestAnimationFrame(animateTouchGuide);
     }
 
-    function stopSequenceAutoPlay() {
-      if (sequenceAutoTimer) {
-        clearInterval(sequenceAutoTimer);
-        sequenceAutoTimer = null;
+    function scheduleTouchGuideDemo(delay = TOUCH_GUIDE_REPEAT_DELAY) {
+      if (sequenceHasUserInteracted || !infoOverlay.classList.contains("open")) return;
+
+      if (touchGuideRepeatTimer) {
+        clearTimeout(touchGuideRepeatTimer);
+        touchGuideRepeatTimer = null;
       }
+
+      touchGuideRepeatTimer = setTimeout(() => {
+        touchGuideRepeatTimer = null;
+        if (!sequenceHasUserInteracted && infoOverlay.classList.contains("open")) {
+          startTouchGuideDemo();
+        }
+      }, delay);
+    }
+
+    function stopTouchGuideDemo() {
+      if (touchGuideFrameId) {
+        cancelAnimationFrame(touchGuideFrameId);
+        touchGuideFrameId = null;
+      }
+
+      if (touchGuideRepeatTimer) {
+        clearTimeout(touchGuideRepeatTimer);
+        touchGuideRepeatTimer = null;
+      }
+
+      touchGuide.style.opacity = "0";
+      touchGuide.style.transform = "translate3d(-50%, -50%, 0)";
     }
 
     function startSequenceDrag(event) {
       sequenceHasUserInteracted = true;
-      stopSequenceAutoPlay();
+      stopTouchGuideDemo();
 
       isDraggingSequence = true;
       lastDragX = event.clientX;
@@ -784,8 +4833,10 @@
         renderer: "svg",
         loop: false,
         autoplay: true,
-        path: INFO_LOTTIE_PATH
+        path: activeInfoContent.drawingLottiePath
       });
+
+      infoLottieAnimation.setSpeed(1.3);
 
       infoLottieAnimation.addEventListener("complete", () => {
         infoLottieAnimation.goToAndStop(infoLottieAnimation.totalFrames, true);
