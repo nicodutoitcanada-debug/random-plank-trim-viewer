@@ -780,7 +780,8 @@
       font-weight: 300;
       letter-spacing: 0.025em;
       opacity: 0.88;
-    }
+          white-space: pre-line;
+}
 
     .infoCloseButton {
       position: absolute;
@@ -1059,7 +1060,7 @@
       data-position="-0.06853m 0.46294m -0.76885m"
       data-normal="0.00000m -0.00000m 1.00000m"
       aria-label="IS START START info hotspot 1"
-      data-info-key="zSupport"
+      data-info-key="isCnrStarter"
     >
       <div class="infoHotspotLottie" id="isStartStartInfoHotspotLottie1" aria-hidden="true"></div>
     </button>
@@ -1071,7 +1072,7 @@
       data-position="-0.06267m 0.35784m -0.67528m"
       data-normal="-1.00000m 0.00000m -0.00000m"
       aria-label="IS START START info hotspot 2"
-      data-info-key="twoPieceJChannel"
+      data-info-key="rpBoards"
     >
       <div class="infoHotspotLottie" id="isStartStartInfoHotspotLottie2" aria-hidden="true"></div>
     </button>
@@ -1131,7 +1132,7 @@
       data-position="0.65333m 0.35475m -0.00865m"
       data-normal="-0.08713m 0.00000m 0.99620m"
       aria-label="OS START START info hotspot 5"
-      data-info-key="osStartStartInfo5"
+      data-info-key="osCnrStarter"
     >
       <div class="infoHotspotLottie" id="osStartStartInfoHotspotLottie5" aria-hidden="true"></div>
     </button>
@@ -1143,7 +1144,7 @@
       data-position="0.72176m 0.42157m -0.06136m"
       data-normal="1.00000m 0.00000m 0.00000m"
       aria-label="OS START START info hotspot 6"
-      data-info-key="osStartStartInfo6"
+      data-info-key="osCnrStarter"
     >
       <div class="infoHotspotLottie" id="osStartStartInfoHotspotLottie6" aria-hidden="true"></div>
     </button>
@@ -1167,7 +1168,7 @@
       data-position="0.74044m 0.36001m -0.74403m"
       data-normal="1.00000m 0.00000m -0.00000m"
       aria-label="IS END START info hotspot 1"
-      data-info-key="isEndStartInfo1"
+      data-info-key="zSupport"
     >
       <div class="infoHotspotLottie" id="isEndStartInfoHotspotLottie1" aria-hidden="true"></div>
     </button>
@@ -1179,7 +1180,7 @@
       data-position="0.72166m 0.43651m -0.75583m"
       data-normal="1.00000m 0.00000m -0.00000m"
       aria-label="IS END START info hotspot 2"
-      data-info-key="isEndStartInfo2"
+      data-info-key="twoPieceJChannel"
     >
       <div class="infoHotspotLottie" id="isEndStartInfoHotspotLottie2" aria-hidden="true"></div>
     </button>
@@ -1215,7 +1216,7 @@
       data-position="1.47207m 0.36085m -0.75164m"
       data-normal="0.00000m 0.00000m 1.00000m"
       aria-label="IS END END info hotspot 1"
-      data-info-key="isEndEndInfo1"
+      data-info-key="zSupport"
     >
       <div class="infoHotspotLottie" id="isEndEndInfoHotspotLottie1" aria-hidden="true"></div>
     </button>
@@ -1227,7 +1228,7 @@
       data-position="1.47385m 0.43668m -0.77106m"
       data-normal="0.00000m 0.00000m 1.00000m"
       aria-label="IS END END info hotspot 2"
-      data-info-key="isEndEndInfo2"
+      data-info-key="twoPieceJChannel"
     >
       <div class="infoHotspotLottie" id="isEndEndInfoHotspotLottie2" aria-hidden="true"></div>
     </button>
@@ -1251,7 +1252,7 @@
       data-position="1.55475m 0.41119m -0.73502m"
       data-normal="-1.00000m -0.00000m -0.00000m"
       aria-label="IS END END info hotspot 4"
-      data-info-key="isEndEndInfo4"
+      data-info-key="twoPieceJChannel"
     >
       <div class="infoHotspotLottie" id="isEndEndInfoHotspotLottie4" aria-hidden="true"></div>
     </button>
@@ -1263,7 +1264,7 @@
       data-position="1.53532m 0.35228m -0.74046m"
       data-normal="-1.00000m -0.00000m -0.00000m"
       aria-label="IS END END info hotspot 5"
-      data-info-key="isEndEndInfo5"
+      data-info-key="zSupport"
     >
       <div class="infoHotspotLottie" id="isEndEndInfoHotspotLottie5" aria-hidden="true"></div>
     </button>
@@ -1287,7 +1288,7 @@
       data-position="1.55418m 0.51697m -0.04972m"
       data-normal="-1.00000m 0.00000m 0.00000m"
       aria-label="OS START END info hotspot 1"
-      data-info-key="osStartEndInfo1"
+      data-info-key="osCnrStarter"
     >
       <div class="infoHotspotLottie" id="osStartEndInfoHotspotLottie1" aria-hidden="true"></div>
     </button>
@@ -1299,9 +1300,21 @@
       data-position="1.59874m 0.41983m -0.00543m"
       data-normal="-0.00000m -0.00000m 1.00000m"
       aria-label="OS START END info hotspot 2"
-      data-info-key="osStartEndInfo2"
+      data-info-key="twoPieceJChannel"
     >
       <div class="infoHotspotLottie" id="osStartEndInfoHotspotLottie2" aria-hidden="true"></div>
+    </button>
+
+    <button
+      id="osStartEndInfoHotspot3"
+      class="InfoHotspot hiddenUntilOsStartEnd"
+      slot="hotspot-os-start-end-info-3"
+      data-position="1.58329m 0.34359m 0.01399m"
+      data-normal="0.00000m -0.00000m 1.00000m"
+      aria-label="OS START END info hotspot 3"
+      data-info-key="zSupport"
+    >
+      <div class="infoHotspotLottie" id="osStartEndInfoHotspotLottie3" aria-hidden="true"></div>
     </button>
 
     <button
@@ -1335,7 +1348,7 @@
       data-position="2.32267m 0.43942m -0.00955m"
       data-normal="0.00000m 0.00000m 1.00000m"
       aria-label="STARTER info hotspot 7"
-      data-info-key="starterInfo7"
+      data-info-key="twoPieceJChannel"
     >
       <div class="infoHotspotLottie" id="starterInfoHotspotLottie7" aria-hidden="true"></div>
     </button>
@@ -1659,11 +1672,13 @@
     ];
     const osStartEndInfoHotspots = [
       document.querySelector("#osStartEndInfoHotspot1"),
-      document.querySelector("#osStartEndInfoHotspot2")
+      document.querySelector("#osStartEndInfoHotspot2"),
+      document.querySelector("#osStartEndInfoHotspot3")
     ];
     const osStartEndInfoHotspotLotties = [
       document.querySelector("#osStartEndInfoHotspotLottie1"),
-      document.querySelector("#osStartEndInfoHotspotLottie2")
+      document.querySelector("#osStartEndInfoHotspotLottie2"),
+      document.querySelector("#osStartEndInfoHotspotLottie3")
     ];
     const starterInfoHotspots = [
       document.querySelector("#starterInfoHotspot6"),
@@ -1823,26 +1838,47 @@
         sequencePrefix: "Z_support",
         drawingLottiePath: "lottie/Z_support.json"
       },
+      isCnrStarter: {
+        title: "IS Cnr Starter",
+        subtitle: "10’: #800057 | #810057 (WCNS) | 13’: #800061 | #810061 (WCNS)",
+        sequenceFolder: "sequences/IS Cnr Starter/",
+        sequencePrefix: "IS Cnr Starter",
+        drawingLottiePath: "lottie/IS Cnr Starter.json"
+      },
+      rpBoards: {
+        title: "RP boards",
+        subtitle: "3.5” Board - 10’: #800010 | #810010 (WCNS) | 13’: #800012 | #810012 (WCNS)\n5.5” Board - 10’: #800014 | #810014 (WCNS) | 13’: #800016 | #810016 (WCNS)\n9.5” Board - 10’: #800022 | #810022 (WCNS) | 13’: #800024 | #810024 (WCNS)",
+        sequenceFolder: "sequences/RP boards/",
+        sequencePrefix: "RP boards",
+        drawingLottiePath: "lottie/RP boards.json"
+      },
       osEndEndInfo3: {
-        title: "OS END END",
-        subtitle: "Info hotspot 3",
-        sequenceFolder: "sequences/2pc_J-trim/",
-        sequencePrefix: "2pc_Jtrim",
-        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+        title: "OS L-trim",
+        subtitle: "10’: #800062 | #810062 (WCNS) | 13’: #800072 | #810072 (WCNS)",
+        sequenceFolder: "sequences/OS L-trim/",
+        sequencePrefix: "OS L-trim",
+        drawingLottiePath: "lottie/OS L-trim.json"
       },
       boxBaseInfo1: {
-        title: "BOX BASE",
-        subtitle: "Info hotspot 1",
-        sequenceFolder: "sequences/2pc_J-trim/",
-        sequencePrefix: "2pc_Jtrim",
-        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+        title: "Box Base",
+        subtitle: "10’: #800054 | #810054 (WCNS)",
+        sequenceFolder: "sequences/Box Base/",
+        sequencePrefix: "Box Base",
+        drawingLottiePath: "lottie/Box Base.json"
       },
       boxBaseInfo2: {
-        title: "BOX BASE",
-        subtitle: "Info hotspot 2",
-        sequenceFolder: "sequences/2pc_J-trim/",
-        sequencePrefix: "2pc_Jtrim",
-        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+        title: "U_support",
+        subtitle: "10’: #800058",
+        sequenceFolder: "sequences/U_support/",
+        sequencePrefix: "U_support",
+        drawingLottiePath: "lottie/U_support.json"
+      },
+      osCnrStarter: {
+        title: "OS Cnr Starter",
+        subtitle: "10’: #800056 | #810056 (WCNS) | 13’: #800065 | #810065 (WCNS)",
+        sequenceFolder: "sequences/OS Cnr Starter/",
+        sequencePrefix: "OS Cnr Starter",
+        drawingLottiePath: "lottie/OS Cnr Starter.json"
       },
       osStartStartInfo5: {
         title: "OS START START",
@@ -1873,11 +1909,11 @@
         drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
       },
       isEndStartInfo3: {
-        title: "IS END START",
-        subtitle: "Info hotspot 3",
-        sequenceFolder: "sequences/2pc_J-trim/",
-        sequencePrefix: "2pc_Jtrim",
-        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+        title: "Standard Starter",
+        subtitle: "10’: #800060 | #810060 (WCNS) | 13’: #800063 | #810063 (WCNS)",
+        sequenceFolder: "sequences/Standard Starter/",
+        sequencePrefix: "Standard Starter",
+        drawingLottiePath: "lottie/Standard Starter.json"
       },
       isEndEndInfo1: {
         title: "IS END END",
@@ -1929,11 +1965,11 @@
         drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
       },
       starterInfo6: {
-        title: "STARTER",
-        subtitle: "Info hotspot 6",
-        sequenceFolder: "sequences/2pc_J-trim/",
-        sequencePrefix: "2pc_Jtrim",
-        drawingLottiePath: "lottie/2pc_J-trim-drawing.json"
+        title: "Standard Starter",
+        subtitle: "10’: #800060 | #810060 (WCNS) | 13’: #800063 | #810063 (WCNS)",
+        sequenceFolder: "sequences/Standard Starter/",
+        sequencePrefix: "Standard Starter",
+        drawingLottiePath: "lottie/Standard Starter.json"
       },
       starterInfo7: {
         title: "STARTER",
