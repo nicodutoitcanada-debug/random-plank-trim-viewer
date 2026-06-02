@@ -603,6 +603,10 @@
       display: none;
     }
 
+    model-viewer::part(default-ar-button) {
+      display: none;
+    }
+
     .mouseInfoCloseButton {
       position: absolute;
       right: -8px;
@@ -908,8 +912,6 @@
   <model-viewer
     id="viewer"
     src="RP-TRIM GUIDE test 17.glb"
-    ar
-    ar-modes="webxr scene-viewer quick-look"
     camera-controls
     tone-mapping="neutral"
     poster="poster.webp"
