@@ -2092,6 +2092,7 @@
     const TOUCH_GUIDE_REPEAT_DELAY = 4000;
     const TOUCH_GUIDE_FADE_IN_DURATION = 1000;
     const INFO_HOTSPOT_REVEAL_STAGGER = 100;
+    const MAIN_HOTSPOT_PULSE_STAGGER = 100;
     const CAMERA_ZOOM_FACTOR = 0.64;
     const CAMERA_WHEEL_ZOOM_FACTOR = 1.30;
     const CAMERA_MIN_RADIUS = 0.35;
@@ -4641,77 +4642,41 @@
       });
       infoHotspotLottieAnimations = [];
 
-      terminateHotspotLottieAnimation = lottie.loadAnimation({
-        container: terminateHotspotLottie,
-        renderer: "svg",
-        loop: true,
-        autoplay: true,
-        path: TERMINATE_HOTSPOT_LOTTIE_PATH
-      });
+      function loadMainHotspotPulse(container, staggerIndex) {
+        if (!container) return null;
 
-      osEndEndHotspotLottieAnimation = lottie.loadAnimation({
-        container: osEndEndHotspotLottie,
-        renderer: "svg",
-        loop: true,
-        autoplay: true,
-        path: TERMINATE_HOTSPOT_LOTTIE_PATH
-      });
+        const animation = lottie.loadAnimation({
+          container,
+          renderer: "svg",
+          loop: true,
+          autoplay: false,
+          path: TERMINATE_HOTSPOT_LOTTIE_PATH
+        });
 
-      isStartStartHotspotLottieAnimation = lottie.loadAnimation({
-        container: isStartStartHotspotLottie,
-        renderer: "svg",
-        loop: true,
-        autoplay: true,
-        path: TERMINATE_HOTSPOT_LOTTIE_PATH
-      });
+        animation.addEventListener("DOMLoaded", () => {
+          const delay = staggerIndex * MAIN_HOTSPOT_PULSE_STAGGER;
 
-      boxBaseHotspotLottieAnimation = lottie.loadAnimation({
-        container: boxBaseHotspotLottie,
-        renderer: "svg",
-        loop: true,
-        autoplay: true,
-        path: TERMINATE_HOTSPOT_LOTTIE_PATH
-      });
+          setTimeout(() => {
+            if (animation && typeof animation.goToAndPlay === "function") {
+              animation.goToAndPlay(0, true);
+            } else if (animation && typeof animation.play === "function") {
+              animation.play();
+            }
+          }, delay);
+        });
 
-      osStartStartHotspotLottieAnimation = lottie.loadAnimation({
-        container: osStartStartHotspotLottie,
-        renderer: "svg",
-        loop: true,
-        autoplay: true,
-        path: TERMINATE_HOTSPOT_LOTTIE_PATH
-      });
+        return animation;
+      }
 
-      isEndStartHotspotLottieAnimation = lottie.loadAnimation({
-        container: isEndStartHotspotLottie,
-        renderer: "svg",
-        loop: true,
-        autoplay: true,
-        path: TERMINATE_HOTSPOT_LOTTIE_PATH
-      });
-
-      isEndEndHotspotLottieAnimation = lottie.loadAnimation({
-        container: isEndEndHotspotLottie,
-        renderer: "svg",
-        loop: true,
-        autoplay: true,
-        path: TERMINATE_HOTSPOT_LOTTIE_PATH
-      });
-
-      osStartEndHotspotLottieAnimation = lottie.loadAnimation({
-        container: osStartEndHotspotLottie,
-        renderer: "svg",
-        loop: true,
-        autoplay: true,
-        path: TERMINATE_HOTSPOT_LOTTIE_PATH
-      });
-
-      starterHotspotLottieAnimation = lottie.loadAnimation({
-        container: starterHotspotLottie,
-        renderer: "svg",
-        loop: true,
-        autoplay: true,
-        path: TERMINATE_HOTSPOT_LOTTIE_PATH
-      });
+      terminateHotspotLottieAnimation = loadMainHotspotPulse(terminateHotspotLottie, 0);
+      isStartStartHotspotLottieAnimation = loadMainHotspotPulse(isStartStartHotspotLottie, 1);
+      osEndEndHotspotLottieAnimation = loadMainHotspotPulse(osEndEndHotspotLottie, 2);
+      boxBaseHotspotLottieAnimation = loadMainHotspotPulse(boxBaseHotspotLottie, 3);
+      osStartStartHotspotLottieAnimation = loadMainHotspotPulse(osStartStartHotspotLottie, 4);
+      isEndStartHotspotLottieAnimation = loadMainHotspotPulse(isEndStartHotspotLottie, 5);
+      isEndEndHotspotLottieAnimation = loadMainHotspotPulse(isEndEndHotspotLottie, 6);
+      osStartEndHotspotLottieAnimation = loadMainHotspotPulse(osStartEndHotspotLottie, 7);
+      starterHotspotLottieAnimation = loadMainHotspotPulse(starterHotspotLottie, 8);
 
       [terminateVideoHotspotLottie, osEndEndVideoHotspotLottie, isStartStartVideoHotspotLottie, boxBaseVideoHotspotLottie, osStartStartVideoHotspotLottie, isEndStartVideoHotspotLottie, isEndEndVideoHotspotLottie, osStartEndVideoHotspotLottie, starterVideoHotspotLottie].forEach((container) => {
         if (!container) return;
