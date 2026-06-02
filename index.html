@@ -1450,7 +1450,7 @@
 
     <div class="mouseInfoMini" id="mouseInfoMini" aria-hidden="true">
       <button class="mouseInfoCloseButton" id="howToCloseButton" aria-label="Close how-to guide">×</button>
-      <img src="mouse info.png" alt="Mouse controls" draggable="false" />
+      <img id="guideInfoImage" src="mouse info.png" alt="Mouse controls" draggable="false" />
     </div>
   </div>
 
@@ -3043,6 +3043,18 @@
       return timer;
     }
 
+    function isTouchDevice() {
+      return Boolean(
+        window.matchMedia("(pointer: coarse)").matches ||
+        window.matchMedia("(hover: none)").matches ||
+        navigator.maxTouchPoints > 0
+      );
+    }
+
+    function getGuideInfoImage() {
+      return document.querySelector("#guideInfoImage");
+    }
+
     function setCustomGuideIcon(src, className) {
       customGuideIcon.classList.remove("guidePan", "guideRotate", "guideScroll", "isHidden");
       customGuideIcon.src = src;
@@ -3059,6 +3071,14 @@
     }
 
     function setMouseInfoVisible(isVisible) {
+      const guideInfoImage = getGuideInfoImage();
+
+      if (guideInfoImage) {
+        const touchMode = isTouchDevice();
+        guideInfoImage.src = touchMode ? "touch info.png" : "mouse info.png";
+        guideInfoImage.alt = touchMode ? "Touch controls" : "Mouse controls";
+      }
+
       mouseInfoMini.classList.toggle("isVisible", isVisible);
       mouseInfoMini.setAttribute("aria-hidden", isVisible ? "false" : "true");
     }
@@ -3166,6 +3186,17 @@
         ]);
       }
 
+      if (type === "touchRotate") {
+        setCustomGuideIcon("touch.png", "guideRotate");
+
+        animateGuideCamera([
+          { theta: -35.62141, phi: 60.17364, radius: 6.30660, target: DEFAULT_CAMERA_VIEW.target, fov: 15.06401 },
+          { theta: -48.00000, phi: 60.17364, radius: 6.30660, target: DEFAULT_CAMERA_VIEW.target, fov: 15.06401 },
+          { theta: -23.00000, phi: 60.17364, radius: 6.30660, target: DEFAULT_CAMERA_VIEW.target, fov: 15.06401 },
+          { theta: -35.62141, phi: 60.17364, radius: 6.30660, target: DEFAULT_CAMERA_VIEW.target, fov: 15.06401 }
+        ]);
+      }
+
       if (type === "scroll") {
         setCustomGuideIcon("mouse scroll.png", "guideScroll");
 
@@ -3263,6 +3294,12 @@
       howToOverlay.classList.add("open");
       howToOverlay.setAttribute("aria-hidden", "false");
       setMouseInfoVisible(showMouseInfo);
+
+      if (isTouchDevice()) {
+        showCustomGuideStep("touchRotate");
+        scheduleCustomGuideStep(finishCustomGuideCycle, GUIDE_STEP_DURATION + 250);
+        return;
+      }
 
       showCustomGuideStep("pan");
       scheduleCustomGuideStep(() => showCustomGuideStep("rotate"), GUIDE_STEP_DURATION + GUIDE_STEP_GAP);
