@@ -603,6 +603,15 @@
       display: none;
     }
 
+    body.guideInfoCardVisible #zoomOutButton,
+    body.guideInfoCardVisible #zoomInButton,
+    body.guideInfoCardVisible #howToButton {
+      opacity: 0.32;
+      filter: grayscale(1);
+      pointer-events: none;
+      cursor: default;
+    }
+
     model-viewer::part(default-ar-button) {
       display: none;
     }
@@ -3152,6 +3161,7 @@
 
       mouseInfoMini.classList.toggle("isVisible", isVisible);
       mouseInfoMini.setAttribute("aria-hidden", isVisible ? "false" : "true");
+      document.body.classList.toggle("guideInfoCardVisible", isVisible);
     }
 
     function easeInOutSine(progress) {
