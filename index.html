@@ -2109,6 +2109,7 @@
     const INFO_HOTSPOT_REVEAL_STAGGER = 100;
     const MAIN_HOTSPOT_PULSE_STAGGER = 100;
     const CAMERA_ZOOM_FACTOR = 0.64;
+    const INFO_WINDOW_ZOOM_FACTOR = 0.46;
     const CAMERA_WHEEL_ZOOM_FACTOR = 1.30;
     const CAMERA_MIN_RADIUS = 0.35;
     const CAMERA_MAX_RADIUS = 7;
@@ -3974,6 +3975,21 @@
       }
     }
 
+    function getInfoWindowZoomCameraView(baseView) {
+      if (!baseView) return null;
+
+      const parsed = parseCameraOrbit(baseView.orbit, false);
+      if (!parsed) return baseView;
+
+      const zoomedRadius = Math.max(CAMERA_MIN_RADIUS, parsed.radius * INFO_WINDOW_ZOOM_FACTOR);
+
+      return {
+        orbit: `${parsed.theta.toFixed(5)}${parsed.thetaUnit || "deg"} ${parsed.phi.toFixed(5)}${parsed.phiUnit || "deg"} ${zoomedRadius.toFixed(5)}${parsed.radiusUnit || "m"}`,
+        target: baseView.target,
+        fov: baseView.fov
+      };
+    }
+
     function getCurrentHotspotCameraView() {
       if (activeMainHotspot === "starter" || isStarterOpen) {
         return STARTER_CAMERA_VIEW;
@@ -4908,8 +4924,12 @@
       infoTitle.textContent = activeInfoContent.title;
       infoSubtitle.textContent = activeInfoContent.subtitle;
 
-      returnCameraViewAfterInfoClose = getCurrentHotspotCameraView();
-      moveCameraToDefaultView(true);
+      returnCameraViewAfterInfoClose = getCurrentHotspotCameraView() || getCurrentCameraViewSnapshot();
+
+      const infoZoomCameraView = getInfoWindowZoomCameraView(returnCameraViewAfterInfoClose);
+      if (infoZoomCameraView) {
+        moveCameraToView(infoZoomCameraView, true);
+      }
 
       sequenceHasUserInteracted = false;
       sequenceImage.style.transition = "none";
