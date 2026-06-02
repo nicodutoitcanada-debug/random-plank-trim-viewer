@@ -419,7 +419,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 32px 10px 32px;
+      height: 43px;
+      padding: 10px 28px 10px 22px;
       border-radius: 999px;
       background: rgba(0, 0, 0, 0.5);
       box-sizing: border-box;
@@ -427,6 +428,7 @@
       -webkit-backdrop-filter: blur(8px);
       opacity: 1;
       pointer-events: auto;
+      overflow: visible;
       transition: opacity 0.28s ease;
     }
 
@@ -466,6 +468,24 @@
       object-fit: contain;
       pointer-events: none;
       user-select: none;
+    }
+
+    #themeToggleButton {
+      width: 54px;
+      height: 54px;
+      padding: 0;
+      margin-left: -4px;
+      margin-right: 4px;
+      overflow: visible;
+      flex: 0 0 54px;
+    }
+
+    #themeToggleLottie {
+      width: 54px;
+      height: 54px;
+      pointer-events: none;
+      transform: scale(1.12);
+      transform-origin: 50% 50%;
     }
 
     .bottomControlTooltip {
@@ -603,6 +623,7 @@
       display: none;
     }
 
+    body.guideInfoCardVisible #themeToggleButton,
     body.guideInfoCardVisible #zoomOutButton,
     body.guideInfoCardVisible #zoomInButton,
     body.guideInfoCardVisible #howToButton {
@@ -687,13 +708,30 @@
         right: 14px;
         bottom: 14px;
         gap: 6px;
-        padding: 8px 24px 8px 24px;
+        height: 36px;
+        padding: 8px 22px 8px 18px;
+        overflow: visible;
       }
 
       .bottomControlButton {
         width: 20px;
         height: 20px;
         padding: 2px;
+      }
+
+      #themeToggleButton {
+        width: 46px;
+        height: 46px;
+        padding: 0;
+        margin-left: -3px;
+        margin-right: 3px;
+        flex-basis: 46px;
+      }
+
+      #themeToggleLottie {
+        width: 46px;
+        height: 46px;
+        transform: scale(1.12);
       }
 
       #resetCameraButton {
@@ -771,8 +809,8 @@
     model-viewer,
     .bottomControlBar,
     .hotspotSummaryWindow {
-      transition: filter 1.15s ease;
-      will-change: filter;
+      transition: filter 1.15s ease, background-color 0.35s ease;
+      will-change: filter, background-color;
     }
 
     body.infoWindowBackdropActive model-viewer,
@@ -1541,6 +1579,10 @@
   </div>
 
   <div class="bottomControlBar" id="bottomControlBar" aria-label="Viewer controls">
+    <button class="bottomControlButton" id="themeToggleButton" aria-label="Switch to dark background">
+      <div id="themeToggleLottie" aria-hidden="true"></div>
+      <span class="bottomControlTooltip" id="themeToggleTooltip">Dark background</span>
+    </button>
     <button class="bottomControlButton" id="zoomOutButton" aria-label="Zoom out">
       <img src="zoom out.png" alt="" draggable="false" />
       <span class="bottomControlTooltip">Zoom out</span>
@@ -1633,6 +1675,9 @@
     const howToCloseButton = document.querySelector("#howToCloseButton");
     const customGuideIcon = document.querySelector("#customGuideIcon");
     const mouseInfoMini = document.querySelector("#mouseInfoMini");
+    const themeToggleButton = document.querySelector("#themeToggleButton");
+    const themeToggleLottie = document.querySelector("#themeToggleLottie");
+    const themeToggleTooltip = document.querySelector("#themeToggleTooltip");
     const zoomInButton = document.querySelector("#zoomInButton");
     const zoomOutButton = document.querySelector("#zoomOutButton");
     const resetCameraButton = document.querySelector("#resetCameraButton");
@@ -2066,6 +2111,8 @@
     const TERMINATE_HOTSPOT_LOTTIE_PATH = "lottie/play.json";
     const INFO_HOTSPOT_LOTTIE_PATH = "lottie/info.json";
     const VIDEO_HOTSPOT_LOTTIE_PATH = "lottie/video.json";
+    const THEME_TOGGLE_LOTTIE_PATH = "lottie/theme.json";
+    const DARK_THEME_BACKGROUND = "#2f2f2f";
 
     const VIDEO_CONTENT = {
       terminate: {
@@ -2234,10 +2281,58 @@
     let infoHotspotLottieAnimations = [];
     let infoLottieAnimation = null;
     let hotspotSummaryVideoLottieAnimation = null;
+    let themeToggleLottieAnimation = null;
+    let isDarkThemeActive = false;
+    let lightThemeBackground = "";
+    let lightBodyBackground = "";
     let activeHotspotSummaryVideoKey = "terminate";
     let hotspotSummaryWasOpenBeforeInfo = false;
 
     loadHotspotLotties();
+    initThemeToggle();
+
+    function getThemeFinalFrame() {
+      if (!themeToggleLottieAnimation || !themeToggleLottieAnimation.totalFrames) return 0;
+      return Math.max(0, Math.floor(themeToggleLottieAnimation.totalFrames) - 1);
+    }
+
+    function applyThemeBackground() {
+      modelViewer.style.backgroundColor = isDarkThemeActive ? DARK_THEME_BACKGROUND : lightThemeBackground;
+      document.body.style.backgroundColor = isDarkThemeActive ? DARK_THEME_BACKGROUND : lightBodyBackground;
+
+      themeToggleButton.setAttribute(
+        "aria-label",
+        isDarkThemeActive ? "Switch to light background" : "Switch to dark background"
+      );
+
+      themeToggleTooltip.textContent = isDarkThemeActive ? "Light background" : "Dark background";
+    }
+
+    function initThemeToggle() {
+      const computedViewerBackground = window.getComputedStyle(modelViewer).backgroundColor;
+      const computedBodyBackground = window.getComputedStyle(document.body).backgroundColor;
+
+      lightThemeBackground = computedViewerBackground || "#f4f4f4";
+      lightBodyBackground = computedBodyBackground || "#111";
+
+      themeToggleLottieAnimation = lottie.loadAnimation({
+        container: themeToggleLottie,
+        renderer: "svg",
+        loop: false,
+        autoplay: false,
+        path: THEME_TOGGLE_LOTTIE_PATH
+      });
+
+      themeToggleLottieAnimation.addEventListener("DOMLoaded", () => {
+        themeToggleLottieAnimation.goToAndStop(0, true);
+      });
+
+      themeToggleLottieAnimation.addEventListener("complete", () => {
+        themeToggleLottieAnimation.goToAndStop(isDarkThemeActive ? getThemeFinalFrame() : 0, true);
+      });
+
+      applyThemeBackground();
+    }
 
     modelViewer.addEventListener("progress", (event) => {
       const progress = event.detail.totalProgress;
@@ -3583,6 +3678,23 @@
 
       updateFullscreenButton();
     }
+
+    themeToggleButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      isDarkThemeActive = !isDarkThemeActive;
+      applyThemeBackground();
+
+      if (!themeToggleLottieAnimation) return;
+
+      if (isDarkThemeActive) {
+        themeToggleLottieAnimation.setDirection(1);
+        themeToggleLottieAnimation.goToAndPlay(0, true);
+      } else {
+        themeToggleLottieAnimation.setDirection(-1);
+        themeToggleLottieAnimation.goToAndPlay(getThemeFinalFrame(), true);
+      }
+    });
 
     zoomInButton.addEventListener("click", (event) => {
       event.stopPropagation();
