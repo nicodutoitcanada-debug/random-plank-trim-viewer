@@ -681,6 +681,115 @@
       100% { transform: translateY(0) scale(0.96); opacity: 0; }
     }
 
+
+
+    .installationPlanControl {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      z-index: 9999995;
+      width: min(390px, calc(100vw - 48px));
+      color: #fff;
+      box-sizing: border-box;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .installationPlanControl.isHiddenBehindSummary {
+      opacity: 0;
+      transform: translateY(-6px);
+      pointer-events: none;
+    }
+
+    .installationPlanButton {
+      width: 100%;
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 18px;
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: 0.025em;
+      text-align: left;
+      text-transform: uppercase;
+      box-sizing: border-box;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+      transition: background 0.22s ease, transform 0.22s ease;
+    }
+
+    .installationPlanButton:hover {
+      background: rgba(0, 0, 0, 0.62);
+      transform: translateY(-1px);
+    }
+
+    .installationPlanButton:active {
+      transform: translateY(0) scale(0.99);
+    }
+
+    .installationPlanDropdown {
+      margin-top: 10px;
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+      box-sizing: border-box;
+      opacity: 0;
+      transform: translateY(-8px) scale(0.985);
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .installationPlanControl.open .installationPlanDropdown {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .installationPlanIntro {
+      margin: 0 0 14px;
+      font-size: 13px;
+      line-height: 1.42;
+      font-weight: 400;
+      opacity: 0.94;
+    }
+
+    .installationPlanList {
+      display: grid;
+      gap: 7px;
+    }
+
+    .installationPlanItem {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0.025em;
+      text-align: left;
+      text-transform: uppercase;
+      transition: background 0.18s ease, transform 0.18s ease;
+    }
+
+    .installationPlanItem:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(3px);
+    }
+
+    .installationPlanItem:active {
+      transform: translateX(1px) scale(0.99);
+    }
+
     @media (max-width: 720px) {
       .hotspotSummaryWindow {
         top: 14px;
@@ -752,6 +861,31 @@
         padding: 12px;
         border-radius: 18px;
       }
+      .installationPlanControl {
+        top: 14px;
+        left: 14px;
+        width: min(330px, calc(100vw - 28px));
+      }
+
+      .installationPlanButton {
+        padding: 11px 15px;
+        font-size: 11px;
+      }
+
+      .installationPlanDropdown {
+        padding: 15px;
+        border-radius: 18px;
+      }
+
+      .installationPlanIntro {
+        font-size: 12px;
+      }
+
+      .installationPlanItem {
+        padding: 9px 10px;
+        font-size: 11px;
+      }
+
     }
 
     .progress-bar {
@@ -1558,6 +1692,38 @@
 
   </model-viewer>
 
+
+
+  <div class="installationPlanControl" id="installationPlanControl">
+    <button
+      class="installationPlanButton"
+      id="installationPlanButton"
+      type="button"
+      aria-expanded="false"
+      aria-controls="installationPlanDropdown"
+    >
+      HOW TO PLAN YOUR INSTALLATION
+    </button>
+
+    <div class="installationPlanDropdown" id="installationPlanDropdown" aria-hidden="true">
+      <p class="installationPlanIntro">
+        Below lists the methods for installing each particular LUX trim for different starting and termination points.
+      </p>
+
+      <div class="installationPlanList" aria-label="Installation planning methods">
+        <button class="installationPlanItem" type="button" data-hotspot-target="terminate">TERMINATE</button>
+        <button class="installationPlanItem" type="button" data-hotspot-target="osEndEnd">OUTSIDE END END</button>
+        <button class="installationPlanItem" type="button" data-hotspot-target="isStartStart">INSIDE START START</button>
+        <button class="installationPlanItem" type="button" data-hotspot-target="boxBase">BOX BASE</button>
+        <button class="installationPlanItem" type="button" data-hotspot-target="osStartStart">OUTSIDE START START</button>
+        <button class="installationPlanItem" type="button" data-hotspot-target="isEndStart">INSIDE END START</button>
+        <button class="installationPlanItem" type="button" data-hotspot-target="isEndEnd">INSIDE END END</button>
+        <button class="installationPlanItem" type="button" data-hotspot-target="osStartEnd">OUTSIDE START END</button>
+        <button class="installationPlanItem" type="button" data-hotspot-target="starter">STARTER</button>
+      </div>
+    </div>
+  </div>
+
   <div class="howToOverlay" id="howToOverlay" aria-hidden="true">
     <div class="customGuideIconWrap" aria-hidden="true">
       <img class="customGuideIcon" id="customGuideIcon" src="mouse right.png" alt="" draggable="false" />
@@ -1663,6 +1829,9 @@
 
   <script>
     const modelViewer = document.querySelector("#viewer");
+    const installationPlanControl = document.querySelector("#installationPlanControl");
+    const installationPlanButton = document.querySelector("#installationPlanButton");
+    const installationPlanDropdown = document.querySelector("#installationPlanDropdown");
     const bottomControlBar = document.querySelector("#bottomControlBar");
     const hotspotSummaryWindow = document.querySelector("#hotspotSummaryWindow");
     const hotspotSummaryCloseButton = document.querySelector("#hotspotSummaryCloseButton");
@@ -1728,6 +1897,18 @@
     const starterHotspotLabel = document.querySelector("#starterHotspotLabel");
     const starterVideoHotspot = document.querySelector("#starterVideoHotspot");
     const starterVideoHotspotLottie = document.querySelector("#starterVideoHotspotLottie");
+
+    const installationPlanHotspotTargets = {
+      terminate: terminateHotspot,
+      osEndEnd: osEndEndHotspot,
+      isStartStart: isStartStartHotspot,
+      boxBase: boxBaseHotspot,
+      osStartStart: osStartStartHotspot,
+      isEndStart: isEndStartHotspot,
+      isEndEnd: isEndEndHotspot,
+      osStartEnd: osStartEndHotspot,
+      starter: starterHotspot
+    };
     const infoHotspot1 = document.querySelector("#infoHotspot1");
     const infoHotspot2 = document.querySelector("#infoHotspot2");
     const infoHotspotLottie1 = document.querySelector("#infoHotspotLottie1");
@@ -3101,6 +3282,39 @@
       setCameraRadius(nextRadius);
     }
 
+
+
+    function openInstallationPlanMenu() {
+      installationPlanControl.classList.add("open");
+      installationPlanButton.setAttribute("aria-expanded", "true");
+      installationPlanDropdown.setAttribute("aria-hidden", "false");
+    }
+
+    function closeInstallationPlanMenu() {
+      installationPlanControl.classList.remove("open");
+      installationPlanButton.setAttribute("aria-expanded", "false");
+      installationPlanDropdown.setAttribute("aria-hidden", "true");
+    }
+
+    function toggleInstallationPlanMenu() {
+      if (installationPlanControl.classList.contains("open")) {
+        closeInstallationPlanMenu();
+      } else {
+        openInstallationPlanMenu();
+      }
+    }
+
+    function selectInstallationPlanHotspot(targetKey) {
+      const hotspot = installationPlanHotspotTargets[targetKey];
+      if (!hotspot) return;
+
+      closeInstallationPlanMenu();
+      closeHowToWindow();
+      closeInfoWindow();
+      closeVideoWindow();
+      hotspot.click();
+    }
+
     function formatHotspotSummaryTitle(title) {
       if (title.startsWith("IS ")) {
         return `INSIDE ${title.slice(3)}`;
@@ -3144,6 +3358,8 @@
         hotspotSummaryVideoLottieAnimation.goToAndPlay(0, true);
       }
 
+      closeInstallationPlanMenu();
+      installationPlanControl.classList.add("isHiddenBehindSummary");
       hotspotSummaryWindow.classList.add("open");
       hotspotSummaryWindow.setAttribute("aria-hidden", "false");
     }
@@ -3152,6 +3368,7 @@
       hotspotSummaryWasOpenBeforeInfo = false;
       hotspotSummaryWindow.classList.remove("open", "isHiddenBehindInfo");
       hotspotSummaryWindow.setAttribute("aria-hidden", "true");
+      installationPlanControl.classList.remove("isHiddenBehindSummary");
 
       if (hotspotSummaryVideoLottieAnimation) {
         hotspotSummaryVideoLottieAnimation.goToAndStop(0, true);
@@ -3678,6 +3895,26 @@
 
       updateFullscreenButton();
     }
+
+
+
+    installationPlanButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleInstallationPlanMenu();
+    });
+
+    installationPlanDropdown.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const item = event.target.closest(".installationPlanItem");
+      if (!item) return;
+      selectInstallationPlanHotspot(item.dataset.hotspotTarget);
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!installationPlanControl.contains(event.target)) {
+        closeInstallationPlanMenu();
+      }
+    });
 
     themeToggleButton.addEventListener("click", (event) => {
       event.stopPropagation();
