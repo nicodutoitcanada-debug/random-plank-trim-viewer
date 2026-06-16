@@ -413,8 +413,10 @@
 
     .bottomControlBar {
       position: fixed;
-      right: 24px;
+      left: 50%;
+      right: auto;
       bottom: 24px;
+      transform: translateX(-50%);
       z-index: 999999;
       display: flex;
       align-items: center;
@@ -685,26 +687,35 @@
 
     .installationPlanControl {
       position: fixed;
-      left: 24px;
-      bottom: 24px;
+      inset: 0;
       z-index: 9999995;
-      width: min(390px, calc(100vw - 48px));
       color: #fff;
       box-sizing: border-box;
-      transition: opacity 0.25s ease, transform 0.25s ease;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
     }
 
     .installationPlanControl.isHiddenBehindSummary {
-      opacity: 0;
-      transform: translateY(6px);
+      opacity: 1;
       pointer-events: none;
     }
 
+    .installationPlanControl.isHiddenBehindSummary .installationPlanButton {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(-10px);
+    }
+
     .installationPlanButton {
-      width: 100%;
+      position: absolute;
+      left: 50%;
+      top: 24px;
+      width: min(430px, calc(100vw - 48px));
+      transform: translateX(-50%);
+      pointer-events: auto;
       border: 0;
       border-radius: 999px;
-      padding: 13px 18px;
+      padding: 4px 14px 4px 7px;
       background: rgba(0, 0, 0, 0.5);
       color: #fff;
       cursor: pointer;
@@ -718,79 +729,156 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
-      transition: background 0.22s ease, transform 0.22s ease;
+      transition: background 0.22s ease, transform 0.22s ease, opacity 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 23px;
+      min-height: 48px;
     }
 
     .installationPlanButton:hover {
       background: rgba(0, 0, 0, 0.62);
-      transform: translateY(-1px);
+      transform: translateX(-50%) translateY(-1px);
     }
 
     .installationPlanButton:active {
-      transform: translateY(0) scale(0.99);
+      transform: translateX(-50%) translateY(0) scale(0.99);
+    }
+
+    .installationPlanButtonLottie {
+      width: 44px;
+      height: 44px;
+      flex: 0 0 44px;
+      pointer-events: none;
+      transform: scale(1.12);
+      transform-origin: 50% 50%;
+    }
+
+    .installationPlanButtonText {
+      display: block;
+      pointer-events: none;
     }
 
     .installationPlanDropdown {
-      position: absolute;
-      left: 0;
-      bottom: calc(100% + 10px);
-      width: 100%;
-      padding: 18px;
-      border-radius: 22px;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      width: min(1060px, calc(100vw - 48px));
+      max-height: min(720px, calc(100vh - 96px));
+      padding: 26px 28px 28px;
+      border-radius: 26px;
+      background: rgba(0, 0, 0, 0.58);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.34);
       box-sizing: border-box;
       opacity: 0;
-      transform: translateY(8px) scale(0.985);
+      transform: translate(-50%, -50%) scale(0.985);
       pointer-events: none;
       transition: opacity 0.3s ease, transform 0.3s ease;
+      overflow-y: auto;
     }
 
     .installationPlanControl.open .installationPlanDropdown {
       opacity: 1;
-      transform: translateY(0) scale(1);
+      transform: translate(-50%, -50%) scale(1);
       pointer-events: auto;
     }
 
+    .installationPlanCloseButton {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+      font-size: 24px;
+      line-height: 32px;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.18s ease, transform 0.18s ease;
+    }
+
+    .installationPlanCloseButton:hover {
+      background: rgba(255, 255, 255, 0.28);
+      transform: scale(1.04);
+    }
+
     .installationPlanIntro {
-      margin: 0 0 14px;
-      font-size: 13px;
-      line-height: 1.42;
-      font-weight: 400;
-      opacity: 0.94;
+      margin: 2px 52px 18px 0;
+      line-height: 1.35;
+      opacity: 0.96;
+    }
+
+    .installationPlanIntroMain {
+      display: block;
+      font-size: 16px;
+      line-height: 1.35;
+      font-weight: 800;
+    }
+
+    .installationPlanIntroSub {
+      display: block;
+      margin-top: 5px;
+      font-size: 12px;
+      line-height: 1.3;
+      font-weight: 300;
+      opacity: 0.78;
     }
 
     .installationPlanList {
       display: grid;
-      gap: 7px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-rows: repeat(3, minmax(0, 1fr));
+      gap: 12px;
     }
 
     .installationPlanItem {
       width: 100%;
+      min-height: 118px;
       border: 0;
-      border-radius: 12px;
-      padding: 10px 12px;
+      border-radius: 16px;
+      padding: 15px 15px 14px;
       background: rgba(255, 255, 255, 0.12);
       color: #fff;
       cursor: pointer;
-      font-size: 12px;
-      line-height: 1;
-      font-weight: 800;
-      letter-spacing: 0.025em;
       text-align: left;
-      text-transform: uppercase;
+      box-sizing: border-box;
       transition: background 0.18s ease, transform 0.18s ease;
     }
 
     .installationPlanItem:hover {
       background: rgba(255, 255, 255, 0.2);
-      transform: translateX(3px);
+      transform: translateY(-2px);
     }
 
     .installationPlanItem:active {
-      transform: translateX(1px) scale(0.99);
+      transform: translateY(0) scale(0.99);
+    }
+
+    .installationPlanItemTitle {
+      display: block;
+      margin-bottom: 9px;
+      font-size: 13px;
+      line-height: 1.05;
+      font-weight: 800;
+      letter-spacing: 0.025em;
+      text-transform: uppercase;
+    }
+
+    .installationPlanItemDescription {
+      display: block;
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 400;
+      opacity: 0.9;
     }
 
     @media (max-width: 720px) {
@@ -817,8 +905,10 @@
       }
 
       .bottomControlBar {
-        right: 14px;
+        left: 50%;
+        right: auto;
         bottom: 14px;
+        transform: translateX(-50%);
         gap: 6px;
         height: 36px;
         padding: 8px 22px 8px 18px;
@@ -864,28 +954,51 @@
         padding: 12px;
         border-radius: 18px;
       }
-      .installationPlanControl {
-        left: 14px;
-        bottom: 14px;
-        width: min(330px, calc(100vw - 28px));
+      .installationPlanButton {
+        top: 14px;
+        width: min(370px, calc(100vw - 28px));
+        padding: 3px 12px 3px 6px;
+        font-size: 11px;
+        gap: 15px;
+        min-height: 42px;
       }
 
-      .installationPlanButton {
-        padding: 11px 15px;
-        font-size: 11px;
+      .installationPlanButtonLottie {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+        transform: scale(1.12);
       }
 
       .installationPlanDropdown {
-        padding: 15px;
+        width: min(560px, calc(100vw - 28px));
+        max-height: calc(100vh - 80px);
+        padding: 20px;
         border-radius: 18px;
       }
 
       .installationPlanIntro {
-        font-size: 12px;
+        margin-right: 36px;
+        margin-bottom: 14px;
+      }
+
+      .installationPlanIntroMain {
+        font-size: 13px;
+      }
+
+      .installationPlanIntroSub {
+        font-size: 11px;
+      }
+
+      .installationPlanList {
+        grid-template-columns: 1fr;
+        grid-template-rows: none;
+        gap: 8px;
       }
 
       .installationPlanItem {
-        padding: 9px 10px;
+        min-height: auto;
+        padding: 10px 11px;
         font-size: 11px;
       }
 
@@ -1705,24 +1818,54 @@
       aria-expanded="false"
       aria-controls="installationPlanDropdown"
     >
-      HOW TO PLAN YOUR INSTALLATION
+      <div class="installationPlanButtonLottie" id="installationPlanButtonLottie" aria-hidden="true"></div>
+      <span class="installationPlanButtonText">HOW TO PLAN YOUR INSTALLATION</span>
     </button>
 
     <div class="installationPlanDropdown" id="installationPlanDropdown" aria-hidden="true">
+      <button class="installationPlanCloseButton" id="installationPlanCloseButton" type="button" aria-label="Close installation planning menu">×</button>
       <p class="installationPlanIntro">
-        Below lists the methods for installing each particular LUX trim for different starting and termination points.
+        <span class="installationPlanIntroMain">Below lists the methods for installing each particular LUX trim for different starting and termination points.</span>
+        <span class="installationPlanIntroSub">It is important to plan your installation before starting</span>
       </p>
 
       <div class="installationPlanList" aria-label="Installation planning methods">
-        <button class="installationPlanItem" type="button" data-hotspot-target="terminate">TERMINATE</button>
-        <button class="installationPlanItem" type="button" data-hotspot-target="osEndEnd">OUTSIDE END END</button>
-        <button class="installationPlanItem" type="button" data-hotspot-target="isStartStart">INSIDE START START</button>
-        <button class="installationPlanItem" type="button" data-hotspot-target="boxBase">BOX BASE</button>
-        <button class="installationPlanItem" type="button" data-hotspot-target="osStartStart">OUTSIDE START START</button>
-        <button class="installationPlanItem" type="button" data-hotspot-target="isEndStart">INSIDE END START</button>
-        <button class="installationPlanItem" type="button" data-hotspot-target="isEndEnd">INSIDE END END</button>
-        <button class="installationPlanItem" type="button" data-hotspot-target="osStartEnd">OUTSIDE START END</button>
-        <button class="installationPlanItem" type="button" data-hotspot-target="starter">STARTER</button>
+        <button class="installationPlanItem" type="button" data-hotspot-target="terminate">
+          <span class="installationPlanItemTitle">TERMINATE</span>
+          <span class="installationPlanItemDescription">Use this configuration to terminate a panel run.</span>
+        </button>
+        <button class="installationPlanItem" type="button" data-hotspot-target="osEndEnd">
+          <span class="installationPlanItemTitle">OUTSIDE END END</span>
+          <span class="installationPlanItemDescription">Use this configuration when an outside corner of your Random Plank ends from both directions.</span>
+        </button>
+        <button class="installationPlanItem" type="button" data-hotspot-target="isStartStart">
+          <span class="installationPlanItemTitle">INSIDE START START</span>
+          <span class="installationPlanItemDescription">Use this configuration when an inside corner of your Random Plank starts in two directions at a 90-degree angle.</span>
+        </button>
+        <button class="installationPlanItem" type="button" data-hotspot-target="boxBase">
+          <span class="installationPlanItemTitle">BOX BASE</span>
+          <span class="installationPlanItemDescription">The Box Base and U-Support are key components of LUX Random Plank that provide a solid foundation ensuring there is no distortion or sliding of the panel.</span>
+        </button>
+        <button class="installationPlanItem" type="button" data-hotspot-target="osStartStart">
+          <span class="installationPlanItemTitle">OUTSIDE START START</span>
+          <span class="installationPlanItemDescription">Use this configuration when an outside corner of your Random Plank starts in two directions at a 90-degree angle.</span>
+        </button>
+        <button class="installationPlanItem" type="button" data-hotspot-target="isEndStart">
+          <span class="installationPlanItemTitle">INSIDE END START</span>
+          <span class="installationPlanItemDescription">Use this configuration when an inside corner of your Random Plank terminates and you need to start again in another direction.</span>
+        </button>
+        <button class="installationPlanItem" type="button" data-hotspot-target="isEndEnd">
+          <span class="installationPlanItemTitle">INSIDE END END</span>
+          <span class="installationPlanItemDescription">Use this configuration when an inside corner of your Random Plank project ends from both directions.</span>
+        </button>
+        <button class="installationPlanItem" type="button" data-hotspot-target="osStartEnd">
+          <span class="installationPlanItemTitle">OUTSIDE START END</span>
+          <span class="installationPlanItemDescription">Use this configuration when an outside corner of your Random Plank starts in two directions at a 90-degree angle.</span>
+        </button>
+        <button class="installationPlanItem" type="button" data-hotspot-target="starter">
+          <span class="installationPlanItemTitle">STARTER</span>
+          <span class="installationPlanItemDescription">This method is for a single start point either on single-wall applications or following a termination.</span>
+        </button>
       </div>
     </div>
   </div>
@@ -1834,6 +1977,8 @@
     const modelViewer = document.querySelector("#viewer");
     const installationPlanControl = document.querySelector("#installationPlanControl");
     const installationPlanButton = document.querySelector("#installationPlanButton");
+    const installationPlanButtonLottie = document.querySelector("#installationPlanButtonLottie");
+    const installationPlanCloseButton = document.querySelector("#installationPlanCloseButton");
     const installationPlanDropdown = document.querySelector("#installationPlanDropdown");
     const bottomControlBar = document.querySelector("#bottomControlBar");
     const hotspotSummaryWindow = document.querySelector("#hotspotSummaryWindow");
@@ -2296,6 +2441,7 @@
     const INFO_HOTSPOT_LOTTIE_PATH = "lottie/info.json";
     const VIDEO_HOTSPOT_LOTTIE_PATH = "lottie/video.json";
     const THEME_TOGGLE_LOTTIE_PATH = "lottie/theme.json";
+    const INSTALLATION_PLAN_LOTTIE_PATH = "lottie/plan.json";
     const DARK_THEME_BACKGROUND = "#2f2f2f";
 
     const VIDEO_CONTENT = {
@@ -2466,6 +2612,9 @@
     let infoLottieAnimation = null;
     let hotspotSummaryVideoLottieAnimation = null;
     let themeToggleLottieAnimation = null;
+    let installationPlanButtonLottieAnimation = null;
+    let installationPlanMenuZoomApplied = false;
+    let installationPlanZoomTimer = null;
     let isDarkThemeActive = false;
     let lightThemeBackground = "";
     let lightBodyBackground = "";
@@ -2474,6 +2623,18 @@
 
     loadHotspotLotties();
     initThemeToggle();
+    initInstallationPlanButtonLottie();
+
+
+    function initInstallationPlanButtonLottie() {
+      installationPlanButtonLottieAnimation = lottie.loadAnimation({
+        container: installationPlanButtonLottie,
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        path: INSTALLATION_PLAN_LOTTIE_PATH
+      });
+    }
 
     function getThemeFinalFrame() {
       if (!themeToggleLottieAnimation || !themeToggleLottieAnimation.totalFrames) return 0;
@@ -3287,16 +3448,69 @@
 
 
 
+    function zoomInForInstallationPlanMenu() {
+      if (installationPlanMenuZoomApplied) return;
+
+      restoreBrokenCameraIfNeeded();
+      zoomCamera("in");
+      clampCameraAfterWheel();
+      installationPlanMenuZoomApplied = true;
+    }
+
+    function zoomOutAfterInstallationPlanMenu() {
+      if (!installationPlanMenuZoomApplied) return;
+
+      restoreBrokenCameraIfNeeded();
+      zoomCamera("out");
+      clampCameraAfterWheel();
+      installationPlanMenuZoomApplied = false;
+    }
+
     function openInstallationPlanMenu() {
+      if (installationPlanControl.classList.contains("open")) return;
+
+      const wasHowToOpen =
+        customGuideActive ||
+        customGuideReplayTimer ||
+        howToOverlay.classList.contains("open") ||
+        mouseInfoMini.classList.contains("isVisible");
+
+      if (wasHowToOpen) {
+        closeHowToWindow();
+      }
+
       installationPlanControl.classList.add("open");
       installationPlanButton.setAttribute("aria-expanded", "true");
       installationPlanDropdown.setAttribute("aria-hidden", "false");
+
+      if (installationPlanZoomTimer) {
+        clearTimeout(installationPlanZoomTimer);
+      }
+
+      installationPlanZoomTimer = setTimeout(() => {
+        installationPlanZoomTimer = null;
+
+        if (installationPlanControl.classList.contains("open")) {
+          zoomInForInstallationPlanMenu();
+        }
+      }, wasHowToOpen ? 120 : 0);
     }
 
     function closeInstallationPlanMenu() {
+      const wasOpen = installationPlanControl.classList.contains("open");
+
+      if (installationPlanZoomTimer) {
+        clearTimeout(installationPlanZoomTimer);
+        installationPlanZoomTimer = null;
+      }
+
       installationPlanControl.classList.remove("open");
       installationPlanButton.setAttribute("aria-expanded", "false");
       installationPlanDropdown.setAttribute("aria-hidden", "true");
+
+      if (wasOpen) {
+        zoomOutAfterInstallationPlanMenu();
+      }
     }
 
     function toggleInstallationPlanMenu() {
@@ -3906,6 +4120,11 @@
       toggleInstallationPlanMenu();
     });
 
+    installationPlanCloseButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      closeInstallationPlanMenu();
+    });
+
     installationPlanDropdown.addEventListener("click", (event) => {
       event.stopPropagation();
       const item = event.target.closest(".installationPlanItem");
@@ -4001,6 +4220,14 @@
         event.stopPropagation();
         event.stopImmediatePropagation();
         clampCameraAfterUnexpectedInteraction();
+      }
+    }, { capture: true });
+
+    modelViewer.addEventListener("click", (event) => {
+      const clickedHotspot = event.target.closest?.(".Hotspot, .InfoHotspot");
+
+      if (clickedHotspot && installationPlanControl.classList.contains("open")) {
+        closeInstallationPlanMenu();
       }
     }, { capture: true });
 
@@ -4103,6 +4330,10 @@
     });
 
     window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && installationPlanControl.classList.contains("open")) {
+        closeInstallationPlanMenu();
+      }
+
       if (event.key === "Escape" && infoOverlay.classList.contains("open")) {
         closeInfoWindow();
       }
