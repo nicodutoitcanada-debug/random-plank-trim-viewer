@@ -985,8 +985,8 @@
       position: absolute;
       left: 50%;
       top: 50%;
-      width: 178px;
-      height: 178px;
+      width: 89px;
+      height: 89px;
       transform: translate(-50%, -50%);
       pointer-events: none;
     }
@@ -1522,8 +1522,8 @@
       }
 
       .installationPlanVideoLottie {
-        width: 148px;
-        height: 148px;
+        width: 74px;
+        height: 74px;
       }
 
       .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanVideoButton,
@@ -2331,6 +2331,478 @@
     .installationPlanControl.directionChoiceStep.directionStepSelected.directionTerminateSelected .installationPlanBackButton {
       width: min(260px, calc(50% - 6px));
       max-width: 260px;
+    }
+
+
+    /* STEP 15 — CONSISTENT CHOICE SPACING AND COMPACT HOTSPOT DETAIL MENUS */
+
+    /* When advancing between planning stages, collapse the previous layout
+       immediately. Opacity and scale still animate, but the old max-height no
+       longer leaves a temporary empty band above the newly displayed controls. */
+    .installationPlanControl.scenarioChoiceStep:not(.scenarioStepSelected) .installationPlanActions,
+    .installationPlanControl.directionChoiceStep:not(.directionStepSelected) .installationPlanActions,
+    .installationPlanControl.directionChoiceStep:not(.directionStepSelected) .installationPlanScenarioOptions,
+    .installationPlanControl.changeDirectionChoiceStep:not(.changeDirectionStepSelected) .installationPlanActions,
+    .installationPlanControl.changeDirectionChoiceStep:not(.changeDirectionStepSelected) .installationPlanScenarioOptions,
+    .installationPlanControl.changeDirectionChoiceStep:not(.changeDirectionStepSelected) .installationPlanDirectionOptions,
+    .installationPlanControl.terminationChoiceStep:not(.terminationStepSelected) .installationPlanActions,
+    .installationPlanControl.terminationChoiceStep:not(.terminationStepSelected) .installationPlanScenarioOptions,
+    .installationPlanControl.terminationChoiceStep:not(.terminationStepSelected) .installationPlanDirectionOptions,
+    .installationPlanControl.terminationChoiceStep:not(.terminationStepSelected) .installationPlanChangeDirectionOptions {
+      transition-property: opacity, transform !important;
+      transition-duration: 0.24s, 0.38s !important;
+      transition-timing-function: ease, cubic-bezier(0.4, 0, 0.2, 1) !important;
+      transition-delay: 0s !important;
+    }
+
+    .installationPlanControl.scenarioChoiceStep:not(.scenarioStepSelected) .installationPlanVideoButton,
+    .installationPlanControl.directionChoiceStep:not(.directionStepSelected) .installationPlanVideoButton,
+    .installationPlanControl.changeDirectionChoiceStep:not(.changeDirectionStepSelected) .installationPlanVideoButton,
+    .installationPlanControl.terminationChoiceStep:not(.terminationStepSelected) .installationPlanVideoButton {
+      height: 0;
+      max-height: 0;
+      margin: 0 auto;
+      transition-property: opacity, transform !important;
+      transition-duration: 0.2s, 0.3s !important;
+      transition-delay: 0s !important;
+    }
+
+    /* Match the dependable BOX BASE spacing in every unselected choice menu. */
+    .installationPlanControl.scenarioChoiceStep:not(.scenarioStepSelected) .installationPlanIntro,
+    .installationPlanControl.directionChoiceStep:not(.directionStepSelected) .installationPlanIntro,
+    .installationPlanControl.changeDirectionChoiceStep:not(.changeDirectionStepSelected) .installationPlanIntro,
+    .installationPlanControl.terminationChoiceStep:not(.terminationStepSelected) .installationPlanIntro {
+      margin-bottom: 22px;
+    }
+
+    /* Once a hotspot has been selected and the exploded GLB view is being
+       shown, use a shallower window so more of the model remains visible. */
+    .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanDropdown,
+    .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanDropdown,
+    .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanDropdown,
+    .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanDropdown,
+    .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanDropdown {
+      padding: 15px 22px 16px;
+    }
+
+    .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanIntro,
+    .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanIntro,
+    .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanIntro,
+    .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanIntro,
+    .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanIntro {
+      margin: 0 48px 12px;
+      text-align: center;
+    }
+
+    .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanIntroMain,
+    .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanIntroMain,
+    .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanIntroMain,
+    .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanIntroMain,
+    .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanIntroMain {
+      font-size: 15px;
+      line-height: 1.24;
+    }
+
+    .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanIntroSub,
+    .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanIntroSub,
+    .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanIntroSub,
+    .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanIntroSub,
+    .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanIntroSub {
+      margin-top: 4px;
+      line-height: 1.3;
+    }
+
+    .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanActions,
+    .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanActions,
+    .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanActions,
+    .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanActions,
+    .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanActions {
+      max-height: 42px;
+      gap: 10px;
+    }
+
+    .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanActionButton,
+    .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanActionButton,
+    .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanActionButton,
+    .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanActionButton,
+    .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanActionButton {
+      min-height: 40px;
+      padding: 7px 14px;
+    }
+
+    .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanActionButtonTitle,
+    .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanActionButtonTitle,
+    .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanActionButtonTitle,
+    .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanActionButtonTitle,
+    .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanActionButtonTitle {
+      font-size: 12px;
+    }
+
+    /* The YouTube Lottie becomes a compact top-left control, mirrored against
+       the close button. Removing it from normal flow saves its former row. */
+    .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanVideoButton,
+    .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanVideoButton,
+    .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanVideoButton,
+    .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanVideoButton,
+    .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanVideoButton {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 5;
+      width: 32px;
+      height: 32px;
+      max-height: 32px;
+      margin: 0;
+      border-radius: 50%;
+      opacity: 1;
+      transform: none;
+      transform-origin: 50% 50%;
+      pointer-events: auto;
+      transition: opacity 0.22s ease, transform 0.18s ease;
+    }
+
+    .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanVideoLottie,
+    .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanVideoLottie,
+    .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanVideoLottie,
+    .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanVideoLottie,
+    .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanVideoLottie {
+      width: 32px;
+      height: 32px;
+    }
+
+    .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanVideoButton:hover,
+    .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanVideoButton:hover,
+    .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanVideoButton:hover,
+    .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanVideoButton:hover,
+    .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanVideoButton:hover {
+      transform: scale(1.06);
+    }
+
+    .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanVideoButton:active,
+    .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanVideoButton:active,
+    .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanVideoButton:active,
+    .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanVideoButton:active,
+    .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanVideoButton:active {
+      transform: scale(0.94);
+    }
+
+    @media (max-width: 720px) {
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanDropdown,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanDropdown,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanDropdown,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanDropdown,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanDropdown {
+        padding: 12px 14px 14px;
+      }
+
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanIntro,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanIntro,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanIntro,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanIntro,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanIntro {
+        margin: 0 42px 10px;
+      }
+
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanIntroMain,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanIntroMain,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanIntroMain,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanIntroMain,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanIntroMain {
+        font-size: 12.5px;
+      }
+
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanIntroSub,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanIntroSub,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanIntroSub,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanIntroSub,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanIntroSub {
+        font-size: 10.5px;
+      }
+
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanActions,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanActions,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanActions,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanActions,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanActions {
+        max-height: 38px;
+        gap: 8px;
+      }
+
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanActionButton,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanActionButton,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanActionButton,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanActionButton,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanActionButton {
+        min-height: 36px;
+        padding: 6px 10px;
+      }
+
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanVideoButton,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanVideoButton,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanVideoButton,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanVideoButton,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanVideoButton {
+        top: 10px;
+        left: 10px;
+      }
+
+      .installationPlanCloseButton {
+        top: 10px;
+        right: 10px;
+      }
+    }
+
+
+    /* STEP 17 — HALF-SIZE YOUTUBE CONTROL WITH ADAPTIVE DETAIL WINDOWS
+       Keep the tutorial control fully inside its own bounds so it cannot be
+       clipped by the planning window or overlap the centered copy and actions. */
+    .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanVideoButton,
+    .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanVideoButton,
+    .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanVideoButton,
+    .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanVideoButton,
+    .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanVideoButton {
+      width: 89px;
+      height: 89px;
+      max-height: 89px;
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanVideoLottie,
+    .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanVideoLottie,
+    .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanVideoLottie,
+    .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanVideoLottie,
+    .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanVideoLottie {
+      width: 89px;
+      height: 89px;
+    }
+
+    @media (max-width: 720px) {
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanVideoButton,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanVideoButton,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanVideoButton,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanVideoButton,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanVideoButton {
+        width: 74px;
+        height: 74px;
+        max-height: 74px;
+      }
+
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanVideoLottie,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanVideoLottie,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanVideoLottie,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanVideoLottie,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanVideoLottie {
+        width: 74px;
+        height: 74px;
+      }
+    }
+
+
+    /* Give compact exploded-view menus enough horizontal room for the tutorial
+       control while keeping the title, subtitle, and action row visually centred. */
+    @media (min-width: 721px) {
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanDropdown,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanDropdown,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanDropdown,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanDropdown,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanDropdown {
+        width: min(980px, calc(100vw - 48px));
+      }
+
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanIntro,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanIntro,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanIntro,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanIntro,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanIntro {
+        margin-left: 112px;
+        margin-right: 112px;
+      }
+
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanActions,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanActions,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanActions,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanActions,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanActions {
+        width: min(680px, calc(100% - 224px));
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanDropdown,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanDropdown,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanDropdown,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanDropdown,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanDropdown {
+        width: calc(100vw - 20px);
+      }
+
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanIntro,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanIntro,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanIntro,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanIntro,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanIntro {
+        margin-left: 82px;
+        margin-right: 44px;
+      }
+
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanActions,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanActions,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanActions,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanActions,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanActions {
+        width: calc(100% - 94px);
+        margin-left: 82px;
+        margin-right: 12px;
+      }
+    }
+
+
+    /* STEP 18 — TIGHTER DETAIL MENUS, ALIGNED TUTORIAL CONTROL, AND A SINGLE BACK CONTROL */
+
+    /* During the guided installation flow the selected model hotspot has already
+       become a BACK button. Hide that duplicate control until its GLB animation
+       has fully reversed and the original hotspot state has been restored. */
+    .Hotspot.isHiddenForInstallationPlan {
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    @media (min-width: 721px) {
+      /* Pull both side controls closer to the central copy and actions. */
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanDropdown,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanDropdown,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanDropdown,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanDropdown,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanDropdown {
+        width: min(840px, calc(100vw - 48px));
+      }
+
+      /* Use a short hit area whose centre line matches the 32px close button.
+         The square Lottie remains centred inside it, so its visible tutorial pill
+         is slightly larger and sits on the same horizontal line as the close icon. */
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanVideoButton,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanVideoButton,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanVideoButton,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanVideoButton,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanVideoButton {
+        top: 14px;
+        left: 14px;
+        width: 96px;
+        height: 32px;
+        max-height: 32px;
+        border-radius: 0;
+        overflow: visible;
+      }
+
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanVideoLottie,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanVideoLottie,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanVideoLottie,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanVideoLottie,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanVideoLottie {
+        width: 96px;
+        height: 96px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanVideoButton,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanVideoButton,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanVideoButton,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanVideoButton,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanVideoButton {
+        top: 10px;
+        left: 10px;
+        width: 80px;
+        height: 32px;
+        max-height: 32px;
+        border-radius: 0;
+        overflow: visible;
+      }
+
+      .installationPlanControl.boxBaseStepSelected:not(.scenarioChoiceStep):not(.directionChoiceStep):not(.changeDirectionChoiceStep):not(.terminationChoiceStep) .installationPlanVideoLottie,
+      .installationPlanControl.scenarioChoiceStep.scenarioStepSelected .installationPlanVideoLottie,
+      .installationPlanControl.directionChoiceStep.directionStepSelected .installationPlanVideoLottie,
+      .installationPlanControl.changeDirectionChoiceStep.changeDirectionStepSelected .installationPlanVideoLottie,
+      .installationPlanControl.terminationChoiceStep.terminationStepSelected .installationPlanVideoLottie {
+        width: 80px;
+        height: 80px;
+      }
+    }
+
+
+
+    /* STEP 19 — SMALLER STANDALONE TUTORIAL CONTROL AND UNIFORM CHOICE SPACING */
+
+    /* The tutorial control in the standalone top-left hotspot summary is
+       slightly smaller, while its transparent Lottie canvas receives more
+       breathing room above and below inside the summary card. */
+    .hotspotSummaryVideoButton {
+      width: 174px;
+      height: 174px;
+      margin: -24px 0 -36px -10px;
+    }
+
+    /* Remove inactive planning controls from layout entirely while a choice
+       screen is open. Their collapsed max-heights previously left a large
+       invisible band between the explanatory copy and the active choices. */
+    .installationPlanControl.scenarioChoiceStep:not(.scenarioStepSelected) .installationPlanActions,
+    .installationPlanControl.scenarioChoiceStep:not(.scenarioStepSelected) .installationPlanVideoButton,
+    .installationPlanControl.scenarioChoiceStep:not(.scenarioStepSelected) .installationPlanDirectionOptions,
+    .installationPlanControl.scenarioChoiceStep:not(.scenarioStepSelected) .installationPlanTerminationOptions,
+    .installationPlanControl.scenarioChoiceStep:not(.scenarioStepSelected) .installationPlanChangeDirectionOptions,
+
+    .installationPlanControl.directionChoiceStep:not(.directionStepSelected) .installationPlanActions,
+    .installationPlanControl.directionChoiceStep:not(.directionStepSelected) .installationPlanVideoButton,
+    .installationPlanControl.directionChoiceStep:not(.directionStepSelected) .installationPlanScenarioOptions,
+    .installationPlanControl.directionChoiceStep:not(.directionStepSelected) .installationPlanTerminationOptions,
+    .installationPlanControl.directionChoiceStep:not(.directionStepSelected) .installationPlanChangeDirectionOptions,
+
+    .installationPlanControl.terminationChoiceStep:not(.terminationStepSelected) .installationPlanActions,
+    .installationPlanControl.terminationChoiceStep:not(.terminationStepSelected) .installationPlanVideoButton,
+    .installationPlanControl.terminationChoiceStep:not(.terminationStepSelected) .installationPlanScenarioOptions,
+    .installationPlanControl.terminationChoiceStep:not(.terminationStepSelected) .installationPlanDirectionOptions,
+    .installationPlanControl.terminationChoiceStep:not(.terminationStepSelected) .installationPlanChangeDirectionOptions,
+
+    .installationPlanControl.changeDirectionChoiceStep:not(.changeDirectionStepSelected) .installationPlanActions,
+    .installationPlanControl.changeDirectionChoiceStep:not(.changeDirectionStepSelected) .installationPlanVideoButton,
+    .installationPlanControl.changeDirectionChoiceStep:not(.changeDirectionStepSelected) .installationPlanScenarioOptions,
+    .installationPlanControl.changeDirectionChoiceStep:not(.changeDirectionStepSelected) .installationPlanDirectionOptions,
+    .installationPlanControl.changeDirectionChoiceStep:not(.changeDirectionStepSelected) .installationPlanTerminationOptions {
+      display: none !important;
+    }
+
+    /* Match the BOX BASE screen's copy-to-control rhythm on every menu that
+       asks the user to choose a scenario, direction, or termination method. */
+    .installationPlanControl.scenarioChoiceStep:not(.scenarioStepSelected) .installationPlanIntro,
+    .installationPlanControl.directionChoiceStep:not(.directionStepSelected) .installationPlanIntro,
+    .installationPlanControl.terminationChoiceStep:not(.terminationStepSelected) .installationPlanIntro,
+    .installationPlanControl.changeDirectionChoiceStep:not(.changeDirectionStepSelected) .installationPlanIntro {
+      margin-bottom: 18px !important;
+    }
+
+    .installationPlanControl.scenarioChoiceStep:not(.scenarioStepSelected) .installationPlanScenarioOptions,
+    .installationPlanControl.directionChoiceStep:not(.directionStepSelected) .installationPlanDirectionOptions,
+    .installationPlanControl.terminationChoiceStep:not(.terminationStepSelected) .installationPlanTerminationOptions,
+    .installationPlanControl.changeDirectionChoiceStep:not(.changeDirectionStepSelected) .installationPlanChangeDirectionOptions {
+      margin-top: 0 !important;
+    }
+
+    @media (max-width: 720px) {
+      .hotspotSummaryVideoButton {
+        width: 142px;
+        height: 142px;
+        margin: -20px 0 -30px -9px;
+      }
+
+      .installationPlanControl.scenarioChoiceStep:not(.scenarioStepSelected) .installationPlanIntro,
+      .installationPlanControl.directionChoiceStep:not(.directionStepSelected) .installationPlanIntro,
+      .installationPlanControl.terminationChoiceStep:not(.terminationStepSelected) .installationPlanIntro,
+      .installationPlanControl.changeDirectionChoiceStep:not(.changeDirectionStepSelected) .installationPlanIntro {
+        margin-bottom: 14px !important;
+      }
     }
 
   </style>
@@ -3591,6 +4063,17 @@
       fov: "9.65875deg"
     };
 
+    /* The planning menu occupies the upper part of the viewport. Keep the original
+       hand-picked hotspot angles for normal hotspot clicks, but use a slightly higher
+       target and a little more camera distance while the installation-plan menu is open.
+       This lowers the exploded assembly within the remaining visible area and keeps more
+       of its outer pieces in frame. */
+    const INSTALLATION_PLAN_CAMERA_TARGET_Y_OFFSET = 0.085;
+    /* BOX BASE needs slightly less upward target compensation than the other
+       planning hotspots so the exploded assembly sits a little higher in view. */
+    const INSTALLATION_PLAN_BOX_BASE_TARGET_Y_OFFSET = 0.055;
+    const INSTALLATION_PLAN_CAMERA_DISTANCE_SCALE = 1.12;
+
     const END_PADDING = 0.04;
     const REVERSE_SPEED = 1.0;
 
@@ -3622,6 +4105,7 @@
     let starterSafeEndTime = 0;
     let isStarterOpen = false;
     let activeMainHotspot = null;
+    let installationPlanHiddenMainHotspotKey = null;
     let isPlaying = false;
     let forwardFrameId = null;
     let reverseFrameId = null;
@@ -5169,6 +5653,37 @@
       }
     }
 
+    function hideInstallationPlanMainHotspot(targetKey) {
+      if (
+        installationPlanHiddenMainHotspotKey &&
+        installationPlanHiddenMainHotspotKey !== targetKey
+      ) {
+        const previousHotspot = installationPlanHotspotTargets[installationPlanHiddenMainHotspotKey];
+        if (previousHotspot) {
+          previousHotspot.classList.remove("isHiddenForInstallationPlan");
+        }
+      }
+
+      const hotspot = installationPlanHotspotTargets[targetKey];
+      if (!hotspot) return;
+
+      hotspot.classList.add("isHiddenForInstallationPlan");
+      installationPlanHiddenMainHotspotKey = targetKey;
+    }
+
+    function restoreInstallationPlanMainHotspot(targetKey = installationPlanHiddenMainHotspotKey) {
+      if (!targetKey) return;
+
+      const hotspot = installationPlanHotspotTargets[targetKey];
+      if (hotspot) {
+        hotspot.classList.remove("isHiddenForInstallationPlan");
+      }
+
+      if (installationPlanHiddenMainHotspotKey === targetKey) {
+        installationPlanHiddenMainHotspotKey = null;
+      }
+    }
+
     function resetInstallationPlanStep() {
       if (installationPlanTextSwapTimer) {
         clearTimeout(installationPlanTextSwapTimer);
@@ -5177,6 +5692,10 @@
 
       installationPlanStage = "foundation";
       installationPlanActiveHotspot = null;
+
+      if (!isPlaying && !activeMainHotspot) {
+        restoreInstallationPlanMainHotspot();
+      }
 
       installationPlanControl.classList.remove(
         "boxBaseStepSelected",
@@ -5239,6 +5758,7 @@
             : "scenarioViewed";
 
       installationPlanActiveHotspot = activeHotspotKey;
+      hideInstallationPlanMainHotspot(activeHotspotKey);
       installationPlanControl.classList.add("boxBaseStepSelected");
 
       if (isTerminationScenario) {
@@ -5392,6 +5912,7 @@
 
     function reverseInstallationPlanHotspot(targetKey) {
       if (!targetKey) {
+        restoreInstallationPlanMainHotspot();
         moveCameraToDefaultView(true);
         installationPlanMenuZoomApplied = false;
         return;
@@ -5499,6 +6020,7 @@
       }
 
       if (!animationName) {
+        restoreInstallationPlanMainHotspot(targetKey);
         moveCameraToDefaultView(true);
         installationPlanMenuZoomApplied = false;
         return;
@@ -5554,7 +6076,7 @@
       showInstallationPlanReadyState("boxBase");
 
       if (activeMainHotspot === "boxBase" && isBoxBaseOpen) {
-        moveCameraToBoxBaseView(true);
+        moveCameraToInstallationPlanView(BOX_BASE_CAMERA_VIEW, true);
         return;
       }
 
@@ -6999,6 +7521,39 @@
       }
     }
 
+    function getInstallationPlanCameraView(baseView) {
+      const orbitParts = String(baseView?.orbit || "").trim().split(/\s+/);
+      const targetParts = String(baseView?.target || "").trim().split(/\s+/);
+
+      if (orbitParts.length !== 3 || targetParts.length !== 3) {
+        return baseView;
+      }
+
+      const radius = parseFloat(orbitParts[2]);
+      const targetY = parseFloat(targetParts[1]);
+
+      if (!Number.isFinite(radius) || !Number.isFinite(targetY)) {
+        return baseView;
+      }
+
+      const targetYOffset = baseView === BOX_BASE_CAMERA_VIEW
+        ? INSTALLATION_PLAN_BOX_BASE_TARGET_Y_OFFSET
+        : INSTALLATION_PLAN_CAMERA_TARGET_Y_OFFSET;
+
+      orbitParts[2] = `${(radius * INSTALLATION_PLAN_CAMERA_DISTANCE_SCALE).toFixed(5)}m`;
+      targetParts[1] = `${(targetY + targetYOffset).toFixed(5)}m`;
+
+      return {
+        ...baseView,
+        orbit: orbitParts.join(" "),
+        target: targetParts.join(" ")
+      };
+    }
+
+    function moveCameraToInstallationPlanView(view, animate = true) {
+      moveCameraToView(getInstallationPlanCameraView(view), animate);
+    }
+
     function moveCameraToDefaultView(animate = true) {
       moveCameraToView(DEFAULT_CAMERA_VIEW, animate);
     }
@@ -7366,7 +7921,11 @@
 
       hideAllInfoHotspots();
       animateMainHotspotButton(terminateHotspotLottie, true);
-      moveCameraToTerminateView(true);
+      if (keepInstallationPlanOpen) {
+        moveCameraToInstallationPlanView(TERMINATE_CAMERA_VIEW, true);
+      } else {
+        moveCameraToTerminateView(true);
+      }
 
       modelViewer.animationName = TERMINATE_ANIMATION_NAME;
       modelViewer.timeScale = 1;
@@ -7425,7 +7984,11 @@
 
       hideAllInfoHotspots();
       animateMainHotspotButton(osEndEndHotspotLottie, true);
-      moveCameraToOsEndEndView(true);
+      if (keepInstallationPlanOpen) {
+        moveCameraToInstallationPlanView(OS_END_END_CAMERA_VIEW, true);
+      } else {
+        moveCameraToOsEndEndView(true);
+      }
 
       modelViewer.animationName = OS_END_END_ANIMATION_NAME;
       modelViewer.timeScale = 1;
@@ -7484,7 +8047,11 @@
 
       hideAllInfoHotspots();
       animateMainHotspotButton(isStartStartHotspotLottie, true);
-      moveCameraToIsStartStartView(true);
+      if (keepInstallationPlanOpen) {
+        moveCameraToInstallationPlanView(IS_START_START_CAMERA_VIEW, true);
+      } else {
+        moveCameraToIsStartStartView(true);
+      }
 
       modelViewer.animationName = IS_START_START_ANIMATION_NAME;
       modelViewer.timeScale = 1;
@@ -7543,7 +8110,11 @@
 
       hideAllInfoHotspots();
       animateMainHotspotButton(boxBaseHotspotLottie, true);
-      moveCameraToBoxBaseView(true);
+      if (keepInstallationPlanOpen) {
+        moveCameraToInstallationPlanView(BOX_BASE_CAMERA_VIEW, true);
+      } else {
+        moveCameraToBoxBaseView(true);
+      }
 
       modelViewer.animationName = BOX_BASE_ANIMATION_NAME;
       modelViewer.timeScale = 1;
@@ -7602,7 +8173,11 @@
 
       hideAllInfoHotspots();
       animateMainHotspotButton(osStartStartHotspotLottie, true);
-      moveCameraToOsStartStartView(true);
+      if (keepInstallationPlanOpen) {
+        moveCameraToInstallationPlanView(OS_START_START_CAMERA_VIEW, true);
+      } else {
+        moveCameraToOsStartStartView(true);
+      }
 
       modelViewer.animationName = OS_START_START_ANIMATION_NAME;
       modelViewer.timeScale = 1;
@@ -7661,7 +8236,11 @@
 
       hideAllInfoHotspots();
       animateMainHotspotButton(isEndStartHotspotLottie, true);
-      moveCameraToIsEndStartView(true);
+      if (keepInstallationPlanOpen) {
+        moveCameraToInstallationPlanView(IS_END_START_CAMERA_VIEW, true);
+      } else {
+        moveCameraToIsEndStartView(true);
+      }
 
       modelViewer.animationName = IS_END_START_ANIMATION_NAME;
       modelViewer.timeScale = 1;
@@ -7720,7 +8299,11 @@
 
       hideAllInfoHotspots();
       animateMainHotspotButton(isEndEndHotspotLottie, true);
-      moveCameraToIsEndEndView(true);
+      if (keepInstallationPlanOpen) {
+        moveCameraToInstallationPlanView(IS_END_END_CAMERA_VIEW, true);
+      } else {
+        moveCameraToIsEndEndView(true);
+      }
 
       modelViewer.animationName = IS_END_END_ANIMATION_NAME;
       modelViewer.timeScale = 1;
@@ -7779,7 +8362,11 @@
 
       hideAllInfoHotspots();
       animateMainHotspotButton(osStartEndHotspotLottie, true);
-      moveCameraToOsStartEndView(true);
+      if (keepInstallationPlanOpen) {
+        moveCameraToInstallationPlanView(OS_START_END_CAMERA_VIEW, true);
+      } else {
+        moveCameraToOsStartEndView(true);
+      }
 
       modelViewer.animationName = OS_START_END_ANIMATION_NAME;
       modelViewer.timeScale = 1;
@@ -7838,7 +8425,11 @@
 
       hideAllInfoHotspots();
       animateMainHotspotButton(starterHotspotLottie, true);
-      moveCameraToStarterView(true);
+      if (keepInstallationPlanOpen) {
+        moveCameraToInstallationPlanView(STARTER_CAMERA_VIEW, true);
+      } else {
+        moveCameraToStarterView(true);
+      }
 
       modelViewer.animationName = STARTER_ANIMATION_NAME;
       modelViewer.timeScale = 1;
@@ -8029,6 +8620,7 @@
           modelViewer.classList.remove("showInfoHotspots");
         }
 
+        restoreInstallationPlanMainHotspot(activeMainHotspot);
         activeMainHotspot = null;
 
         stopAllMonitors();
