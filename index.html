@@ -763,15 +763,6 @@
       transform: translateX(-50%) translateY(0) scale(0.99);
     }
 
-    .installationPlanButtonLottie {
-      width: 44px;
-      height: 44px;
-      flex: 0 0 44px;
-      pointer-events: none;
-      transform: scale(1.12);
-      transform-origin: 50% 50%;
-    }
-
     .installationPlanButtonText {
       display: block;
       pointer-events: none;
@@ -1466,13 +1457,6 @@
         font-size: 11px;
         gap: 15px;
         min-height: 42px;
-      }
-
-      .installationPlanButtonLottie {
-        width: 36px;
-        height: 36px;
-        flex-basis: 36px;
-        transform: scale(1.12);
       }
 
       .installationPlanDropdown,
@@ -2805,6 +2789,507 @@
       }
     }
 
+
+
+    /* INSTALLATION MENU — quick-access catalogue beside the guided-tour button */
+    .installationPlanTopControls {
+      position: absolute;
+      left: 50%;
+      top: 24px;
+      z-index: 5;
+      width: min(340px, calc(100vw - 48px));
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      gap: 12px;
+      transform: translateX(-50%);
+      pointer-events: auto;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .installationPlanButton,
+    .installationMenuButton {
+      position: relative;
+      left: auto;
+      top: auto;
+      min-height: 48px;
+      border: 0;
+      border-radius: 999px;
+      padding: 4px 14px 4px 7px;
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: 0.025em;
+      text-align: center;
+      text-transform: uppercase;
+      box-sizing: border-box;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.22s ease, transform 0.22s ease, opacity 0.25s ease;
+    }
+
+    .installationPlanButton,
+    .installationMenuButton {
+      width: 0;
+      flex: 1 1 0;
+      transform: none;
+      gap: 0;
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+
+    .installationPlanButton:hover,
+    .installationMenuButton:hover {
+      background: rgba(0, 0, 0, 0.62);
+      transform: translateY(-1px);
+    }
+
+    .installationPlanButton:active,
+    .installationMenuButton:active {
+      transform: translateY(0) scale(0.99);
+    }
+
+    .installationMenuButtonText {
+      pointer-events: none;
+    }
+
+    .installationPlanControl.isHiddenBehindSummary .installationPlanTopControls {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(-10px);
+    }
+
+    .installationPlanControl.isHiddenBehindSummary .installationMenuDropdown {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .installationMenuDropdown {
+      position: fixed;
+      left: 50%;
+      top: 84px;
+      z-index: 3;
+      width: min(1500px, calc(100vw - 32px));
+      max-height: calc(100vh - 108px);
+      padding: 24px 26px 26px;
+      border-radius: 26px;
+      background: rgba(0, 0, 0, 0.58);
+      color: #fff;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.34);
+      box-sizing: border-box;
+      opacity: 0;
+      transform: translateX(-50%) translateY(-12px) scale(0.985);
+      pointer-events: none;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      transition: opacity 0.3s ease, transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .installationMenuDropdown::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    .installationPlanControl.menuOpen .installationMenuDropdown {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .installationMenuCloseButton {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 4;
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+      font-size: 24px;
+      line-height: 32px;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.18s ease, transform 0.18s ease;
+    }
+
+    .installationMenuCloseButton:hover {
+      background: rgba(255, 255, 255, 0.28);
+      transform: scale(1.04);
+    }
+
+    .installationMenuCategoryButtons {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      width: calc(100% - 48px);
+      margin: 0 48px 20px 0;
+    }
+
+    .installationMenuCategoryButton,
+    .installationMenuShowAllButton {
+      min-height: 48px;
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1.12;
+      font-weight: 800;
+      letter-spacing: 0.035em;
+      text-align: center;
+      text-transform: uppercase;
+      box-sizing: border-box;
+      transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .installationMenuCategoryButton:hover,
+    .installationMenuShowAllButton:hover {
+      background: rgba(255, 255, 255, 0.21);
+      transform: translateY(-2px);
+    }
+
+    .installationMenuCategoryButton:active,
+    .installationMenuShowAllButton:active {
+      transform: translateY(0) scale(0.985);
+    }
+
+    .installationMenuCategoryButton.isActive {
+      background: rgba(205, 31, 39, 0.94);
+      box-shadow: 0 8px 24px rgba(145, 0, 8, 0.28);
+    }
+
+    .installationMenuOptions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      width: 100%;
+      align-items: stretch;
+    }
+
+    .installationMenuOptions[data-filter="foundation"] {
+      grid-template-columns: minmax(0, 470px);
+      justify-content: center;
+    }
+
+    .installationMenuOptions[data-filter="changeDirection"] {
+      grid-template-columns: repeat(2, minmax(0, 470px));
+      justify-content: center;
+    }
+
+    .installationMenuOptions[data-filter="starting"],
+    .installationMenuOptions[data-filter="termination"] {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .installationMenuOptionCard {
+      min-width: 0;
+      min-height: 176px;
+      display: flex;
+      flex-direction: column;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.14);
+      box-sizing: border-box;
+      overflow: hidden;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .installationMenuOptionCard[hidden] {
+      display: none !important;
+    }
+
+    .installationMenuOptionCard:hover {
+      background: rgba(255, 255, 255, 0.19);
+      transform: translateY(-2px);
+    }
+
+    .installationPlanScenarioCard.isWholeCardClickable,
+    .installationMenuOptionCard.isWholeCardClickable {
+      cursor: pointer;
+    }
+
+    .installationPlanScenarioCard.isWholeCardClickable:active,
+    .installationMenuOptionCard.isWholeCardClickable:active {
+      transform: translateY(0) scale(0.992);
+    }
+
+    .installationMenuOptionLottie {
+      display: none;
+      width: 100%;
+      height: 160px;
+      border-radius: 13px;
+      background: transparent;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .installationMenuOptionButton {
+      width: 100%;
+      min-height: 176px;
+      flex: 1 1 auto;
+      border: 0;
+      border-radius: inherit;
+      padding: 22px 22px 20px;
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+      text-align: left;
+      box-sizing: border-box;
+      transition: background 0.18s ease, transform 0.18s ease;
+    }
+
+    .installationMenuOptionButton:active {
+      transform: scale(0.992);
+    }
+
+    .installationMenuOptionTitle {
+      display: block;
+      margin-bottom: 13px;
+      font-size: 21px;
+      line-height: 1.08;
+      font-weight: 800;
+      letter-spacing: 0.025em;
+      text-transform: uppercase;
+    }
+
+    .installationMenuOptionDescription {
+      display: block;
+      font-size: 17px;
+      line-height: 1.42;
+      font-weight: 400;
+      opacity: 0.94;
+    }
+
+    .installationMenuOptions:not([data-filter="all"]) .installationMenuOptionCard {
+      min-height: 0;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 21px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .installationMenuOptions:not([data-filter="all"]) .installationMenuOptionCard:hover {
+      background: rgba(255, 255, 255, 0.11);
+    }
+
+    .installationMenuOptions:not([data-filter="all"]) .installationMenuOptionLottie {
+      display: block;
+    }
+
+    .installationMenuOptions:not([data-filter="all"]) .installationMenuOptionButton {
+      min-height: 126px;
+      border-radius: 13px;
+      padding: 16px 17px 15px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .installationMenuOptions[data-filter="foundation"]
+      .installationMenuOptionCard[data-menu-key="boxBase"] {
+      display: block;
+    }
+
+    .installationMenuOptions[data-filter="foundation"]
+      .installationMenuOptionCard[data-menu-key="boxBase"]
+      .installationMenuOptionButton {
+      width: 100%;
+    }
+
+    .installationMenuOptions:not([data-filter="all"]) .installationMenuOptionButton:hover {
+      background: rgba(255, 255, 255, 0.21);
+      transform: translateY(-2px);
+    }
+
+    .installationMenuOptions:not([data-filter="all"]) .installationMenuOptionTitle {
+      margin-bottom: 9px;
+      font-size: 13px;
+    }
+
+    .installationMenuOptions:not([data-filter="all"]) .installationMenuOptionDescription {
+      font-size: 12px;
+      line-height: 1.36;
+      opacity: 0.9;
+    }
+
+    .installationMenuOptions .installationMenuOptionCard.isCategoryPreview,
+    .installationMenuOptions:not([data-filter="all"]) .installationMenuOptionCard.isCategoryPreview {
+      background: rgba(205, 31, 39, 0.94);
+      box-shadow: 0 10px 28px rgba(145, 0, 8, 0.32);
+      transform: translateY(-2px);
+    }
+
+    .installationMenuOptions .installationMenuOptionCard.isCategoryPreview .installationMenuOptionButton,
+    .installationMenuOptions:not([data-filter="all"]) .installationMenuOptionCard.isCategoryPreview .installationMenuOptionButton {
+      background: rgba(205, 31, 39, 0.94);
+    }
+
+    .installationMenuShowAllButton {
+      display: none;
+      width: min(260px, 100%);
+      margin: 20px auto 0;
+    }
+
+    .installationMenuDropdown.isFiltered .installationMenuShowAllButton {
+      display: block;
+    }
+
+    @media (max-width: 1040px) {
+      .installationMenuCategoryButtons {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .installationMenuOptions {
+        gap: 12px;
+      }
+
+      .installationMenuOptionTitle {
+        font-size: 17px;
+      }
+
+      .installationMenuOptionDescription {
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .installationPlanTopControls {
+        top: 14px;
+        width: min(300px, calc(100vw - 28px));
+        gap: 7px;
+      }
+
+      .installationPlanButton,
+      .installationMenuButton {
+        min-height: 42px;
+        font-size: 11px;
+      }
+
+      .installationPlanButton,
+      .installationMenuButton {
+        width: 0;
+        flex: 1 1 0;
+        gap: 0;
+        padding: 3px 12px;
+      }
+
+      .installationMenuDropdown {
+        top: 66px;
+        width: min(520px, calc(100vw - 28px));
+        max-height: calc(100vh - 82px);
+        padding: 18px 16px 20px;
+        border-radius: 18px;
+      }
+
+      .installationMenuCloseButton {
+        top: 10px;
+        right: 10px;
+      }
+
+      .installationMenuCategoryButtons {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        width: calc(100% - 38px);
+        margin: 0 38px 14px 0;
+      }
+
+      .installationMenuCategoryButton,
+      .installationMenuShowAllButton {
+        min-height: 42px;
+        padding: 8px 9px;
+        font-size: 10px;
+      }
+
+      .installationMenuOptions,
+      .installationMenuOptions[data-filter="foundation"],
+      .installationMenuOptions[data-filter="starting"],
+      .installationMenuOptions[data-filter="termination"],
+      .installationMenuOptions[data-filter="changeDirection"] {
+        grid-template-columns: 1fr;
+        gap: 11px;
+      }
+
+      .installationMenuOptionCard {
+        min-height: 0;
+        border-radius: 18px;
+      }
+
+      .installationMenuOptionButton {
+        min-height: 128px;
+        padding: 18px 18px 16px;
+      }
+
+      .installationMenuOptionTitle {
+        margin-bottom: 9px;
+        font-size: 15px;
+      }
+
+      .installationMenuOptionDescription {
+        font-size: 12px;
+      }
+
+      .installationMenuOptions:not([data-filter="all"]) .installationMenuOptionCard {
+        display: grid;
+        grid-template-columns: 112px minmax(0, 1fr);
+        align-items: stretch;
+        gap: 9px;
+        padding: 8px;
+        border-radius: 17px;
+      }
+
+      .installationMenuOptions:not([data-filter="all"]) .installationMenuOptionLottie {
+        height: 112px;
+        border-radius: 10px;
+      }
+
+      .installationMenuOptions:not([data-filter="all"]) .installationMenuOptionButton {
+        min-height: 112px;
+        padding: 13px 14px;
+        border-radius: 10px;
+      }
+
+      .installationMenuOptions:not([data-filter="all"]) .installationMenuOptionTitle {
+        margin-bottom: 7px;
+        font-size: 11px;
+      }
+
+      .installationMenuOptions:not([data-filter="all"]) .installationMenuOptionDescription {
+        font-size: 10.5px;
+      }
+
+      .installationMenuShowAllButton {
+        margin-top: 14px;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .installationPlanButton,
+      .installationMenuButton {
+        width: 0;
+        flex: 1 1 0;
+        gap: 0;
+        padding-left: 9px;
+        padding-right: 9px;
+        font-size: 10px;
+      }
+
+    }
+
   </style>
 </head>
 
@@ -3362,16 +3847,27 @@
 
 
   <div class="installationPlanControl" id="installationPlanControl">
-    <button
-      class="installationPlanButton"
-      id="installationPlanButton"
-      type="button"
-      aria-expanded="false"
-      aria-controls="installationPlanDropdown"
-    >
-      <div class="installationPlanButtonLottie" id="installationPlanButtonLottie" aria-hidden="true"></div>
-      <span class="installationPlanButtonText">HOW TO PLAN YOUR INSTALLATION</span>
-    </button>
+    <div class="installationPlanTopControls" aria-label="Installation planning controls">
+      <button
+        class="installationPlanButton"
+        id="installationPlanButton"
+        type="button"
+        aria-expanded="false"
+        aria-controls="installationPlanDropdown"
+      >
+        <span class="installationPlanButtonText">GUIDED TOUR</span>
+      </button>
+
+      <button
+        class="installationMenuButton"
+        id="installationMenuButton"
+        type="button"
+        aria-expanded="false"
+        aria-controls="installationMenuDropdown"
+      >
+        <span class="installationMenuButtonText">MENU</span>
+      </button>
+    </div>
 
     <div class="installationPlanDropdown" id="installationPlanDropdown" aria-hidden="true">
       <button class="installationPlanChoiceBackButton" id="installationPlanChoiceBackButton" type="button" aria-label="Go back to the previous installation-planning step">&lt;</button>
@@ -3598,13 +4094,100 @@
         </div>
       </div>
     </div>
+
+    <div class="installationMenuDropdown" id="installationMenuDropdown" aria-hidden="true">
+      <button class="installationMenuCloseButton" id="installationMenuCloseButton" type="button" aria-label="Close installation menu">×</button>
+
+      <div class="installationMenuCategoryButtons" id="installationMenuCategoryButtons" aria-label="Installation menu categories">
+        <button class="installationMenuCategoryButton" type="button" data-menu-filter="foundation">FOUNDATION</button>
+        <button class="installationMenuCategoryButton" type="button" data-menu-filter="starting">STARTING OPTIONS</button>
+        <button class="installationMenuCategoryButton" type="button" data-menu-filter="termination">TERMINATION OPTIONS</button>
+        <button class="installationMenuCategoryButton" type="button" data-menu-filter="changeDirection">CHANGE DIRECTION</button>
+        <button class="installationMenuCategoryButton" type="button" data-menu-action="guidedTour">GUIDED TOUR</button>
+      </div>
+
+      <div class="installationMenuOptions" id="installationMenuOptions" data-filter="all" aria-label="Random Plank installation options">
+        <div class="installationMenuOptionCard" data-menu-category="termination" data-menu-key="terminate">
+          <div class="installationMenuOptionLottie" data-lottie-path="lottie/TERMINATE.json" aria-hidden="true"></div>
+          <button class="installationMenuOptionButton" type="button" data-menu-hotspot-target="terminate">
+            <span class="installationMenuOptionTitle">TERMINATE</span>
+            <span class="installationMenuOptionDescription">Use this configuration to terminate a panel run.</span>
+          </button>
+        </div>
+
+        <div class="installationMenuOptionCard" data-menu-category="termination" data-menu-key="osEndEnd">
+          <div class="installationMenuOptionLottie" data-lottie-path="lottie/OUTSIDE END END.json" aria-hidden="true"></div>
+          <button class="installationMenuOptionButton" type="button" data-menu-hotspot-target="osEndEnd">
+            <span class="installationMenuOptionTitle">OUTSIDE END END</span>
+            <span class="installationMenuOptionDescription">Use this configuration when an outside corner of your Random Plank ends from both directions.</span>
+          </button>
+        </div>
+
+        <div class="installationMenuOptionCard" data-menu-category="starting" data-menu-key="isStartStart">
+          <div class="installationMenuOptionLottie" data-lottie-path="lottie/INSIDE START START.json" aria-hidden="true"></div>
+          <button class="installationMenuOptionButton" type="button" data-menu-hotspot-target="isStartStart">
+            <span class="installationMenuOptionTitle">INSIDE START START</span>
+            <span class="installationMenuOptionDescription">Use this configuration when an inside corner of your Random Plank starts in two directions at a 90-degree angle.</span>
+          </button>
+        </div>
+
+        <div class="installationMenuOptionCard" data-menu-category="foundation" data-menu-key="boxBase">
+          <button class="installationMenuOptionButton" type="button" data-menu-hotspot-target="boxBase">
+            <span class="installationMenuOptionTitle">BOX BASE</span>
+            <span class="installationMenuOptionDescription">The Box Base and U-Support are key components of LUX Random Plank that provide a solid foundation ensuring there is no distortion or sliding of the panel.</span>
+          </button>
+        </div>
+
+        <div class="installationMenuOptionCard" data-menu-category="starting" data-menu-key="osStartStart">
+          <div class="installationMenuOptionLottie" data-lottie-path="lottie/OUTSIDE START START.json" aria-hidden="true"></div>
+          <button class="installationMenuOptionButton" type="button" data-menu-hotspot-target="osStartStart">
+            <span class="installationMenuOptionTitle">OUTSIDE START START</span>
+            <span class="installationMenuOptionDescription">Use this configuration when an outside corner of your Random Plank starts in two directions at a 90-degree angle.</span>
+          </button>
+        </div>
+
+        <div class="installationMenuOptionCard" data-menu-category="changeDirection" data-menu-key="isEndStart">
+          <div class="installationMenuOptionLottie" data-lottie-path="lottie/INSIDE END START.json" aria-hidden="true"></div>
+          <button class="installationMenuOptionButton" type="button" data-menu-hotspot-target="isEndStart">
+            <span class="installationMenuOptionTitle">INSIDE END START</span>
+            <span class="installationMenuOptionDescription">Use this configuration when an inside corner of your Random Plank terminates and you need to start again in another direction.</span>
+          </button>
+        </div>
+
+        <div class="installationMenuOptionCard" data-menu-category="termination" data-menu-key="isEndEnd">
+          <div class="installationMenuOptionLottie" data-lottie-path="lottie/INSIDE END END.json" aria-hidden="true"></div>
+          <button class="installationMenuOptionButton" type="button" data-menu-hotspot-target="isEndEnd">
+            <span class="installationMenuOptionTitle">INSIDE END END</span>
+            <span class="installationMenuOptionDescription">Use this configuration when an inside corner of your Random Plank project ends from both directions.</span>
+          </button>
+        </div>
+
+        <div class="installationMenuOptionCard" data-menu-category="changeDirection" data-menu-key="osStartEnd">
+          <div class="installationMenuOptionLottie" data-lottie-path="lottie/OUTSIDE START END.json" aria-hidden="true"></div>
+          <button class="installationMenuOptionButton" type="button" data-menu-hotspot-target="osStartEnd">
+            <span class="installationMenuOptionTitle">OUTSIDE START END</span>
+            <span class="installationMenuOptionDescription">Use this configuration when an outside corner of your Random Plank starts in two directions at a 90-degree angle.</span>
+          </button>
+        </div>
+
+        <div class="installationMenuOptionCard" data-menu-category="starting" data-menu-key="starter">
+          <div class="installationMenuOptionLottie" data-lottie-path="lottie/STARTER.json" aria-hidden="true"></div>
+          <button class="installationMenuOptionButton" type="button" data-menu-hotspot-target="starter">
+            <span class="installationMenuOptionTitle">STARTER</span>
+            <span class="installationMenuOptionDescription">This method is for a single start point either on single-wall applications or following a termination.</span>
+          </button>
+        </div>
+      </div>
+
+      <button class="installationMenuShowAllButton" id="installationMenuShowAllButton" type="button">SHOW ALL</button>
+    </div>
   </div>
 
   <div class="newUserPromptOverlay" id="newUserPromptOverlay" aria-hidden="true">
     <div class="newUserPromptWindow" role="dialog" aria-modal="true" aria-labelledby="newUserPromptTitle">
       <button class="newUserPromptCloseButton" id="newUserPromptCloseButton" type="button" aria-label="Close Random Plank guide prompt">×</button>
       <div class="newUserPromptTitle" id="newUserPromptTitle">New to Random Plank?</div>
-      <div class="newUserPromptBody">We can guide you through your installation step by step by clicking on the HOW TO PLAN YOUR INSTALLATION button at the top of this window.</div>
+      <div class="newUserPromptBody">We can guide you through your installation step by step by clicking on the GUIDED TOUR button at the top of this window.</div>
       <div class="newUserPromptActions">
         <button class="newUserPromptActionButton newUserPromptTryButton" id="newUserPromptTryButton" type="button">TRY IT NOW</button>
         <button class="newUserPromptActionButton" id="newUserPromptNoThanksButton" type="button">NO THANKS</button>
@@ -3719,7 +4302,17 @@
     const modelViewer = document.querySelector("#viewer");
     const installationPlanControl = document.querySelector("#installationPlanControl");
     const installationPlanButton = document.querySelector("#installationPlanButton");
-    const installationPlanButtonLottie = document.querySelector("#installationPlanButtonLottie");
+    const installationMenuButton = document.querySelector("#installationMenuButton");
+    const installationMenuDropdown = document.querySelector("#installationMenuDropdown");
+    const installationMenuCloseButton = document.querySelector("#installationMenuCloseButton");
+    const installationMenuCategoryButtons = Array.from(
+      document.querySelectorAll(".installationMenuCategoryButton")
+    );
+    const installationMenuOptions = document.querySelector("#installationMenuOptions");
+    const installationMenuOptionCards = Array.from(
+      document.querySelectorAll(".installationMenuOptionCard")
+    );
+    const installationMenuShowAllButton = document.querySelector("#installationMenuShowAllButton");
     const installationPlanCloseButton = document.querySelector("#installationPlanCloseButton");
     const installationPlanChoiceBackButton = document.querySelector("#installationPlanChoiceBackButton");
     const installationPlanDropdown = document.querySelector("#installationPlanDropdown");
@@ -4280,7 +4873,6 @@
     const INFO_HOTSPOT_LOTTIE_PATH = "lottie/info.json";
     const VIDEO_HOTSPOT_LOTTIE_PATH = "lottie/video.json";
     const THEME_TOGGLE_LOTTIE_PATH = "lottie/theme.json";
-    const INSTALLATION_PLAN_LOTTIE_PATH = "lottie/plan.json";
     const DARK_THEME_BACKGROUND = "#2f2f2f";
 
     const VIDEO_CONTENT = {
@@ -4454,7 +5046,6 @@
     let hotspotSummaryVideoLottieReady = false;
     let hotspotSummaryVideoLottiePendingPlay = false;
     let themeToggleLottieAnimation = null;
-    let installationPlanButtonLottieAnimation = null;
     let installationPlanVideoLottieAnimation = null;
     let installationPlanVideoLottieReady = false;
     let installationPlanVideoLottiePendingPlay = false;
@@ -4470,6 +5061,11 @@
     let installationPlanTerminationLottieAnimations = [];
     let installationPlanTerminationLottieReady = [];
     let installationPlanTerminationLottieStartTimers = [];
+    const installationMenuLottieAnimations = new Map();
+    let installationMenuLottieStartTimers = [];
+    let installationMenuActiveFilter = "all";
+    let installationMenuHotspotOriginFilter = null;
+    let installationMenuReturnRequested = false;
     let newUserPromptTimer = null;
     let newUserPromptDismissed = false;
     let installationPlanStage = "foundation";
@@ -4483,7 +5079,6 @@
 
     loadHotspotLotties();
     initThemeToggle();
-    initInstallationPlanButtonLottie();
 
     // Build both YouTube-thumbnail animations immediately. Their containers may be
     // hidden, but the JSON and SVG are ready before either menu can be opened.
@@ -4491,15 +5086,6 @@
     ensureHotspotSummaryVideoLottie();
 
 
-    function initInstallationPlanButtonLottie() {
-      installationPlanButtonLottieAnimation = lottie.loadAnimation({
-        container: installationPlanButtonLottie,
-        renderer: "svg",
-        loop: true,
-        autoplay: true,
-        path: INSTALLATION_PLAN_LOTTIE_PATH
-      });
-    }
 
     function getThemeFinalFrame() {
       if (!themeToggleLottieAnimation || !themeToggleLottieAnimation.totalFrames) return 0;
@@ -4712,6 +5298,7 @@
       if (!isOpen) {
         playForwardAndHold();
       } else {
+        requestInstallationMenuReturnFromHotspot();
         playBackwardByScrubbing();
       }
     });
@@ -4737,6 +5324,7 @@
       if (!isOsEndEndOpen) {
         playOsEndEndForwardAndHold();
       } else {
+        requestInstallationMenuReturnFromHotspot();
         playOsEndEndBackwardByScrubbing();
       }
     });
@@ -4762,6 +5350,7 @@
       if (!isIsStartStartOpen) {
         playIsStartStartForwardAndHold();
       } else {
+        requestInstallationMenuReturnFromHotspot();
         playIsStartStartBackwardByScrubbing();
       }
     });
@@ -4787,6 +5376,7 @@
       if (!isBoxBaseOpen) {
         playBoxBaseForwardAndHold();
       } else {
+        requestInstallationMenuReturnFromHotspot();
         playBoxBaseBackwardByScrubbing();
       }
     });
@@ -4812,6 +5402,7 @@
       if (!isOsStartStartOpen) {
         playOsStartStartForwardAndHold();
       } else {
+        requestInstallationMenuReturnFromHotspot();
         playOsStartStartBackwardByScrubbing();
       }
     });
@@ -4837,6 +5428,7 @@
       if (!isIsEndStartOpen) {
         playIsEndStartForwardAndHold();
       } else {
+        requestInstallationMenuReturnFromHotspot();
         playIsEndStartBackwardByScrubbing();
       }
     });
@@ -4862,6 +5454,7 @@
       if (!isIsEndEndOpen) {
         playIsEndEndForwardAndHold();
       } else {
+        requestInstallationMenuReturnFromHotspot();
         playIsEndEndBackwardByScrubbing();
       }
     });
@@ -4887,6 +5480,7 @@
       if (!isOsStartEndOpen) {
         playOsStartEndForwardAndHold();
       } else {
+        requestInstallationMenuReturnFromHotspot();
         playOsStartEndBackwardByScrubbing();
       }
     });
@@ -4912,6 +5506,7 @@
       if (!isStarterOpen) {
         playStarterForwardAndHold();
       } else {
+        requestInstallationMenuReturnFromHotspot();
         playStarterBackwardByScrubbing();
       }
     });
@@ -6336,6 +6931,242 @@
     }
 
 
+    function clearInstallationMenuLottieStartTimers() {
+      installationMenuLottieStartTimers.forEach((timer) => clearTimeout(timer));
+      installationMenuLottieStartTimers = [];
+    }
+
+    function stopInstallationMenuLotties() {
+      clearInstallationMenuLottieStartTimers();
+
+      installationMenuLottieAnimations.forEach((animation) => {
+        if (animation) {
+          animation.goToAndStop(0, true);
+        }
+      });
+    }
+
+    function ensureInstallationMenuLottie(card) {
+      if (!card) return null;
+      const key = card.dataset.menuKey;
+      if (!key) return null;
+
+      if (installationMenuLottieAnimations.has(key)) {
+        return installationMenuLottieAnimations.get(key);
+      }
+
+      const container = card.querySelector(".installationMenuOptionLottie");
+      if (!container || !container.dataset.lottiePath) return null;
+
+      const animation = lottie.loadAnimation({
+        container,
+        renderer: "svg",
+        loop: true,
+        autoplay: false,
+        path: container.dataset.lottiePath
+      });
+
+      animation.__installationMenuReady = false;
+      animation.addEventListener("DOMLoaded", () => {
+        animation.__installationMenuReady = true;
+        animation.goToAndStop(0, true);
+
+        if (
+          installationPlanControl.classList.contains("menuOpen") &&
+          installationMenuActiveFilter !== "all" &&
+          card.dataset.menuCategory === installationMenuActiveFilter &&
+          !card.hidden
+        ) {
+          animation.goToAndPlay(0, true);
+        }
+      });
+
+      animation.addEventListener("data_failed", () => {
+        console.warn(`The installation-menu Lottie failed to load: ${container.dataset.lottiePath}`);
+      });
+
+      installationMenuLottieAnimations.set(key, animation);
+      return animation;
+    }
+
+    function playVisibleInstallationMenuLotties() {
+      stopInstallationMenuLotties();
+      if (installationMenuActiveFilter === "all") return;
+
+      const visibleCards = installationMenuOptionCards.filter((card) => !card.hidden);
+
+      visibleCards.forEach((card, index) => {
+        const animation = ensureInstallationMenuLottie(card);
+        if (!animation) return;
+
+        const timer = setTimeout(() => {
+          if (
+            installationPlanControl.classList.contains("menuOpen") &&
+            installationMenuActiveFilter !== "all" &&
+            !card.hidden
+          ) {
+            if (animation.__installationMenuReady) {
+              animation.goToAndPlay(0, true);
+            }
+          }
+        }, index * 180);
+
+        installationMenuLottieStartTimers.push(timer);
+      });
+    }
+
+    function clearInstallationMenuCategoryPreview() {
+      installationMenuOptionCards.forEach((card) => {
+        card.classList.remove("isCategoryPreview");
+      });
+    }
+
+    function previewInstallationMenuCategory(filter) {
+      clearInstallationMenuCategoryPreview();
+      if (!filter) return;
+
+      installationMenuOptionCards.forEach((card) => {
+        card.classList.toggle(
+          "isCategoryPreview",
+          card.dataset.menuCategory === filter
+        );
+      });
+    }
+
+    function requestInstallationMenuReturnFromHotspot() {
+      if (installationMenuHotspotOriginFilter === null) return;
+      installationMenuReturnRequested = true;
+    }
+
+    function setInstallationMenuFilter(filter = "all") {
+      const validFilters = ["all", "foundation", "starting", "termination", "changeDirection"];
+      installationMenuActiveFilter = validFilters.includes(filter) ? filter : "all";
+      clearInstallationMenuCategoryPreview();
+
+      installationMenuDropdown.classList.toggle("isFiltered", installationMenuActiveFilter !== "all");
+      installationMenuOptions.dataset.filter = installationMenuActiveFilter;
+
+      const categoryOrder = {
+        foundation: ["boxBase"],
+        starting: ["starter", "isStartStart", "osStartStart"],
+        termination: ["terminate", "osEndEnd", "isEndEnd"],
+        changeDirection: ["isEndStart", "osStartEnd"]
+      };
+
+      installationMenuOptionCards.forEach((card, originalIndex) => {
+        const isVisible =
+          installationMenuActiveFilter === "all" ||
+          card.dataset.menuCategory === installationMenuActiveFilter;
+
+        card.hidden = !isVisible;
+
+        if (installationMenuActiveFilter === "all") {
+          card.style.order = "";
+        } else {
+          const order = categoryOrder[installationMenuActiveFilter] || [];
+          const filteredIndex = order.indexOf(card.dataset.menuKey);
+          card.style.order = String(filteredIndex >= 0 ? filteredIndex : originalIndex);
+        }
+      });
+
+      installationMenuCategoryButtons.forEach((button) => {
+        button.classList.toggle(
+          "isActive",
+          button.dataset.menuFilter === installationMenuActiveFilter
+        );
+      });
+
+      requestAnimationFrame(playVisibleInstallationMenuLotties);
+    }
+
+    function openInstallationOptionsMenu(filter = "all") {
+      closeNewUserPrompt(true);
+
+      if (installationPlanControl.classList.contains("open")) {
+        closeInstallationPlanMenu();
+      }
+
+      const wasHowToOpen =
+        customGuideActive ||
+        customGuideReplayTimer ||
+        howToOverlay.classList.contains("open") ||
+        mouseInfoMini.classList.contains("isVisible");
+
+      if (wasHowToOpen) {
+        closeHowToWindow();
+      }
+
+      setInstallationMenuFilter(filter);
+      installationPlanControl.classList.add("menuOpen");
+      installationMenuButton.setAttribute("aria-expanded", "true");
+      installationMenuDropdown.setAttribute("aria-hidden", "false");
+    }
+
+    function closeInstallationOptionsMenu() {
+      if (!installationPlanControl.classList.contains("menuOpen")) return;
+
+      installationPlanControl.classList.remove("menuOpen");
+      installationMenuButton.setAttribute("aria-expanded", "false");
+      installationMenuDropdown.setAttribute("aria-hidden", "true");
+      stopInstallationMenuLotties();
+    }
+
+    function toggleInstallationOptionsMenu() {
+      if (installationPlanControl.classList.contains("menuOpen")) {
+        closeInstallationOptionsMenu();
+      } else {
+        openInstallationOptionsMenu();
+      }
+    }
+
+    function launchInstallationMenuHotspot(targetKey) {
+      if (isPlaying) return;
+
+      const validTargets = [
+        "boxBase",
+        "starter",
+        "isStartStart",
+        "osStartStart",
+        "terminate",
+        "osEndEnd",
+        "isEndEnd",
+        "isEndStart",
+        "osStartEnd"
+      ];
+
+      if (!validTargets.includes(targetKey)) return;
+      if (!ensureInstallationPlanAnimationReady(targetKey)) return;
+
+      installationMenuHotspotOriginFilter = installationMenuActiveFilter;
+      installationMenuReturnRequested = false;
+
+      closeInstallationOptionsMenu();
+      closeHowToWindow();
+      closeInfoWindow();
+      closeVideoWindow();
+
+      if (targetKey === "boxBase") {
+        playBoxBaseForwardAndHold();
+      } else if (targetKey === "starter") {
+        playStarterForwardAndHold();
+      } else if (targetKey === "isStartStart") {
+        playIsStartStartForwardAndHold();
+      } else if (targetKey === "osStartStart") {
+        playOsStartStartForwardAndHold();
+      } else if (targetKey === "terminate") {
+        playForwardAndHold();
+      } else if (targetKey === "osEndEnd") {
+        playOsEndEndForwardAndHold();
+      } else if (targetKey === "isEndEnd") {
+        playIsEndEndForwardAndHold();
+      } else if (targetKey === "isEndStart") {
+        playIsEndStartForwardAndHold();
+      } else if (targetKey === "osStartEnd") {
+        playOsStartEndForwardAndHold();
+      }
+    }
+
+
     function clearNewUserPromptTimer() {
       if (newUserPromptTimer) {
         clearTimeout(newUserPromptTimer);
@@ -6394,6 +7225,7 @@
     function openInstallationPlanMenu() {
       if (installationPlanControl.classList.contains("open")) return;
 
+      closeInstallationOptionsMenu();
       closeNewUserPrompt(true);
       resetInstallationPlanStep();
 
@@ -6563,6 +7395,7 @@
       playHotspotSummaryVideoLottie();
 
       closeInstallationPlanMenu();
+      closeInstallationOptionsMenu();
       installationPlanControl.classList.add("isHiddenBehindSummary");
       hotspotSummaryWindow.classList.add("open");
       hotspotSummaryWindow.setAttribute("aria-hidden", "false");
@@ -7115,9 +7948,86 @@
 
 
 
+    function enableWholeInstallationCardClicks() {
+      const clickableCards = document.querySelectorAll(
+        ".installationPlanScenarioCard, .installationMenuOptionCard"
+      );
+
+      clickableCards.forEach((card) => {
+        const actionButton = card.querySelector(
+          "[data-hotspot-target], [data-menu-hotspot-target]"
+        );
+
+        if (!actionButton) return;
+
+        card.classList.add("isWholeCardClickable");
+
+        card.addEventListener("click", (event) => {
+          // The real button already has the existing launch logic. Forward clicks
+          // from the Lottie, card background, padding, title, and description to it.
+          if (event.target.closest("button")) return;
+          actionButton.click();
+        });
+      });
+    }
+
+    enableWholeInstallationCardClicks();
+
+
     installationPlanButton.addEventListener("click", (event) => {
       event.stopPropagation();
       toggleInstallationPlanMenu();
+    });
+
+    installationMenuButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleInstallationOptionsMenu();
+    });
+
+    installationMenuCloseButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      closeInstallationOptionsMenu();
+    });
+
+    installationMenuCategoryButtons.forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+
+        if (button.dataset.menuAction === "guidedTour") {
+          closeInstallationOptionsMenu();
+          openInstallationPlanMenu();
+          return;
+        }
+
+        setInstallationMenuFilter(button.dataset.menuFilter || "all");
+      });
+
+      const previewFilter = button.dataset.menuFilter;
+      if (previewFilter) {
+        button.addEventListener("pointerenter", () => {
+          previewInstallationMenuCategory(previewFilter);
+        });
+
+        button.addEventListener("pointerleave", clearInstallationMenuCategoryPreview);
+        button.addEventListener("focus", () => {
+          previewInstallationMenuCategory(previewFilter);
+        });
+        button.addEventListener("blur", clearInstallationMenuCategoryPreview);
+      }
+    });
+
+    installationMenuShowAllButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      setInstallationMenuFilter("all");
+    });
+
+    installationMenuDropdown.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      const optionButton = event.target.closest("[data-menu-hotspot-target]");
+      if (!optionButton) return;
+
+      launchInstallationMenuHotspot(optionButton.dataset.menuHotspotTarget);
     });
 
     installationPlanCloseButton.addEventListener("click", (event) => {
@@ -7261,6 +8171,7 @@
 
       if (!installationPlanControl.contains(event.target)) {
         closeInstallationPlanMenu();
+        closeInstallationOptionsMenu();
       }
     });
 
@@ -8620,10 +9531,24 @@
           modelViewer.classList.remove("showInfoHotspots");
         }
 
+        const menuFilterToRestore = installationMenuReturnRequested
+          ? (installationMenuHotspotOriginFilter || "all")
+          : null;
+
+        installationMenuReturnRequested = false;
+        installationMenuHotspotOriginFilter = null;
+
         restoreInstallationPlanMainHotspot(activeMainHotspot);
         activeMainHotspot = null;
 
         stopAllMonitors();
+
+        if (menuFilterToRestore) {
+          requestAnimationFrame(() => {
+            openInstallationOptionsMenu(menuFilterToRestore);
+          });
+        }
+
         return;
       }
 
@@ -8915,7 +9840,10 @@
     }
 
     function suspendInstallationPlanForInfoWindow() {
-      if (!installationPlanControl.classList.contains("open")) return;
+      if (
+        !installationPlanControl.classList.contains("open") &&
+        !installationPlanControl.classList.contains("menuOpen")
+      ) return;
 
       installationPlanWasSuspendedForInfo = true;
       installationPlanControl.classList.add("isHiddenForInfoWindow");
