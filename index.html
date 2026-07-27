@@ -2892,7 +2892,27 @@
       overflow-y: auto;
       scrollbar-width: none;
       -ms-overflow-style: none;
-      transition: opacity 0.3s ease, transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+      transition:
+        width 0.62s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.3s ease,
+        transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Match the guided tour's expanding and contracting window movement when
+       switching between the full catalogue and a focused category. */
+    .installationMenuDropdown[data-filter="foundation"] {
+      /* Keep enough horizontal room for all five category controls to remain
+         in one row while the focused Foundation view is open. */
+      width: min(760px, calc(100vw - 32px));
+    }
+
+    .installationMenuDropdown[data-filter="starting"],
+    .installationMenuDropdown[data-filter="termination"] {
+      width: min(980px, calc(100vw - 32px));
+    }
+
+    .installationMenuDropdown[data-filter="changeDirection"] {
+      width: min(760px, calc(100vw - 32px));
     }
 
     .installationMenuDropdown::-webkit-scrollbar {
@@ -2935,8 +2955,10 @@
 
     .installationMenuCategoryButtons {
       display: grid;
+      /* Always keep the five category controls in one row. Each column may
+         contract, but the text scales and wraps inside its own button. */
       grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 10px;
+      gap: 8px;
       width: calc(100% - 48px);
       margin: 0 48px 20px 0;
     }
@@ -2950,12 +2972,16 @@
       background: rgba(255, 255, 255, 0.12);
       color: #fff;
       cursor: pointer;
-      font-size: 12px;
-      line-height: 1.12;
+      font-size: clamp(9px, 1vw, 12px);
+      line-height: 1.08;
       font-weight: 800;
-      letter-spacing: 0.035em;
+      letter-spacing: 0.02em;
       text-align: center;
       text-transform: uppercase;
+      white-space: normal;
+      overflow-wrap: normal;
+      word-break: keep-all;
+      min-width: 0;
       box-sizing: border-box;
       transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     }
@@ -2982,6 +3008,30 @@
       gap: 18px;
       width: 100%;
       align-items: stretch;
+      opacity: 1;
+      transform: scale(1);
+      transform-origin: 50% 24%;
+      filter: blur(0);
+      will-change: opacity, transform, filter;
+      transition:
+        opacity 0.46s ease,
+        transform 0.72s cubic-bezier(0.4, 0, 0.2, 1),
+        filter 0.4s ease;
+    }
+
+    /* The current set contracts first, then the next set grows into place. This
+       mirrors the guided-tour choice transitions instead of instantly swapping. */
+    .installationMenuDropdown.isMenuViewExiting .installationMenuOptions,
+    .installationMenuDropdown.isMenuViewEntering .installationMenuOptions {
+      opacity: 0;
+      transform: scale(0.7);
+      filter: blur(3px);
+      pointer-events: none;
+    }
+
+    .installationMenuDropdown.isMenuViewTransitioning .installationMenuCategoryButtons,
+    .installationMenuDropdown.isMenuViewTransitioning .installationMenuShowAllButton {
+      pointer-events: none;
     }
 
     .installationMenuOptions[data-filter="foundation"] {
@@ -3140,18 +3190,41 @@
     }
 
     .installationMenuShowAllButton {
-      display: none;
+      display: block;
       width: min(260px, 100%);
-      margin: 20px auto 0;
+      min-height: 0;
+      max-height: 0;
+      margin: 0 auto;
+      padding-top: 0;
+      padding-bottom: 0;
+      opacity: 0;
+      transform: scale(0.72);
+      overflow: hidden;
+      pointer-events: none;
+      transition:
+        min-height 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+        max-height 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+        margin 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+        padding 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.36s ease,
+        transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+        background 0.2s ease;
     }
 
     .installationMenuDropdown.isFiltered .installationMenuShowAllButton {
-      display: block;
+      min-height: 48px;
+      max-height: 48px;
+      margin: 20px auto 0;
+      padding: 10px 14px;
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
     }
 
     @media (max-width: 1040px) {
       .installationMenuCategoryButtons {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 6px;
       }
 
       .installationMenuOptions {
@@ -3188,7 +3261,11 @@
         padding: 3px 12px;
       }
 
-      .installationMenuDropdown {
+      .installationMenuDropdown,
+      .installationMenuDropdown[data-filter="foundation"],
+      .installationMenuDropdown[data-filter="starting"],
+      .installationMenuDropdown[data-filter="termination"],
+      .installationMenuDropdown[data-filter="changeDirection"] {
         top: 66px;
         width: min(520px, calc(100vw - 28px));
         max-height: calc(100vh - 82px);
@@ -3202,17 +3279,19 @@
       }
 
       .installationMenuCategoryButtons {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
-        width: calc(100% - 38px);
-        margin: 0 38px 14px 0;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 4px;
+        width: 100%;
+        margin: 34px 0 14px;
       }
 
       .installationMenuCategoryButton,
       .installationMenuShowAllButton {
-        min-height: 42px;
-        padding: 8px 9px;
-        font-size: 10px;
+        min-height: 44px;
+        padding: 7px 3px;
+        font-size: clamp(7px, 2.25vw, 10px);
+        line-height: 1.04;
+        letter-spacing: 0;
       }
 
       .installationMenuOptions,
@@ -3272,8 +3351,11 @@
         font-size: 10.5px;
       }
 
-      .installationMenuShowAllButton {
+      .installationMenuDropdown.isFiltered .installationMenuShowAllButton {
+        min-height: 42px;
+        max-height: 42px;
         margin-top: 14px;
+        padding: 8px 9px;
       }
     }
 
@@ -5066,6 +5148,9 @@
     let installationMenuActiveFilter = "all";
     let installationMenuHotspotOriginFilter = null;
     let installationMenuReturnRequested = false;
+    let installationMenuViewSwapTimer = null;
+    let installationMenuViewEnterTimer = null;
+    let installationMenuViewTransitionToken = 0;
     let newUserPromptTimer = null;
     let newUserPromptDismissed = false;
     let installationPlanStage = "foundation";
@@ -7038,12 +7123,37 @@
       installationMenuReturnRequested = true;
     }
 
-    function setInstallationMenuFilter(filter = "all") {
+    function normalizeInstallationMenuFilter(filter) {
       const validFilters = ["all", "foundation", "starting", "termination", "changeDirection"];
-      installationMenuActiveFilter = validFilters.includes(filter) ? filter : "all";
+      return validFilters.includes(filter) ? filter : "all";
+    }
+
+    function clearInstallationMenuViewTransition() {
+      installationMenuViewTransitionToken += 1;
+
+      if (installationMenuViewSwapTimer) {
+        clearTimeout(installationMenuViewSwapTimer);
+        installationMenuViewSwapTimer = null;
+      }
+
+      if (installationMenuViewEnterTimer) {
+        clearTimeout(installationMenuViewEnterTimer);
+        installationMenuViewEnterTimer = null;
+      }
+
+      installationMenuDropdown.classList.remove(
+        "isMenuViewExiting",
+        "isMenuViewEntering",
+        "isMenuViewTransitioning"
+      );
+    }
+
+    function applyInstallationMenuFilter(filter = "all") {
+      installationMenuActiveFilter = normalizeInstallationMenuFilter(filter);
       clearInstallationMenuCategoryPreview();
 
       installationMenuDropdown.classList.toggle("isFiltered", installationMenuActiveFilter !== "all");
+      installationMenuDropdown.dataset.filter = installationMenuActiveFilter;
       installationMenuOptions.dataset.filter = installationMenuActiveFilter;
 
       const categoryOrder = {
@@ -7075,8 +7185,74 @@
           button.dataset.menuFilter === installationMenuActiveFilter
         );
       });
+    }
 
-      requestAnimationFrame(playVisibleInstallationMenuLotties);
+    function setInstallationMenuFilter(filter = "all", { immediate = false } = {}) {
+      const nextFilter = normalizeInstallationMenuFilter(filter);
+      const menuIsOpen = installationPlanControl.classList.contains("menuOpen");
+
+      if (nextFilter === installationMenuActiveFilter) {
+        clearInstallationMenuCategoryPreview();
+
+        if (immediate) {
+          clearInstallationMenuViewTransition();
+          stopInstallationMenuLotties();
+          applyInstallationMenuFilter(nextFilter);
+        }
+
+        if (menuIsOpen) {
+          requestAnimationFrame(playVisibleInstallationMenuLotties);
+        }
+        return;
+      }
+
+      if (immediate || !menuIsOpen) {
+        clearInstallationMenuViewTransition();
+        stopInstallationMenuLotties();
+        applyInstallationMenuFilter(nextFilter);
+        if (menuIsOpen) {
+          requestAnimationFrame(playVisibleInstallationMenuLotties);
+        }
+        return;
+      }
+
+      clearInstallationMenuViewTransition();
+      stopInstallationMenuLotties();
+      clearInstallationMenuCategoryPreview();
+
+      const transitionToken = installationMenuViewTransitionToken;
+      installationMenuDropdown.classList.add(
+        "isMenuViewTransitioning",
+        "isMenuViewExiting"
+      );
+
+      installationMenuViewSwapTimer = setTimeout(() => {
+        installationMenuViewSwapTimer = null;
+        if (transitionToken !== installationMenuViewTransitionToken) return;
+
+        applyInstallationMenuFilter(nextFilter);
+        installationMenuDropdown.classList.remove("isMenuViewExiting");
+        installationMenuDropdown.classList.add("isMenuViewEntering");
+
+        // Commit the new grid while it is still contracted, then let it grow in
+        // on the following frame just like the guided-tour choice panels.
+        void installationMenuOptions.offsetWidth;
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (transitionToken !== installationMenuViewTransitionToken) return;
+            installationMenuDropdown.classList.remove("isMenuViewEntering");
+
+            installationMenuViewEnterTimer = setTimeout(() => {
+              installationMenuViewEnterTimer = null;
+              if (transitionToken !== installationMenuViewTransitionToken) return;
+
+              installationMenuDropdown.classList.remove("isMenuViewTransitioning");
+              playVisibleInstallationMenuLotties();
+            }, 250);
+          });
+        });
+      }, 360);
     }
 
     function openInstallationOptionsMenu(filter = "all") {
@@ -7096,10 +7272,11 @@
         closeHowToWindow();
       }
 
-      setInstallationMenuFilter(filter);
+      setInstallationMenuFilter(filter, { immediate: true });
       installationPlanControl.classList.add("menuOpen");
       installationMenuButton.setAttribute("aria-expanded", "true");
       installationMenuDropdown.setAttribute("aria-hidden", "false");
+      requestAnimationFrame(playVisibleInstallationMenuLotties);
     }
 
     function closeInstallationOptionsMenu() {
@@ -7108,6 +7285,7 @@
       installationPlanControl.classList.remove("menuOpen");
       installationMenuButton.setAttribute("aria-expanded", "false");
       installationMenuDropdown.setAttribute("aria-hidden", "true");
+      clearInstallationMenuViewTransition();
       stopInstallationMenuLotties();
     }
 
