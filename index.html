@@ -1859,13 +1859,11 @@
       transform: scale(1.04);
     }
 
-    .installationPlanControl.scenarioChoiceStep:not(.scenarioStepSelected) .installationPlanChoiceBackButton,
     .installationPlanControl.changeDirectionChoiceStep:not(.changeDirectionStepSelected) .installationPlanChoiceBackButton,
     .installationPlanControl.terminationChoiceStep:not(.terminationStepSelected) .installationPlanChoiceBackButton {
       display: flex;
     }
 
-    .installationPlanControl.scenarioChoiceStep:not(.scenarioStepSelected) .installationPlanIntro,
     .installationPlanControl.changeDirectionChoiceStep:not(.changeDirectionStepSelected) .installationPlanIntro,
     .installationPlanControl.terminationChoiceStep:not(.terminationStepSelected) .installationPlanIntro {
       margin-left: 52px;
@@ -3955,8 +3953,8 @@
       <button class="installationPlanChoiceBackButton" id="installationPlanChoiceBackButton" type="button" aria-label="Go back to the previous installation-planning step">&lt;</button>
       <button class="installationPlanCloseButton" id="installationPlanCloseButton" type="button" aria-label="Close installation planning menu">×</button>
       <p class="installationPlanIntro">
-        <span class="installationPlanIntroMain" id="installationPlanIntroMain">To begin your Random Plank installation it needs a solid foundation. The Box Base and U-Support is your starting point.</span>
-        <span class="installationPlanIntroSub" id="installationPlanIntroSub">See how these parts fit together by clicking the BOX BASE button or click next if you are already familiar with the box base setup.</span>
+        <span class="installationPlanIntroMain" id="installationPlanIntroMain">There are three possible scenarios you might be faced with when starting your installation.</span>
+        <span class="installationPlanIntroSub" id="installationPlanIntroSub">Choose one of the three options below that suits your particular installation best.</span>
       </p>
 
       <div class="installationPlanActions" id="installationPlanActions" aria-label="Installation planning options">
@@ -4624,10 +4622,10 @@
 
 
     const INSTALLATION_PLAN_INITIAL_TITLE =
-      "To begin your Random Plank installation it needs a solid foundation. The Box Base and U-Support is your starting point.";
+      "There are three possible scenarios you might be faced with when starting your installation.";
 
     const INSTALLATION_PLAN_INITIAL_SUBTITLE =
-      "See how these parts fit together by clicking the BOX BASE button or click next if you are already familiar with the box base setup.";
+      "Choose one of the three options below that suits your particular installation best.";
 
     const INSTALLATION_PLAN_READY_TITLE =
       "Click NEXT when you are ready for the next step.";
@@ -6370,7 +6368,7 @@
         installationPlanTextSwapTimer = null;
       }
 
-      installationPlanStage = "foundation";
+      installationPlanStage = "scenarioChoice";
       installationPlanActiveHotspot = null;
 
       if (!isPlaying && !activeMainHotspot) {
@@ -6390,6 +6388,7 @@
         "terminationStepSelected",
         "isUpdatingPlanText"
       );
+      installationPlanControl.classList.add("boxBaseStepSelected", "scenarioChoiceStep");
 
       setInstallationPlanText(
         INSTALLATION_PLAN_INITIAL_TITLE,
@@ -7421,6 +7420,10 @@
       installationPlanButton.setAttribute("aria-expanded", "true");
       installationPlanDropdown.setAttribute("aria-hidden", "false");
 
+      if (installationPlanStage === "scenarioChoice") {
+        playInstallationPlanScenarioLotties();
+      }
+
       if (installationPlanZoomTimer) {
         clearTimeout(installationPlanZoomTimer);
       }
@@ -8215,11 +8218,6 @@
 
     installationPlanChoiceBackButton.addEventListener("click", (event) => {
       event.stopPropagation();
-
-      if (installationPlanStage === "scenarioChoice") {
-        showInstallationPlanFoundationStep();
-        return;
-      }
 
       if (
         installationPlanStage === "terminationChoice" ||
