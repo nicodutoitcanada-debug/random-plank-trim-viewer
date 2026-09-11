@@ -3739,6 +3739,44 @@
       vector-effect: non-scaling-stroke;
     }
 
+
+    .generatedPlanAngleGuide {
+      pointer-events: none;
+    }
+
+    .generatedPlanAngleArc {
+      fill: none;
+      stroke: #63b63c;
+      stroke-width: 7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vector-effect: non-scaling-stroke;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+    }
+
+    .generatedPlanAngleArrow {
+      fill: none;
+      stroke: #63b63c;
+      stroke-width: 7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vector-effect: non-scaling-stroke;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+    }
+
+    .generatedPlanAngleText {
+      fill: #71c94a;
+      font-size: 24px;
+      font-weight: 900;
+      text-anchor: middle;
+      dominant-baseline: middle;
+      paint-order: stroke;
+      stroke: rgba(10, 10, 10, 0.9);
+      stroke-width: 6px;
+      stroke-linejoin: round;
+      pointer-events: none;
+    }
+
     .generatedPlanBaseWall {
       stroke: rgba(255,255,255,0.28);
       stroke-width: 11;
@@ -4969,6 +5007,11 @@
         <svg class="generatedPlanCanvas" id="generatedPlanCanvas" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" aria-label="Installation plan drawing canvas">
           <g id="generatedPlanViewport"></g>
           <line class="generatedPlanPreview" id="generatedPlanPreview" x1="0" y1="0" x2="0" y2="0" visibility="hidden"></line>
+          <g class="generatedPlanAngleGuide" id="generatedPlanAngleGuide" visibility="hidden" aria-hidden="true">
+            <path class="generatedPlanAngleArc" id="generatedPlanAngleArc" d=""></path>
+            <path class="generatedPlanAngleArrow" id="generatedPlanAngleArrow" d=""></path>
+            <text class="generatedPlanAngleText" id="generatedPlanAngleText" x="0" y="0"></text>
+          </g>
         </svg>
         <div class="generatedPlanHint" id="generatedPlanHint">90° SNAP ON · Hold SHIFT for any angle · Right-click or FINISH RUN to stop drawing.</div>
         <div class="generatedPlanEmptyState" id="generatedPlanEmptyState">Click anywhere to place the first point, then keep clicking to draw your walls.</div>
@@ -8892,6 +8935,10 @@
       const canvas = document.querySelector("#generatedPlanCanvas");
       const viewport = document.querySelector("#generatedPlanViewport");
       const previewLine = document.querySelector("#generatedPlanPreview");
+      const angleGuide = document.querySelector("#generatedPlanAngleGuide");
+      const angleArc = document.querySelector("#generatedPlanAngleArc");
+      const angleArrow = document.querySelector("#generatedPlanAngleArrow");
+      const angleText = document.querySelector("#generatedPlanAngleText");
       const emptyState = document.querySelector("#generatedPlanEmptyState");
       const title = document.querySelector("#generatedPlanTitle");
       const stepText = document.querySelector("#generatedPlanStep");
@@ -9005,9 +9052,108 @@
         return snapToExistingPoint(snapped);
       }
 
+
+      function hideAngleGuide() {
+        if (!angleGuide) return;
+        angleGuide.setAttribute("visibility", "hidden");
+      }
+
+      function updateAngleGuide(point, event) {
+        if (!angleGuide || !angleArc || !angleArrow || !angleText) return;
+
+        // The angle helper is only relevant while SHIFT is actively releasing
+        // the normal 90-degree lock, and only once there is a previous wall to
+        // measure the new wall against.
+        if (
+          phase !== "draw" ||
+          !event.shiftKey ||
+          !currentRun ||
+          currentRun.points.length < 2
+        ) {
+          hideAngleGuide();
+          return;
+        }
+
+        const previous = currentRun.points[currentRun.points.length - 2];
+        const vertex = currentRun.points[currentRun.points.length - 1];
+        const previousLength = pointDistance(previous, vertex);
+        const nextLength = pointDistance(vertex, point);
+
+        if (previousLength < 18 || nextLength < 18) {
+          hideAngleGuide();
+          return;
+        }
+
+        // Measure the included corner angle between the ray back along the
+        // previous wall and the proposed outgoing wall. A normal right-angle
+        // corner therefore reads 90 degrees, while a straight continuation is
+        // 180 degrees.
+        const startAngle = Math.atan2(previous.y - vertex.y, previous.x - vertex.x);
+        const endAngle = Math.atan2(point.y - vertex.y, point.x - vertex.x);
+        const TAU = Math.PI * 2;
+        let delta = ((endAngle - startAngle + Math.PI * 3) % TAU) - Math.PI;
+        if (Math.abs(delta) < 0.01) {
+          hideAngleGuide();
+          return;
+        }
+
+        const degrees = Math.min(180, Math.max(0, Math.round(Math.abs(delta) * 180 / Math.PI)));
+        const radius = Math.max(34, Math.min(68, Math.min(previousLength, nextLength) * 0.34));
+        const arcEndAngle = startAngle + delta;
+        const start = {
+          x: vertex.x + Math.cos(startAngle) * radius,
+          y: vertex.y + Math.sin(startAngle) * radius
+        };
+        const end = {
+          x: vertex.x + Math.cos(arcEndAngle) * radius,
+          y: vertex.y + Math.sin(arcEndAngle) * radius
+        };
+        const sweepFlag = delta > 0 ? 1 : 0;
+
+        angleArc.setAttribute(
+          "d",
+          `M ${start.x.toFixed(2)} ${start.y.toFixed(2)} A ${radius.toFixed(2)} ${radius.toFixed(2)} 0 0 ${sweepFlag} ${end.x.toFixed(2)} ${end.y.toFixed(2)}`
+        );
+
+        // Rounded chevron arrowhead at the end of the green arc.
+        const direction = delta > 0 ? 1 : -1;
+        const tangent = {
+          x: -Math.sin(arcEndAngle) * direction,
+          y: Math.cos(arcEndAngle) * direction
+        };
+        const normal = { x: -tangent.y, y: tangent.x };
+        const arrowBack = 15;
+        const arrowHalf = 8;
+        const base = {
+          x: end.x - tangent.x * arrowBack,
+          y: end.y - tangent.y * arrowBack
+        };
+        const wingA = {
+          x: base.x + normal.x * arrowHalf,
+          y: base.y + normal.y * arrowHalf
+        };
+        const wingB = {
+          x: base.x - normal.x * arrowHalf,
+          y: base.y - normal.y * arrowHalf
+        };
+        angleArrow.setAttribute(
+          "d",
+          `M ${wingA.x.toFixed(2)} ${wingA.y.toFixed(2)} L ${end.x.toFixed(2)} ${end.y.toFixed(2)} L ${wingB.x.toFixed(2)} ${wingB.y.toFixed(2)}`
+        );
+
+        const middleAngle = startAngle + delta / 2;
+        const textRadius = radius + 25;
+        angleText.setAttribute("x", (vertex.x + Math.cos(middleAngle) * textRadius).toFixed(2));
+        angleText.setAttribute("y", (vertex.y + Math.sin(middleAngle) * textRadius).toFixed(2));
+        angleText.textContent = `${degrees}°`;
+
+        angleGuide.setAttribute("visibility", "visible");
+      }
+
       function finishCurrentRun() {
         previewPoint = null;
         previewLine.setAttribute("visibility", "hidden");
+        hideAngleGuide();
         if (!currentRun) return;
 
         if (currentRun.points.length >= 2) {
@@ -9948,6 +10094,7 @@
 
         currentRun.points.push(point);
         previewPoint = point;
+        hideAngleGuide();
         renderPlanner();
       });
 
@@ -9966,6 +10113,7 @@
           previewLine.setAttribute("x2", point.x);
           previewLine.setAttribute("y2", point.y);
           previewLine.setAttribute("visibility", "visible");
+          updateAngleGuide(point, event);
           return;
         }
 
@@ -9982,7 +10130,14 @@
       });
 
       canvas.addEventListener("pointerleave", () => {
-        if (phase === "draw") previewLine.setAttribute("visibility", "hidden");
+        if (phase === "draw") {
+          previewLine.setAttribute("visibility", "hidden");
+          hideAngleGuide();
+        }
+      });
+
+      window.addEventListener("keyup", (event) => {
+        if (event.key === "Shift") hideAngleGuide();
       });
 
       if (resizeHandle && planWindow) {
