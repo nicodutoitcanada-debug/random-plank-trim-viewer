@@ -2795,7 +2795,7 @@
       left: 50%;
       top: 24px;
       z-index: 5;
-      width: min(340px, calc(100vw - 48px));
+      width: min(520px, calc(100vw - 48px));
       display: flex;
       align-items: stretch;
       justify-content: center;
@@ -3241,7 +3241,7 @@
     @media (max-width: 720px) {
       .installationPlanTopControls {
         top: 14px;
-        width: min(300px, calc(100vw - 28px));
+        width: min(420px, calc(100vw - 28px));
         gap: 7px;
       }
 
@@ -3373,7 +3373,7 @@
 
 
     /* ==========================================================
-       GENERATED INSTALLATION PLAN — PROOF OF CONCEPT
+       GENERATED INSTALLATION PLAN
        ========================================================== */
     .installationPlanPlannerButtonWrap {
       display: none;
@@ -3752,8 +3752,16 @@
       stroke-width: 5;
       stroke-linecap: round;
       fill: none;
-      marker-end: url(#generatedPlanArrowHead);
       vector-effect: non-scaling-stroke;
+    }
+
+    .generatedPlanArrowHead {
+      fill: #d22a36;
+      stroke: #d22a36;
+      stroke-width: 3.5;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      pointer-events: none;
     }
 
     .generatedPlanFlowMotion {
@@ -3799,6 +3807,15 @@
       pointer-events: none;
     }
 
+    .generatedPlanHotspotConnector {
+      stroke: rgba(255, 255, 255, 0.92);
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+      pointer-events: none;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.72));
+    }
+
     .generatedPlanHotspotLabelBg {
       fill: rgba(0, 0, 0, 0.78);
       stroke: rgba(255,255,255,0.10);
@@ -3817,22 +3834,6 @@
 
     .generatedPlanHotspot.isActive .generatedPlanHotspotLabelBg {
       fill: #c9222e;
-    }
-
-    .generatedPlanProofBadge {
-      position: absolute;
-      right: 18px;
-      top: 18px;
-      padding: 7px 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.09);
-      color: rgba(255,255,255,0.74);
-      font-size: 9px;
-      line-height: 1;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      pointer-events: none;
     }
 
     .generatedPlanOverlay.isMini {
@@ -3868,7 +3869,6 @@
     .generatedPlanOverlay.isMini .generatedPlanStep,
     .generatedPlanOverlay.isMini .generatedPlanFooter,
     .generatedPlanOverlay.isMini .generatedPlanHint,
-    .generatedPlanOverlay.isMini .generatedPlanProofBadge,
     .generatedPlanOverlay.isMini .generatedPlanFitHeaderButton {
       display: none;
     }
@@ -3882,6 +3882,55 @@
     .generatedPlanOverlay.isMini .generatedPlanCanvasWrap {
       margin: 10px 12px 12px;
       border-radius: 14px;
+    }
+
+    .generatedPlanResizeHandle {
+      display: none;
+      position: absolute;
+      right: 7px;
+      bottom: 7px;
+      width: 24px;
+      height: 24px;
+      z-index: 30;
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.08);
+      cursor: nwse-resize;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .generatedPlanResizeHandle::before,
+    .generatedPlanResizeHandle::after {
+      content: "";
+      position: absolute;
+      border-right: 2px solid rgba(255, 255, 255, 0.78);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.78);
+      border-radius: 0 0 2px 0;
+      pointer-events: none;
+    }
+
+    .generatedPlanResizeHandle::before {
+      right: 5px;
+      bottom: 5px;
+      width: 10px;
+      height: 10px;
+    }
+
+    .generatedPlanResizeHandle::after {
+      right: 10px;
+      bottom: 10px;
+      width: 5px;
+      height: 5px;
+      opacity: 0.72;
+    }
+
+    .generatedPlanOverlay.isMini .generatedPlanResizeHandle {
+      display: block;
+    }
+
+    .generatedPlanWindow.isResizing {
+      transition: none !important;
     }
 
     body.generatedPlanBuilderOpen .installationPlanTopControls {
@@ -3981,10 +4030,6 @@
         min-height: 34px;
         padding: 0 11px;
         font-size: 9px;
-      }
-
-      .generatedPlanProofBadge {
-        display: none;
       }
 
       .generatedPlanOverlay.isMini .generatedPlanWindow {
@@ -4564,6 +4609,15 @@
       </button>
 
       <button
+        class="installationMenuButton installationPlannerTopButton"
+        id="generatedPlanTopButton"
+        type="button"
+        aria-label="Build an installation plan"
+      >
+        <span class="installationMenuButtonText">BUILD PLAN</span>
+      </button>
+
+      <button
         class="installationMenuButton"
         id="installationMenuButton"
         type="button"
@@ -4682,7 +4736,7 @@
       <div class="installationPlanPlannerButtonWrap">
         <button class="installationPlanPlannerButton" id="installationPlanPlannerButton" type="button">
           <span class="installationPlanPlannerButtonTitle">NOT SURE? BUILD MY INSTALLATION PLAN</span>
-          <span class="installationPlanPlannerButtonSub">Draw your walls and let the proof-of-concept planner recommend a starting point and direction.</span>
+          <span class="installationPlanPlannerButtonSub">Draw your walls and let the installation planner recommend a starting point and direction.</span>
         </button>
       </div>
 
@@ -4913,17 +4967,11 @@
 
       <div class="generatedPlanCanvasWrap" id="generatedPlanCanvasWrap">
         <svg class="generatedPlanCanvas" id="generatedPlanCanvas" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" aria-label="Installation plan drawing canvas">
-          <defs>
-            <marker id="generatedPlanArrowHead" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="strokeWidth">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#d22a36"></path>
-            </marker>
-          </defs>
           <g id="generatedPlanViewport"></g>
           <line class="generatedPlanPreview" id="generatedPlanPreview" x1="0" y1="0" x2="0" y2="0" visibility="hidden"></line>
         </svg>
         <div class="generatedPlanHint" id="generatedPlanHint">90° SNAP ON · Hold SHIFT for any angle · Right-click or FINISH RUN to stop drawing.</div>
         <div class="generatedPlanEmptyState" id="generatedPlanEmptyState">Click anywhere to place the first point, then keep clicking to draw your walls.</div>
-        <div class="generatedPlanProofBadge">PROOF OF CONCEPT</div>
       </div>
 
       <div class="generatedPlanFooter">
@@ -4943,6 +4991,14 @@
           <button class="generatedPlanActionButton" id="generatedPlanFitFooterButton" type="button" data-show-phase="generated">FIT PLAN</button>
         </div>
       </div>
+
+      <div
+        class="generatedPlanResizeHandle"
+        id="generatedPlanResizeHandle"
+        role="separator"
+        aria-label="Resize installation plan"
+        title="Drag to resize"
+      ></div>
     </div>
   </div>
 
@@ -7273,10 +7329,12 @@
       return Boolean(measuredDuration);
     }
 
-    function reverseInstallationPlanHotspot(targetKey) {
+    function reverseInstallationPlanHotspot(targetKey, options = {}) {
+      const { keepCamera = false } = options;
+
       if (!targetKey) {
         restoreInstallationPlanMainHotspot();
-        moveCameraToDefaultView(true);
+        if (!keepCamera) moveCameraToDefaultView(true);
         installationPlanMenuZoomApplied = false;
         return;
       }
@@ -7384,7 +7442,7 @@
 
       if (!animationName) {
         restoreInstallationPlanMainHotspot(targetKey);
-        moveCameraToDefaultView(true);
+        if (!keepCamera) moveCameraToDefaultView(true);
         installationPlanMenuZoomApplied = false;
         return;
       }
@@ -7409,7 +7467,7 @@
       activeMainHotspot = targetKey;
 
       animateMainHotspotButton(lottieElement, false);
-      moveCameraToDefaultView(true);
+      if (!keepCamera) moveCameraToDefaultView(true);
 
       modelViewer.animationName = animationName;
       modelViewer.pause();
@@ -7802,6 +7860,13 @@
     }
 
     function requestInstallationMenuReturnFromHotspot() {
+      if (document.body.classList.contains("generatedPlanModelMode")) {
+        installationMenuReturnRequested = false;
+        installationMenuHotspotOriginFilter = null;
+        document.dispatchEvent(new CustomEvent("generatedPlanModelBack"));
+        return;
+      }
+
       if (installationMenuHotspotOriginFilter === null) return;
       installationMenuReturnRequested = true;
     }
@@ -8816,11 +8881,14 @@
 
 
     // ==========================================================
-    // GENERATED INSTALLATION PLAN — PROOF OF CONCEPT
+    // GENERATED INSTALLATION PLAN
     // ==========================================================
     function initGeneratedInstallationPlanner() {
       const launchButton = document.querySelector("#installationPlanPlannerButton");
+      const topLaunchButton = document.querySelector("#generatedPlanTopButton");
       const overlay = document.querySelector("#generatedPlanOverlay");
+      const planWindow = overlay ? overlay.querySelector(".generatedPlanWindow") : null;
+      const resizeHandle = document.querySelector("#generatedPlanResizeHandle");
       const canvas = document.querySelector("#generatedPlanCanvas");
       const viewport = document.querySelector("#generatedPlanViewport");
       const previewLine = document.querySelector("#generatedPlanPreview");
@@ -8865,6 +8933,14 @@
       let panPointerId = null;
       let lastPanClientX = 0;
       let lastPanClientY = 0;
+      let miniWindowWidth = null;
+      let miniWindowHeight = null;
+      let isResizingMiniWindow = false;
+      let resizePointerId = null;
+      let resizeStartClientX = 0;
+      let resizeStartClientY = 0;
+      let resizeStartWidth = 0;
+      let resizeStartHeight = 0;
 
       const isFinePointer = window.matchMedia && window.matchMedia("(pointer: fine)").matches;
 
@@ -8998,7 +9074,7 @@
         } else {
           title.textContent = "YOUR INSTALLATION PLAN";
           stepText.textContent = "Click any hotspot to view that installation condition on the 3D model.";
-          hint.textContent = "Scroll or pinch to zoom the plan. Drag to pan. The current proof-of-concept prefers STARTER and avoids INSIDE START START.";
+          hint.textContent = "Scroll or pinch to zoom the plan. Drag to pan. The planner prefers STARTER and avoids INSIDE START START when possible.";
         }
 
         renderPlanner();
@@ -9047,6 +9123,88 @@
         });
         parent.appendChild(line);
         return line;
+      }
+
+      function drawRoundedArrowHead(parent, a, b) {
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const length = Math.hypot(dx, dy);
+        if (length < 2) return null;
+
+        const ux = dx / length;
+        const uy = dy / length;
+        const px = -uy;
+        const py = ux;
+
+        // Keep the arrowheads proportional to the plan geometry so they scale
+        // naturally with zoom, but make them a little more prominent than the
+        // first version of the planner.
+        const headLength = Math.max(20, Math.min(39, length * 0.39));
+        const halfWidth = Math.max(11, Math.min(22, headLength * 0.59));
+        const tipInset = Math.min(4, length * 0.04);
+        const tip = {
+          x: b.x - ux * tipInset,
+          y: b.y - uy * tipInset
+        };
+        const base = {
+          x: tip.x - ux * headLength,
+          y: tip.y - uy * headLength
+        };
+        const left = {
+          x: base.x + px * halfWidth,
+          y: base.y + py * halfWidth
+        };
+        const right = {
+          x: base.x - px * halfWidth,
+          y: base.y - py * halfWidth
+        };
+
+        // Build a genuinely rounded triangle rather than relying only on the
+        // SVG stroke join. Each corner is softened with a quadratic curve.
+        const points = [tip, left, right];
+        const cornerRadius = Math.min(6, headLength * 0.19);
+        const cornerData = points.map((point, index) => {
+          const previous = points[(index + points.length - 1) % points.length];
+          const next = points[(index + 1) % points.length];
+
+          const prevDx = previous.x - point.x;
+          const prevDy = previous.y - point.y;
+          const nextDx = next.x - point.x;
+          const nextDy = next.y - point.y;
+          const prevLength = Math.max(0.001, Math.hypot(prevDx, prevDy));
+          const nextLength = Math.max(0.001, Math.hypot(nextDx, nextDy));
+          const prevInset = Math.min(cornerRadius, prevLength * 0.24);
+          const nextInset = Math.min(cornerRadius, nextLength * 0.24);
+
+          return {
+            point,
+            incoming: {
+              x: point.x + (prevDx / prevLength) * prevInset,
+              y: point.y + (prevDy / prevLength) * prevInset
+            },
+            outgoing: {
+              x: point.x + (nextDx / nextLength) * nextInset,
+              y: point.y + (nextDy / nextLength) * nextInset
+            }
+          };
+        });
+
+        const d = [
+          `M ${cornerData[0].incoming.x} ${cornerData[0].incoming.y}`,
+          `Q ${cornerData[0].point.x} ${cornerData[0].point.y} ${cornerData[0].outgoing.x} ${cornerData[0].outgoing.y}`,
+          `L ${cornerData[1].incoming.x} ${cornerData[1].incoming.y}`,
+          `Q ${cornerData[1].point.x} ${cornerData[1].point.y} ${cornerData[1].outgoing.x} ${cornerData[1].outgoing.y}`,
+          `L ${cornerData[2].incoming.x} ${cornerData[2].incoming.y}`,
+          `Q ${cornerData[2].point.x} ${cornerData[2].point.y} ${cornerData[2].outgoing.x} ${cornerData[2].outgoing.y}`,
+          "Z"
+        ].join(" ");
+
+        const path = createSvg("path", {
+          d,
+          class: "generatedPlanArrowHead"
+        });
+        parent.appendChild(path);
+        return path;
       }
 
       function renderDraftOrSelection() {
@@ -9098,14 +9256,20 @@
       }
 
       function renderHotspot(eventData, indexAtNode, totalAtNode) {
-        const spread = 34;
+        // When two conditions share a point (for example TERMINATE + STARTER
+        // at an odd-angle change), keep the hotspot circles close to the real
+        // corner but stagger their labels above/below so the titles never sit
+        // on top of one another.
+        const spread = totalAtNode > 2 ? 64 : 48;
         const offset = totalAtNode > 1
           ? (indexAtNode - (totalAtNode - 1) / 2) * spread
           : 0;
         const x = eventData.point.x + offset;
         const y = eventData.point.y;
         const label = eventData.label;
-        const labelWidth = Math.max(78, label.length * 7.2 + 22);
+        // Give the title more breathing room on the left/right so the text
+        // never feels pressed against the rounded label box.
+        const labelWidth = Math.max(92, label.length * 7.2 + 38);
         const group = createSvg("g", {
           class: `generatedPlanHotspot${activeGeneratedHotspotKey === eventData.key ? " isActive" : ""}`,
           tabindex: "0",
@@ -9114,12 +9278,36 @@
         });
         group.dataset.hotspotKey = eventData.key;
 
-        const labelY = y - 46;
+        let labelY = y - 46;
+        if (totalAtNode > 1) {
+          const lane = Math.floor(indexAtNode / 2);
+          const isBelow = indexAtNode % 2 === 1;
+          const laneOffset = lane * 34;
+          labelY = isBelow
+            ? y + 53 + laneOffset
+            : y - 46 - laneOffset;
+        }
+
+        const labelTop = labelY - 17;
+        const labelHeight = 27;
+        const labelBottom = labelTop + labelHeight;
+        const connectorStartY = labelY < y ? labelBottom : labelTop;
+
+        // A short leader line makes it immediately obvious which title belongs
+        // to which hotspot when two conditions share the same corner.
+        group.appendChild(createSvg("line", {
+          x1: x,
+          y1: connectorStartY,
+          x2: x,
+          y2: y,
+          class: "generatedPlanHotspotConnector"
+        }));
+
         group.appendChild(createSvg("rect", {
           x: x - labelWidth / 2,
-          y: labelY - 17,
+          y: labelTop,
           width: labelWidth,
-          height: 27,
+          height: labelHeight,
           rx: 8,
           class: "generatedPlanHotspotLabelBg"
         }));
@@ -9169,6 +9357,7 @@
         generatedPlan.flowEdges.forEach((flow) => {
           drawLine(viewport, flow.a, flow.b, "generatedPlanFlow");
           drawLine(viewport, flow.a, flow.b, "generatedPlanFlowMotion");
+          drawRoundedArrowHead(viewport, flow.a, flow.b);
         });
 
         const grouped = new Map();
@@ -9463,9 +9652,9 @@
         }
         const prefix = parts.length ? `${parts.join(" · ")}. ` : "";
         const branchNote = generatedPlan.branchWarning
-          ? " Junctions are treated as separate runs in this proof of concept."
+          ? " Junctions are currently treated as separate installation runs."
           : "";
-        status.textContent = `${prefix}Proof rule: STARTER is preferred; 90° turns use INSIDE END START; odd angles terminate and restart.${branchNote}`;
+        status.textContent = `${prefix}Plan rule: STARTER is preferred; 90° turns use INSIDE END START; odd angles terminate and restart.${branchNote}`;
       }
 
       function waitForModelIdle(callback, tries = 0) {
@@ -9477,11 +9666,63 @@
         setTimeout(() => waitForModelIdle(callback, tries + 1), 50);
       }
 
+      function getDefaultMiniWindowSize() {
+        const compact = window.innerWidth <= 720;
+        return {
+          width: compact ? 330 : 390,
+          height: compact ? 250 : 300,
+          margin: compact ? 10 : 20
+        };
+      }
+
+      function applyMiniWindowSize() {
+        if (!planWindow || !overlay.classList.contains("isMini")) return;
+
+        const defaults = getDefaultMiniWindowSize();
+        const minWidth = Math.min(280, Math.max(220, window.innerWidth - defaults.margin * 2));
+        const minHeight = Math.min(205, Math.max(170, window.innerHeight - defaults.margin * 2));
+        const maxWidth = Math.max(minWidth, window.innerWidth - defaults.margin * 2);
+        const maxHeight = Math.max(minHeight, window.innerHeight - defaults.margin * 2);
+
+        const desiredWidth = miniWindowWidth ?? defaults.width;
+        const desiredHeight = miniWindowHeight ?? defaults.height;
+        miniWindowWidth = Math.max(minWidth, Math.min(maxWidth, desiredWidth));
+        miniWindowHeight = Math.max(minHeight, Math.min(maxHeight, desiredHeight));
+
+        planWindow.style.width = `${miniWindowWidth}px`;
+        planWindow.style.height = `${miniWindowHeight}px`;
+      }
+
+      function clearMiniWindowSizeStyles() {
+        if (!planWindow) return;
+        planWindow.style.removeProperty("width");
+        planWindow.style.removeProperty("height");
+        planWindow.classList.remove("isResizing");
+      }
+
+      function moveGeneratedPlanCameraDirectlyTo(targetKey) {
+        const viewByKey = {
+          terminate: TERMINATE_CAMERA_VIEW,
+          osEndEnd: OS_END_END_CAMERA_VIEW,
+          isStartStart: IS_START_START_CAMERA_VIEW,
+          boxBase: BOX_BASE_CAMERA_VIEW,
+          osStartStart: OS_START_START_CAMERA_VIEW,
+          isEndStart: IS_END_START_CAMERA_VIEW,
+          isEndEnd: IS_END_END_CAMERA_VIEW,
+          osStartEnd: OS_START_END_CAMERA_VIEW,
+          starter: STARTER_CAMERA_VIEW
+        };
+
+        const targetView = viewByKey[targetKey];
+        if (targetView) moveCameraToView(targetView, true);
+      }
+
       function launchGeneratedHotspot(targetKey) {
         if (!targetKey || isPlaying) return;
 
         activeGeneratedHotspotKey = targetKey;
         overlay.classList.add("isMini");
+        applyMiniWindowSize();
         document.body.classList.add("generatedPlanModelMode");
         closeInfoWindow();
         closeVideoWindow();
@@ -9494,11 +9735,21 @@
             return;
           }
           launchInstallationMenuHotspot(targetKey);
+          // This launch came from the generated plan, not the normal MENU.
+          // Clearing the menu-origin state stops the model's back hotspot from
+          // reopening the catalogue when the user returns to the plan.
+          installationMenuHotspotOriginFilter = null;
+          installationMenuReturnRequested = false;
           closeHotspotSummaryWindow();
         };
 
         if (activeMainHotspot && activeMainHotspot !== targetKey) {
-          reverseInstallationPlanHotspot(activeMainHotspot);
+          // Close the current exploded condition without first flying back to
+          // the overall default view. At the same time, move directly toward
+          // the next hotspot camera so switching points on the mini-map feels
+          // like one continuous move rather than a two-stage detour.
+          reverseInstallationPlanHotspot(activeMainHotspot, { keepCamera: true });
+          moveGeneratedPlanCameraDirectlyTo(targetKey);
           waitForModelIdle(() => {
             setTimeout(launch, 80);
           });
@@ -9535,6 +9786,7 @@
 
         overlay.classList.add("open");
         overlay.classList.remove("isMini");
+        clearMiniWindowSizeStyles();
         overlay.setAttribute("aria-hidden", "false");
         document.body.classList.add("generatedPlanBuilderOpen");
         document.body.classList.remove("generatedPlanModelMode");
@@ -9546,6 +9798,7 @@
 
       function closePlanner() {
         overlay.classList.remove("open", "isMini");
+        clearMiniWindowSizeStyles();
         overlay.setAttribute("aria-hidden", "true");
         document.body.classList.remove("generatedPlanBuilderOpen", "generatedPlanModelMode");
         activeGeneratedHotspotKey = null;
@@ -9556,8 +9809,24 @@
       }
 
       function expandPlanner() {
+        activeGeneratedHotspotKey = null;
         overlay.classList.remove("isMini");
+        clearMiniWindowSizeStyles();
         document.body.classList.remove("generatedPlanModelMode");
+        closeHotspotSummaryWindow();
+
+        // EXPAND behaves exactly like returning with the model's BACK hotspot:
+        // restore the default camera/model state while the plan grows back to
+        // full size, and never fall through to the regular installation MENU.
+        installationMenuHotspotOriginFilter = null;
+        installationMenuReturnRequested = false;
+        if (activeMainHotspot || isPlaying) {
+          returnGeneratedPlanModelToDefault();
+        } else {
+          moveCameraToDefaultView(true);
+        }
+
+        renderPlanner();
         requestAnimationFrame(fitGeneratedPlan);
       }
 
@@ -9565,6 +9834,13 @@
         event.stopPropagation();
         openPlanner();
       });
+
+      if (topLaunchButton) {
+        topLaunchButton.addEventListener("click", (event) => {
+          event.stopPropagation();
+          openPlanner();
+        });
+      }
 
       closeButton.addEventListener("click", (event) => {
         event.stopPropagation();
@@ -9647,6 +9923,7 @@
         event.stopPropagation();
         activeGeneratedHotspotKey = null;
         overlay.classList.remove("isMini");
+        clearMiniWindowSizeStyles();
         document.body.classList.remove("generatedPlanModelMode");
         if (activeMainHotspot || isPlaying) returnGeneratedPlanModelToDefault();
         setPhase("select");
@@ -9708,6 +9985,69 @@
         if (phase === "draw") previewLine.setAttribute("visibility", "hidden");
       });
 
+      if (resizeHandle && planWindow) {
+        resizeHandle.addEventListener("pointerdown", (event) => {
+          if (!overlay.classList.contains("isMini")) return;
+          if (event.button !== 0 && event.pointerType === "mouse") return;
+
+          event.preventDefault();
+          event.stopPropagation();
+
+          const rect = planWindow.getBoundingClientRect();
+          isResizingMiniWindow = true;
+          resizePointerId = event.pointerId;
+          resizeStartClientX = event.clientX;
+          resizeStartClientY = event.clientY;
+          resizeStartWidth = rect.width;
+          resizeStartHeight = rect.height;
+          planWindow.classList.add("isResizing");
+
+          try { resizeHandle.setPointerCapture(event.pointerId); } catch (error) {}
+        });
+
+        resizeHandle.addEventListener("pointermove", (event) => {
+          if (!isResizingMiniWindow || event.pointerId !== resizePointerId) return;
+
+          event.preventDefault();
+          event.stopPropagation();
+
+          const rect = planWindow.getBoundingClientRect();
+          const defaults = getDefaultMiniWindowSize();
+          const minWidth = Math.min(280, Math.max(220, window.innerWidth - defaults.margin * 2));
+          const minHeight = Math.min(205, Math.max(170, window.innerHeight - defaults.margin * 2));
+          const maxWidth = Math.max(minWidth, window.innerWidth - rect.left - defaults.margin);
+          const maxHeight = Math.max(minHeight, window.innerHeight - rect.top - defaults.margin);
+
+          miniWindowWidth = Math.max(
+            minWidth,
+            Math.min(maxWidth, resizeStartWidth + (event.clientX - resizeStartClientX))
+          );
+          miniWindowHeight = Math.max(
+            minHeight,
+            Math.min(maxHeight, resizeStartHeight + (event.clientY - resizeStartClientY))
+          );
+
+          planWindow.style.width = `${miniWindowWidth}px`;
+          planWindow.style.height = `${miniWindowHeight}px`;
+        });
+
+        const endMiniResize = (event) => {
+          if (!isResizingMiniWindow) return;
+          if (event && resizePointerId !== null && event.pointerId !== resizePointerId) return;
+
+          isResizingMiniWindow = false;
+          resizePointerId = null;
+          planWindow.classList.remove("isResizing");
+        };
+
+        resizeHandle.addEventListener("pointerup", endMiniResize);
+        resizeHandle.addEventListener("pointercancel", endMiniResize);
+      }
+
+      window.addEventListener("resize", () => {
+        if (overlay.classList.contains("isMini")) applyMiniWindowSize();
+      });
+
       canvas.addEventListener("pointerdown", (event) => {
         if (phase !== "generated") return;
         if (event.target.closest && event.target.closest(".generatedPlanHotspot")) return;
@@ -9745,6 +10085,16 @@
         viewPanY = point.y - contentY * newScale;
         updateViewportTransform();
       }, { passive: false });
+
+      document.addEventListener("generatedPlanModelBack", () => {
+        if (!overlay.classList.contains("open") || !overlay.classList.contains("isMini")) return;
+        activeGeneratedHotspotKey = null;
+        overlay.classList.remove("isMini");
+        clearMiniWindowSizeStyles();
+        document.body.classList.remove("generatedPlanModelMode");
+        renderPlanner();
+        requestAnimationFrame(fitGeneratedPlan);
+      });
 
       document.addEventListener("keydown", (event) => {
         if (!overlay.classList.contains("open")) return;
