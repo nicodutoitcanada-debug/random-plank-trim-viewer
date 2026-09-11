@@ -8989,6 +8989,22 @@
       let resizeStartWidth = 0;
       let resizeStartHeight = 0;
 
+      // Generated-plan motion smoothing / inertia.
+      let viewportEaseFrame = null;
+      let panInertiaFrame = null;
+      let panVelocityX = 0;
+      let panVelocityY = 0;
+      let lastPanMoveTime = 0;
+
+      // Drawing-edge auto-pan state. The draft geometry itself is translated
+      // while drawing so the user can keep extending a run beyond the space
+      // they originally left on screen without changing the plan geometry.
+      let drawAutoPanFrame = null;
+      let drawAutoPanVelocityX = 0;
+      let drawAutoPanVelocityY = 0;
+      let drawAutoPanLastTime = 0;
+      let lastDrawPointer = null;
+
       const isFinePointer = window.matchMedia && window.matchMedia("(pointer: fine)").matches;
 
       function createSvg(name, attrs = {}) {
@@ -9151,6 +9167,7 @@
       }
 
       function finishCurrentRun() {
+        stopDrawAutoPan(true);
         previewPoint = null;
         previewLine.setAttribute("visibility", "hidden");
         hideAngleGuide();
@@ -9200,6 +9217,7 @@
       }
 
       function setPhase(nextPhase) {
+        if (nextPhase !== "draw") stopDrawAutoPan(true);
         phase = nextPhase;
         overlay.dataset.phase = nextPhase;
         overlay.classList.remove("isMini");
@@ -9233,29 +9251,298 @@
         );
       }
 
+      function cancelViewportEase() {
+        if (viewportEaseFrame !== null) {
+          cancelAnimationFrame(viewportEaseFrame);
+          viewportEaseFrame = null;
+        }
+      }
+
+      function cancelPanInertia() {
+        if (panInertiaFrame !== null) {
+          cancelAnimationFrame(panInertiaFrame);
+          panInertiaFrame = null;
+        }
+        panVelocityX = 0;
+        panVelocityY = 0;
+      }
+
+      function animateViewportTo(targetScale, targetPanX, targetPanY, duration = 260) {
+        cancelViewportEase();
+        cancelPanInertia();
+
+        const startScale = viewScale;
+        const startPanX = viewPanX;
+        const startPanY = viewPanY;
+        const startTime = performance.now();
+
+        const tick = (now) => {
+          const t = Math.min(1, (now - startTime) / Math.max(1, duration));
+          // Smooth ease-out: quick enough to feel responsive, but settles softly.
+          const eased = 1 - Math.pow(1 - t, 3);
+          viewScale = startScale + (targetScale - startScale) * eased;
+          viewPanX = startPanX + (targetPanX - startPanX) * eased;
+          viewPanY = startPanY + (targetPanY - startPanY) * eased;
+          updateViewportTransform();
+
+          if (t < 1) {
+            viewportEaseFrame = requestAnimationFrame(tick);
+          } else {
+            viewportEaseFrame = null;
+          }
+        };
+
+        viewportEaseFrame = requestAnimationFrame(tick);
+      }
+
+      function startPanInertia() {
+        cancelViewportEase();
+        if (Math.hypot(panVelocityX, panVelocityY) < 0.015) {
+          cancelPanInertia();
+          return;
+        }
+
+        if (panInertiaFrame !== null) cancelAnimationFrame(panInertiaFrame);
+        let lastTime = performance.now();
+
+        const tick = (now) => {
+          const dt = Math.min(34, Math.max(1, now - lastTime));
+          lastTime = now;
+
+          viewPanX += panVelocityX * dt;
+          viewPanY += panVelocityY * dt;
+          updateViewportTransform();
+
+          // Frame-rate-independent friction gives the drag a gentle ease-out.
+          const friction = Math.pow(0.88, dt / 16.667);
+          panVelocityX *= friction;
+          panVelocityY *= friction;
+
+          if (Math.hypot(panVelocityX, panVelocityY) > 0.008) {
+            panInertiaFrame = requestAnimationFrame(tick);
+          } else {
+            panInertiaFrame = null;
+            panVelocityX = 0;
+            panVelocityY = 0;
+          }
+        };
+
+        panInertiaFrame = requestAnimationFrame(tick);
+      }
+
       function resetViewport() {
+        cancelViewportEase();
+        cancelPanInertia();
         viewScale = 1;
         viewPanX = 0;
         viewPanY = 0;
         updateViewportTransform();
       }
 
+      function translateDraftGeometry(dx, dy) {
+        if (!dx && !dy) return;
+        runs.forEach((run) => {
+          run.points.forEach((point) => {
+            point.x += dx;
+            point.y += dy;
+          });
+        });
+        if (currentRun) {
+          currentRun.points.forEach((point) => {
+            point.x += dx;
+            point.y += dy;
+          });
+        }
+        if (previewPoint) {
+          previewPoint.x += dx;
+          previewPoint.y += dy;
+        }
+      }
+
+      function stopDrawAutoPan(immediate = false) {
+        lastDrawPointer = null;
+        if (immediate) {
+          drawAutoPanVelocityX = 0;
+          drawAutoPanVelocityY = 0;
+          if (drawAutoPanFrame !== null) {
+            cancelAnimationFrame(drawAutoPanFrame);
+            drawAutoPanFrame = null;
+          }
+        }
+      }
+
+      function refreshDrawPreviewFromPointer() {
+        if (
+          phase !== "draw" ||
+          !lastDrawPointer ||
+          !currentRun ||
+          !currentRun.points.length
+        ) return;
+
+        const last = currentRun.points[currentRun.points.length - 1];
+        const point = applyOrthogonalSnap(screenToSvg(lastDrawPointer), lastDrawPointer);
+        previewPoint = point;
+        previewLine.setAttribute("x1", last.x);
+        previewLine.setAttribute("y1", last.y);
+        previewLine.setAttribute("x2", point.x);
+        previewLine.setAttribute("y2", point.y);
+        previewLine.setAttribute("visibility", "visible");
+        updateAngleGuide(point, lastDrawPointer);
+      }
+
+      function ensureDrawAutoPan() {
+        if (drawAutoPanFrame !== null) return;
+        drawAutoPanLastTime = performance.now();
+
+        const tick = (now) => {
+          const dt = Math.min(34, Math.max(1, now - drawAutoPanLastTime));
+          drawAutoPanLastTime = now;
+
+          let targetVX = 0;
+          let targetVY = 0;
+
+          if (phase === "draw" && lastDrawPointer && currentRun && currentRun.points.length) {
+            const rect = canvas.getBoundingClientRect();
+            const edge = Math.max(52, Math.min(92, Math.min(rect.width, rect.height) * 0.12));
+            const x = lastDrawPointer.clientX;
+            const y = lastDrawPointer.clientY;
+
+            const leftDepth = Math.max(0, Math.min(1, (rect.left + edge - x) / edge));
+            const rightDepth = Math.max(0, Math.min(1, (x - (rect.right - edge)) / edge));
+            const topDepth = Math.max(0, Math.min(1, (rect.top + edge - y) / edge));
+            const bottomDepth = Math.max(0, Math.min(1, (y - (rect.bottom - edge)) / edge));
+
+            // Convert a comfortable screen-space pan speed to SVG units/ms.
+            // Right/bottom edge movement shifts the drawing left/up, revealing
+            // fresh space in the direction the pointer is travelling.
+            const svgPerScreenX = 1000 / Math.max(1, rect.width);
+            const svgPerScreenY = 600 / Math.max(1, rect.height);
+            const maxScreenSpeed = 470 / 1000; // px per ms
+            targetVX = (leftDepth - rightDepth) * maxScreenSpeed * svgPerScreenX;
+            targetVY = (topDepth - bottomDepth) * maxScreenSpeed * svgPerScreenY;
+          }
+
+          // Ease both into and out of edge-pan instead of abruptly starting/stopping.
+          const response = 1 - Math.exp(-dt / 105);
+          drawAutoPanVelocityX += (targetVX - drawAutoPanVelocityX) * response;
+          drawAutoPanVelocityY += (targetVY - drawAutoPanVelocityY) * response;
+
+          const moving = Math.hypot(drawAutoPanVelocityX, drawAutoPanVelocityY) > 0.0015;
+          if (moving) {
+            translateDraftGeometry(
+              drawAutoPanVelocityX * dt,
+              drawAutoPanVelocityY * dt
+            );
+            renderPlanner();
+            refreshDrawPreviewFromPointer();
+          }
+
+          const edgeRequested = Math.hypot(targetVX, targetVY) > 0.0001;
+
+          if (edgeRequested || moving) {
+            drawAutoPanFrame = requestAnimationFrame(tick);
+          } else {
+            drawAutoPanFrame = null;
+            drawAutoPanVelocityX = 0;
+            drawAutoPanVelocityY = 0;
+          }
+        };
+
+        drawAutoPanFrame = requestAnimationFrame(tick);
+      }
+
+      function getGeneratedVisualBounds() {
+        // Fit the plan from what is actually visible, not only from the wall
+        // geometry. That means hotspot circles, leader lines and — most
+        // importantly — their title boxes are included in the calculation.
+        if (phase === "generated" && viewport && viewport.childNodes.length) {
+          try {
+            const box = viewport.getBBox();
+            if (
+              Number.isFinite(box.x) &&
+              Number.isFinite(box.y) &&
+              Number.isFinite(box.width) &&
+              Number.isFinite(box.height) &&
+              box.width > 0 &&
+              box.height > 0
+            ) {
+              const visualPad = 18;
+              return {
+                minX: box.x - visualPad,
+                minY: box.y - visualPad,
+                maxX: box.x + box.width + visualPad,
+                maxY: box.y + box.height + visualPad
+              };
+            }
+          } catch (error) {
+            // Fall back to the solver's geometry bounds below.
+          }
+        }
+
+        return generatedPlan && generatedPlan.bounds
+          ? generatedPlan.bounds
+          : null;
+      }
+
+      function getGeneratedFitArea() {
+        if (overlay.classList.contains("isMini")) {
+          return { left: 48, top: 42, right: 952, bottom: 558 };
+        }
+
+        // The help box intentionally stays exactly where it is. FIT PLAN
+        // instead treats the area below it as the top edge of the usable plan
+        // rectangle so no hotspot title can ever be hidden behind the box.
+        let safeTop = 92;
+        try {
+          const hintRect = hint.getBoundingClientRect();
+          const ctm = canvas.getScreenCTM();
+          if (ctm && hintRect.height > 0) {
+            const point = canvas.createSVGPoint();
+            point.x = hintRect.left;
+            point.y = hintRect.bottom;
+            const svgPoint = point.matrixTransform(ctm.inverse());
+            if (Number.isFinite(svgPoint.y)) {
+              safeTop = Math.max(safeTop, svgPoint.y + 26);
+            }
+          }
+        } catch (error) {}
+
+        // Keep a clean border around the other three sides as well. The plan,
+        // hotspots and their titles are fitted entirely inside this rectangle.
+        return {
+          left: 46,
+          top: Math.min(190, safeTop),
+          right: 954,
+          bottom: 554
+        };
+      }
+
       function fitGeneratedPlan() {
-        if (!generatedPlan || !generatedPlan.bounds) {
+        const bounds = getGeneratedVisualBounds();
+        if (!bounds) {
           resetViewport();
           return;
         }
 
-        const { minX, minY, maxX, maxY } = generatedPlan.bounds;
+        const { minX, minY, maxX, maxY } = bounds;
         const width = Math.max(80, maxX - minX);
         const height = Math.max(80, maxY - minY);
-        const padding = overlay.classList.contains("isMini") ? 70 : 105;
-        const scaleX = (1000 - padding * 2) / width;
-        const scaleY = (600 - padding * 2) / height;
-        viewScale = Math.max(0.35, Math.min(2.8, Math.min(scaleX, scaleY)));
-        viewPanX = 500 - ((minX + maxX) / 2) * viewScale;
-        viewPanY = 300 - ((minY + maxY) / 2) * viewScale;
-        updateViewportTransform();
+        const fitArea = getGeneratedFitArea();
+        const availableWidth = Math.max(120, fitArea.right - fitArea.left);
+        const availableHeight = Math.max(120, fitArea.bottom - fitArea.top);
+        const scaleX = availableWidth / width;
+        const scaleY = availableHeight / height;
+
+        const targetScale = Math.max(0.35, Math.min(2.8, Math.min(scaleX, scaleY)));
+
+        const contentCenterX = (minX + maxX) / 2;
+        const contentCenterY = (minY + maxY) / 2;
+        const fitCenterX = (fitArea.left + fitArea.right) / 2;
+        const fitCenterY = (fitArea.top + fitArea.bottom) / 2;
+
+        const targetPanX = fitCenterX - contentCenterX * targetScale;
+        const targetPanY = fitCenterY - contentCenterY * targetScale;
+        animateViewportTo(targetScale, targetPanX, targetPanY, 360);
       }
 
       function drawLine(parent, a, b, className, extra = {}) {
@@ -9401,21 +9688,72 @@
         }
       }
 
-      function renderHotspot(eventData, indexAtNode, totalAtNode) {
-        // When two conditions share a point (for example TERMINATE + STARTER
-        // at an odd-angle change), keep the hotspot circles close to the real
-        // corner but stagger their labels above/below so the titles never sit
-        // on top of one another.
-        const spread = totalAtNode > 2 ? 64 : 48;
-        const offset = totalAtNode > 1
+      function getHotspotPlacementNormal(point) {
+        // Use the longest wall attached to this node as a stable local axis.
+        // Hotspots that share a node are spread perpendicular to that wall so
+        // they remain readable whether the wall is horizontal, vertical or angled.
+        let best = null;
+        let bestLength = 0;
+
+        if (generatedPlan && generatedPlan.selectedEdges) {
+          generatedPlan.selectedEdges.forEach((edge) => {
+            let other = null;
+            if (pointDistance(edge.a, point) < 2.2) other = edge.b;
+            else if (pointDistance(edge.b, point) < 2.2) other = edge.a;
+            if (!other) return;
+
+            const dx = other.x - point.x;
+            const dy = other.y - point.y;
+            const length = Math.hypot(dx, dy);
+            if (length > bestLength) {
+              bestLength = length;
+              best = { x: dx / length, y: dy / length };
+            }
+          });
+        }
+
+        if (!best) return { x: 1, y: 0 };
+
+        let normal = { x: -best.y, y: best.x };
+        // Keep the normal orientation deterministic so labels do not jump sides
+        // when the plan is re-rendered.
+        if (normal.x < -0.001 || (Math.abs(normal.x) <= 0.001 && normal.y < 0)) {
+          normal = { x: -normal.x, y: -normal.y };
+        }
+        return normal;
+      }
+
+      function pointOnLabelEdge(labelX, labelY, halfWidth, halfHeight, targetX, targetY) {
+        const dx = targetX - labelX;
+        const dy = targetY - labelY;
+        const tx = Math.abs(dx) > 0.001 ? halfWidth / Math.abs(dx) : Infinity;
+        const ty = Math.abs(dy) > 0.001 ? halfHeight / Math.abs(dy) : Infinity;
+        const t = Math.min(1, tx, ty);
+        return {
+          x: labelX + dx * t,
+          y: labelY + dy * t
+        };
+      }
+
+      function renderHotspot(eventData, indexAtNode, totalAtNode, forcedBelow = null) {
+        const normal = getHotspotPlacementNormal(eventData.point);
+
+        // If more than one condition belongs to this exact corner, separate the
+        // hotspot circles perpendicular to the local wall instead of always on
+        // the X axis. This keeps paired hotspots off the wall and avoids stacking.
+        const spread = totalAtNode > 2 ? 64 : 54;
+        const hotspotOffset = totalAtNode > 1
           ? (indexAtNode - (totalAtNode - 1) / 2) * spread
           : 0;
-        const x = eventData.point.x + offset;
-        const y = eventData.point.y;
+        const x = eventData.point.x + normal.x * hotspotOffset;
+        const y = eventData.point.y + normal.y * hotspotOffset;
         const label = eventData.label;
-        // Give the title more breathing room on the left/right so the text
-        // never feels pressed against the rounded label box.
-        const labelWidth = Math.max(92, label.length * 7.2 + 38);
+
+        // Extra horizontal padding keeps long titles comfortably inside the box.
+        const labelWidth = Math.max(100, label.length * 7.2 + 46);
+        const labelHeight = 29;
+        const halfLabelWidth = labelWidth / 2;
+        const halfLabelHeight = labelHeight / 2;
         const group = createSvg("g", {
           class: `generatedPlanHotspot${activeGeneratedHotspotKey === eventData.key ? " isActive" : ""}`,
           tabindex: "0",
@@ -9424,43 +9762,58 @@
         });
         group.dataset.hotspotKey = eventData.key;
 
-        let labelY = y - 46;
+        // Shared-node labels deliberately use opposite lanes: first one above,
+        // second one below. Additional conditions keep alternating with more gap.
+        const lane = Math.floor(indexAtNode / 2);
+        const isBelow = totalAtNode > 1
+          ? indexAtNode % 2 === 1
+          : forcedBelow === true;
+        const verticalGap = (totalAtNode > 1 ? 58 : 50) + lane * 38;
+        let labelY = y + (isBelow ? verticalGap : -verticalGap);
+
+        // Never centre a title directly over its hotspot. The small side offset
+        // makes the leader line diagonal, so on vertical walls it cannot vanish
+        // into the wall line. Paired titles use opposite sides for extra clarity.
+        let labelShiftX;
         if (totalAtNode > 1) {
-          const lane = Math.floor(indexAtNode / 2);
-          const isBelow = indexAtNode % 2 === 1;
-          const laneOffset = lane * 34;
-          labelY = isBelow
-            ? y + 53 + laneOffset
-            : y - 46 - laneOffset;
+          labelShiftX = indexAtNode % 2 === 0 ? -30 : 30;
+        } else if (Math.abs(normal.x) > 0.28) {
+          labelShiftX = normal.x > 0 ? 30 : -30;
+        } else {
+          labelShiftX = x > 500 ? -30 : 30;
         }
+        const labelX = x + labelShiftX;
+        const labelTop = labelY - halfLabelHeight;
 
-        const labelTop = labelY - 17;
-        const labelHeight = 27;
-        const labelBottom = labelTop + labelHeight;
-        const connectorStartY = labelY < y ? labelBottom : labelTop;
+        const connectorStart = pointOnLabelEdge(
+          labelX,
+          labelY,
+          halfLabelWidth,
+          halfLabelHeight,
+          x,
+          y
+        );
 
-        // A short leader line makes it immediately obvious which title belongs
-        // to which hotspot when two conditions share the same corner.
         group.appendChild(createSvg("line", {
-          x1: x,
-          y1: connectorStartY,
+          x1: connectorStart.x,
+          y1: connectorStart.y,
           x2: x,
           y2: y,
           class: "generatedPlanHotspotConnector"
         }));
 
         group.appendChild(createSvg("rect", {
-          x: x - labelWidth / 2,
+          x: labelX - halfLabelWidth,
           y: labelTop,
           width: labelWidth,
           height: labelHeight,
-          rx: 8,
+          rx: 9,
           class: "generatedPlanHotspotLabelBg"
         }));
 
         const labelText = createSvg("text", {
-          x,
-          y: labelY + 1,
+          x: labelX,
+          y: labelY + 4,
           class: "generatedPlanHotspotLabel"
         });
         labelText.textContent = label;
@@ -9500,10 +9853,43 @@
           drawLine(viewport, edge.a, edge.b, "generatedPlanBaseWall");
         });
 
+        const eventPoints = generatedPlan.events.map((eventData) => eventData.point);
+        const hasEventAt = (point) => eventPoints.some((eventPoint) => pointDistance(point, eventPoint) < 2.2);
+
         generatedPlan.flowEdges.forEach((flow) => {
-          drawLine(viewport, flow.a, flow.b, "generatedPlanFlow");
-          drawLine(viewport, flow.a, flow.b, "generatedPlanFlowMotion");
-          drawRoundedArrowHead(viewport, flow.a, flow.b);
+          const dx = flow.b.x - flow.a.x;
+          const dy = flow.b.y - flow.a.y;
+          const length = Math.hypot(dx, dy);
+          if (length < 2) return;
+
+          const ux = dx / length;
+          const uy = dy / length;
+          let startClearance = hasEventAt(flow.a) ? 18 : 0;
+          let endClearance = hasEventAt(flow.b) ? 27 : 0;
+
+          // Never consume a short segment completely. The arrow remains on the
+          // wall, but its tip stops just before the destination hotspot instead
+          // of disappearing underneath the hotspot circle.
+          const maximumCombinedClearance = Math.max(0, length - 18);
+          const requestedClearance = startClearance + endClearance;
+          if (requestedClearance > maximumCombinedClearance && requestedClearance > 0) {
+            const ratio = maximumCombinedClearance / requestedClearance;
+            startClearance *= ratio;
+            endClearance *= ratio;
+          }
+
+          const visibleA = {
+            x: flow.a.x + ux * startClearance,
+            y: flow.a.y + uy * startClearance
+          };
+          const visibleB = {
+            x: flow.b.x - ux * endClearance,
+            y: flow.b.y - uy * endClearance
+          };
+
+          drawLine(viewport, visibleA, visibleB, "generatedPlanFlow");
+          drawLine(viewport, visibleA, visibleB, "generatedPlanFlowMotion");
+          drawRoundedArrowHead(viewport, visibleA, visibleB);
         });
 
         const grouped = new Map();
@@ -9513,9 +9899,55 @@
           grouped.get(key).push(eventData);
         });
 
+        // Nearby but distinct hotspots can still cause long title boxes to
+        // collide (for example two close INSIDE END START corners on a short
+        // vertical wall). Cluster those single-hotspot nodes and alternate the
+        // label lane above/below before drawing them.
+        const singleEntries = [];
+        grouped.forEach((eventsAtNode) => {
+          if (eventsAtNode.length === 1) singleEntries.push(eventsAtNode[0]);
+        });
+
+        const forcedLabelBelow = new Map();
+        const unvisited = new Set(singleEntries);
+        const proximity = 118;
+
+        while (unvisited.size) {
+          const seed = unvisited.values().next().value;
+          unvisited.delete(seed);
+          const cluster = [seed];
+          const queue = [seed];
+
+          while (queue.length) {
+            const current = queue.shift();
+            Array.from(unvisited).forEach((candidate) => {
+              if (pointDistance(current.point, candidate.point) <= proximity) {
+                unvisited.delete(candidate);
+                cluster.push(candidate);
+                queue.push(candidate);
+              }
+            });
+          }
+
+          if (cluster.length > 1) {
+            cluster.sort((a, b) => {
+              const dy = a.point.y - b.point.y;
+              return Math.abs(dy) > 4 ? dy : a.point.x - b.point.x;
+            });
+            cluster.forEach((eventData, index) => {
+              forcedLabelBelow.set(eventData, index % 2 === 1);
+            });
+          }
+        }
+
         grouped.forEach((eventsAtNode) => {
           eventsAtNode.forEach((eventData, index) => {
-            renderHotspot(eventData, index, eventsAtNode.length);
+            renderHotspot(
+              eventData,
+              index,
+              eventsAtNode.length,
+              forcedLabelBelow.has(eventData) ? forcedLabelBelow.get(eventData) : null
+            );
           });
         });
       }
@@ -10101,9 +10533,20 @@
       canvas.addEventListener("pointermove", (event) => {
         if (phase === "draw") {
           if (!currentRun || !currentRun.points.length) {
+            lastDrawPointer = null;
             previewLine.setAttribute("visibility", "hidden");
             return;
           }
+
+          lastDrawPointer = {
+            clientX: event.clientX,
+            clientY: event.clientY,
+            shiftKey: event.shiftKey,
+            altKey: event.altKey,
+            ctrlKey: event.ctrlKey,
+            metaKey: event.metaKey
+          };
+          ensureDrawAutoPan();
 
           const last = currentRun.points[currentRun.points.length - 1];
           const point = applyOrthogonalSnap(screenToSvg(event), event);
@@ -10121,16 +10564,27 @@
           const rect = canvas.getBoundingClientRect();
           const dx = (event.clientX - lastPanClientX) * (1000 / Math.max(1, rect.width));
           const dy = (event.clientY - lastPanClientY) * (600 / Math.max(1, rect.height));
+          const now = performance.now();
+          const dt = Math.max(1, now - lastPanMoveTime);
+          lastPanMoveTime = now;
           lastPanClientX = event.clientX;
           lastPanClientY = event.clientY;
           viewPanX += dx;
           viewPanY += dy;
+
+          // Blend the latest drag speed so releasing the pointer continues with
+          // a short, natural ease rather than stopping abruptly.
+          const instantVX = dx / dt;
+          const instantVY = dy / dt;
+          panVelocityX = panVelocityX * 0.55 + instantVX * 0.45;
+          panVelocityY = panVelocityY * 0.55 + instantVY * 0.45;
           updateViewportTransform();
         }
       });
 
       canvas.addEventListener("pointerleave", () => {
         if (phase === "draw") {
+          stopDrawAutoPan(false);
           previewLine.setAttribute("visibility", "hidden");
           hideAngleGuide();
         }
@@ -10207,10 +10661,15 @@
         if (phase !== "generated") return;
         if (event.target.closest && event.target.closest(".generatedPlanHotspot")) return;
         if (event.button !== 0 && event.pointerType === "mouse") return;
+        cancelViewportEase();
+        cancelPanInertia();
         isPanning = true;
         panPointerId = event.pointerId;
         lastPanClientX = event.clientX;
         lastPanClientY = event.clientY;
+        lastPanMoveTime = performance.now();
+        panVelocityX = 0;
+        panVelocityY = 0;
         canvas.classList.add("isPanning");
         try { canvas.setPointerCapture(event.pointerId); } catch (error) {}
       });
@@ -10221,6 +10680,7 @@
         isPanning = false;
         panPointerId = null;
         canvas.classList.remove("isPanning");
+        startPanInertia();
       }
 
       canvas.addEventListener("pointerup", endPan);
@@ -10229,16 +10689,18 @@
       canvas.addEventListener("wheel", (event) => {
         if (phase !== "generated") return;
         event.preventDefault();
+        cancelPanInertia();
+
         const point = screenToSvg(event);
         const oldScale = viewScale;
         const factor = event.deltaY < 0 ? 1.12 : 0.89;
         const newScale = Math.max(0.35, Math.min(4.5, oldScale * factor));
         const contentX = (point.x - viewPanX) / oldScale;
         const contentY = (point.y - viewPanY) / oldScale;
-        viewScale = newScale;
-        viewPanX = point.x - contentX * newScale;
-        viewPanY = point.y - contentY * newScale;
-        updateViewportTransform();
+        const targetPanX = point.x - contentX * newScale;
+        const targetPanY = point.y - contentY * newScale;
+
+        animateViewportTo(newScale, targetPanX, targetPanY, 220);
       }, { passive: false });
 
       document.addEventListener("generatedPlanModelBack", () => {
