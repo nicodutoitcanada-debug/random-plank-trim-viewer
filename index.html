@@ -3595,7 +3595,8 @@
       cursor: grabbing;
     }
 
-    .generatedPlanOverlay[data-phase="draw"] .generatedPlanCanvas.isPanTool {
+    .generatedPlanOverlay[data-phase="draw"] .generatedPlanCanvas.isPanTool,
+    .generatedPlanOverlay[data-phase="select"] .generatedPlanCanvas.isPanTool {
       cursor: grab;
     }
 
@@ -3611,13 +3612,29 @@
       display: none;
       align-items: center;
       justify-content: center;
-      gap: 9px;
+      gap: 15px;
       transform: translateX(-50%);
       pointer-events: auto;
     }
 
-    .generatedPlanOverlay[data-phase="draw"] .generatedPlanDrawTools {
+    .generatedPlanOverlay[data-phase="draw"] .generatedPlanDrawTools,
+    .generatedPlanOverlay[data-phase="select"] .generatedPlanDrawTools,
+    .generatedPlanOverlay[data-phase="generated"] .generatedPlanDrawTools {
       display: flex;
+    }
+
+    /* After drawing is complete, keep the navigation controls available but
+       remove drawing-only and run-only controls from the toolbar. */
+    .generatedPlanOverlay:not([data-phase="draw"]) .generatedPlanDrawingTools,
+    .generatedPlanOverlay:not([data-phase="draw"]) .generatedPlanRunTools {
+      display: none;
+    }
+
+    .generatedPlanToolGroup {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
     }
 
     .generatedPlanToolButton {
@@ -3637,7 +3654,7 @@
       backdrop-filter: blur(9px);
       -webkit-backdrop-filter: blur(9px);
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
-      transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+      transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease, filter 0.18s ease;
     }
 
     .generatedPlanToolButton:hover {
@@ -3655,6 +3672,12 @@
       transform: translateY(0) scale(0.96);
     }
 
+    .generatedPlanToolButton:disabled {
+      opacity: 0.3;
+      cursor: default;
+      transform: none;
+    }
+
     .generatedPlanToolButton img {
       width: 25px;
       height: 25px;
@@ -3662,6 +3685,30 @@
       object-fit: contain;
       pointer-events: none;
       user-select: none;
+    }
+
+    /* Navigation controls intentionally look lighter than drawing/action tools. */
+    .generatedPlanToolButton.generatedPlanNavigationButton {
+      border-color: transparent;
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      box-shadow: none;
+    }
+
+    .generatedPlanToolButton.generatedPlanNavigationButton:hover {
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
+      opacity: 0.78;
+    }
+
+    .generatedPlanToolButton.generatedPlanNavigationButton.isActive {
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
+      opacity: 1;
+      filter: drop-shadow(0 0 7px rgba(255, 255, 255, 0.48));
     }
 
     .generatedPlanHint {
@@ -4112,6 +4159,10 @@
 
       .generatedPlanDrawTools {
         bottom: 10px;
+        gap: 10px;
+      }
+
+      .generatedPlanToolGroup {
         gap: 7px;
       }
 
@@ -5101,32 +5152,44 @@
         </svg>
 
         <div class="generatedPlanDrawTools" id="generatedPlanDrawTools" role="toolbar" aria-label="Drawing tools">
-          <button class="generatedPlanToolButton isActive" type="button" data-generated-plan-tool="draw" aria-label="Draw wall" aria-pressed="true" title="Draw wall">
-            <img src="draw.png" alt="" aria-hidden="true" />
-          </button>
-          <button class="generatedPlanToolButton" type="button" data-generated-plan-tool="angle" aria-label="Draw wall at an angle" aria-pressed="false" title="Draw wall at an angle (SHIFT)">
-            <img src="draw angle.png" alt="" aria-hidden="true" />
-          </button>
-          <button class="generatedPlanToolButton" type="button" data-generated-plan-tool="pan" aria-label="Pan drawing" aria-pressed="false" title="Pan drawing">
-            <img src="pan.png" alt="" aria-hidden="true" />
-          </button>
-          <button class="generatedPlanToolButton" id="generatedPlanZoomOutButton" type="button" aria-label="Zoom out" title="Zoom out">
-            <img src="zoom out.png" alt="" aria-hidden="true" />
-          </button>
-          <button class="generatedPlanToolButton" id="generatedPlanZoomInButton" type="button" aria-label="Zoom in" title="Zoom in">
-            <img src="zoom in.png" alt="" aria-hidden="true" />
-          </button>
+          <div class="generatedPlanToolGroup generatedPlanNavigationTools" aria-label="Plan navigation tools">
+            <button class="generatedPlanToolButton generatedPlanNavigationButton" type="button" data-generated-plan-tool="pan" aria-label="Pan drawing" aria-pressed="false" title="Pan drawing">
+              <img src="pan.png" alt="" aria-hidden="true" />
+            </button>
+            <button class="generatedPlanToolButton generatedPlanNavigationButton" id="generatedPlanZoomOutButton" type="button" aria-label="Zoom out" title="Zoom out">
+              <img src="zoom out.png" alt="" aria-hidden="true" />
+            </button>
+            <button class="generatedPlanToolButton generatedPlanNavigationButton" id="generatedPlanZoomInButton" type="button" aria-label="Zoom in" title="Zoom in">
+              <img src="zoom in.png" alt="" aria-hidden="true" />
+            </button>
+          </div>
+
+          <div class="generatedPlanToolGroup generatedPlanDrawingTools" aria-label="Wall drawing tools">
+            <button class="generatedPlanToolButton isActive" type="button" data-generated-plan-tool="draw" aria-label="Draw wall" aria-pressed="true" title="Draw wall">
+              <img src="draw.png" alt="" aria-hidden="true" />
+            </button>
+            <button class="generatedPlanToolButton" type="button" data-generated-plan-tool="angle" aria-label="Draw wall at an angle" aria-pressed="false" title="Draw wall at an angle (SHIFT)">
+              <img src="draw angle.png" alt="" aria-hidden="true" />
+            </button>
+          </div>
+
+          <div class="generatedPlanToolGroup generatedPlanRunTools" aria-label="Run controls">
+            <button class="generatedPlanToolButton" id="generatedPlanUndoButton" type="button" aria-label="Undo last point" title="Undo last point">
+              <img src="undo.png" alt="" aria-hidden="true" />
+            </button>
+            <button class="generatedPlanToolButton" id="generatedPlanFinishRunButton" type="button" aria-label="Finish run" title="Finish run">
+              <img src="accept.png" alt="" aria-hidden="true" />
+            </button>
+          </div>
         </div>
 
-        <div class="generatedPlanHint" id="generatedPlanHint">90° SNAP ON · Hold SHIFT for any angle · Middle-drag to pan · Right-click or FINISH RUN to stop drawing.</div>
+        <div class="generatedPlanHint" id="generatedPlanHint">90° SNAP ON · Hold SHIFT for any angle · Middle-drag to pan · Right-click or ACCEPT to stop drawing.</div>
         <div class="generatedPlanEmptyState" id="generatedPlanEmptyState">Click anywhere to place the first point, then keep clicking to draw your walls.</div>
       </div>
 
       <div class="generatedPlanFooter">
         <div class="generatedPlanStatus" id="generatedPlanStatus">Draw one or more wall runs. Separate runs are allowed.</div>
         <div class="generatedPlanActions">
-          <button class="generatedPlanActionButton" id="generatedPlanUndoButton" type="button" data-show-phase="draw">UNDO</button>
-          <button class="generatedPlanActionButton" id="generatedPlanFinishRunButton" type="button" data-show-phase="draw">FINISH RUN</button>
           <button class="generatedPlanActionButton" id="generatedPlanClearButton" type="button" data-show-phase="draw">CLEAR</button>
           <button class="generatedPlanActionButton primary" id="generatedPlanChooseWallsButton" type="button" data-show-phase="draw">SELECT RANDOM PLANK WALLS</button>
 
@@ -9088,6 +9151,7 @@
       let panPointerId = null;
       let panInteractionMode = null;
       let drawingTool = "draw";
+      let selectionPanMode = false;
       let lastPanClientX = 0;
       let lastPanClientY = 0;
       let miniWindowWidth = null;
@@ -9123,15 +9187,47 @@
 
       function updateDrawingToolUi() {
         drawToolButtons.forEach((button) => {
-          const isActive = button.dataset.generatedPlanTool === drawingTool;
+          const tool = button.dataset.generatedPlanTool;
+          let isActive = false;
+
+          if (tool === "pan") {
+            // In the generated plan, drag-to-pan is always available, so keep
+            // the PAN icon visibly active. In selection mode it becomes a
+            // toggle so left-drag can pan without accidentally selecting walls.
+            isActive = phase === "generated"
+              || (phase === "select" && selectionPanMode)
+              || (phase === "draw" && drawingTool === "pan");
+          } else {
+            isActive = phase === "draw" && tool === drawingTool;
+          }
+
           button.classList.toggle("isActive", isActive);
           button.setAttribute("aria-pressed", isActive ? "true" : "false");
         });
-        canvas.classList.toggle("isPanTool", phase === "draw" && drawingTool === "pan");
+
+        const panCursorActive = (phase === "draw" && drawingTool === "pan")
+          || (phase === "select" && selectionPanMode);
+        canvas.classList.toggle("isPanTool", panCursorActive);
       }
 
       function setDrawingTool(nextTool) {
         if (!nextTool || !["draw", "angle", "pan"].includes(nextTool)) return;
+
+        if (nextTool === "pan" && phase === "select") {
+          selectionPanMode = !selectionPanMode;
+          updateDrawingToolUi();
+          return;
+        }
+
+        // The generated plan already supports left-drag panning everywhere;
+        // its PAN control is kept as a visible navigation affordance.
+        if (nextTool === "pan" && phase === "generated") {
+          updateDrawingToolUi();
+          return;
+        }
+
+        if (phase !== "draw") return;
+
         drawingTool = nextTool;
         updateDrawingToolUi();
 
@@ -9142,7 +9238,7 @@
           return;
         }
 
-        if (phase === "draw" && lastDrawPointer && currentRun && currentRun.points.length) {
+        if (lastDrawPointer && currentRun && currentRun.points.length) {
           refreshDrawPreviewFromPointer();
         }
       }
@@ -9399,6 +9495,7 @@
       function setPhase(nextPhase) {
         if (nextPhase !== "draw") stopDrawAutoPan(true);
         phase = nextPhase;
+        if (nextPhase !== "select") selectionPanMode = false;
         overlay.dataset.phase = nextPhase;
         overlay.classList.remove("isMini");
         document.body.classList.remove("generatedPlanModelMode");
@@ -9407,18 +9504,18 @@
           title.textContent = "BUILD YOUR INSTALLATION PLAN";
           stepText.textContent = "STEP 1 — Draw the walls in your project.";
           hint.textContent = isFinePointer
-            ? "90° SNAP ON · Hold SHIFT or use ANGLE for any angle · Middle-drag to pan · Right-click or FINISH RUN to stop drawing."
-            : "90° SNAP ON · Use ANGLE for any angle · Use PAN to move the drawing · FINISH RUN starts a separate wall run.";
+            ? "90° SNAP ON · Hold SHIFT or use ANGLE for any angle · Middle-drag to pan · Right-click or ACCEPT to stop drawing."
+            : "90° SNAP ON · Use ANGLE for any angle · Use PAN to move the drawing · ACCEPT starts a separate wall run.";
           status.textContent = "Draw one or more wall runs. Separate runs are allowed.";
         } else if (nextPhase === "select") {
           title.textContent = "SELECT RANDOM PLANK WALLS";
           stepText.textContent = "STEP 2 — Click the walls that will receive Random Plank.";
-          hint.textContent = "Selected walls are highlighted red. Use SELECT ALL if the entire drawing is Random Plank. Middle-drag to pan.";
+          hint.textContent = "Selected walls are highlighted red. Use PAN for left-drag navigation, or middle-drag at any time. Scroll or use + / − to zoom.";
           status.textContent = "Disconnected selected walls will be planned as separate installation runs.";
         } else {
           title.textContent = "YOUR INSTALLATION PLAN";
           stepText.textContent = "Click any hotspot to view that installation condition on the 3D model.";
-          hint.textContent = "Scroll or pinch to zoom the plan. Drag or middle-drag to pan. The planner prefers STARTER and avoids INSIDE START START when possible.";
+          hint.textContent = "Use PAN or drag to move the plan. Scroll, pinch, or use + / − to zoom. The planner prefers STARTER and avoids INSIDE START START when possible.";
         }
 
         updateDrawingToolUi();
@@ -9846,6 +9943,7 @@
             hit.dataset.segmentId = segment.id;
             hit.addEventListener("click", (event) => {
               event.stopPropagation();
+              if (selectionPanMode) return;
               if (selectedSegments.has(segment.id)) {
                 selectedSegments.delete(segment.id);
               } else {
@@ -10891,10 +10989,11 @@
         const isMiddleButton = isMouse && event.button === 1;
         const isPrimaryButton = !isMouse || event.button === 0;
         const generatedPrimaryPan = phase === "generated" && isPrimaryButton;
+        const selectionToolPan = phase === "select" && selectionPanMode && isPrimaryButton;
         const drawToolPan = phase === "draw" && drawingTool === "pan" && isPrimaryButton;
         const middleButtonPan = isMiddleButton && ["draw", "select", "generated"].includes(phase);
 
-        if (!generatedPrimaryPan && !drawToolPan && !middleButtonPan) return;
+        if (!generatedPrimaryPan && !selectionToolPan && !drawToolPan && !middleButtonPan) return;
         if (
           phase === "generated" &&
           !isMiddleButton &&
@@ -10909,7 +11008,7 @@
 
         isPanning = true;
         panPointerId = event.pointerId;
-        panInteractionMode = phase === "generated" ? "viewport" : "draft";
+        panInteractionMode = (phase === "generated" || phase === "select") ? "viewport" : "draft";
         lastPanClientX = event.clientX;
         lastPanClientY = event.clientY;
         lastPanMoveTime = performance.now();
