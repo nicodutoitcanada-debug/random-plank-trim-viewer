@@ -3630,6 +3630,29 @@
       display: none;
     }
 
+    /* Selection actions live in the same round-button toolbar, on the right,
+       but keep the regular action-button treatment rather than the lighter
+       navigation treatment. */
+    .generatedPlanSelectionTools {
+      display: none !important;
+    }
+
+    .generatedPlanOverlay[data-phase="select"] .generatedPlanSelectionTools {
+      display: flex !important;
+    }
+
+    /* Selection actions are only relevant while choosing Random Plank walls. */
+    .generatedPlanOverlay[data-phase="draw"] .generatedPlanSelectionTools,
+    .generatedPlanOverlay[data-phase="generated"] .generatedPlanSelectionTools {
+      display: none !important;
+    }
+
+    /* The SELECT ALL artwork is visually right-heavy, so nudge the PNG
+       slightly right within the circular button to make it feel optically centered. */
+    #generatedPlanSelectAllButton img {
+      transform: translateX(3px);
+    }
+
     .generatedPlanToolGroup {
       display: flex;
       align-items: center;
@@ -3678,13 +3701,22 @@
       transform: none;
     }
 
-    .generatedPlanToolButton img {
+    .generatedPlanToolButton img,
+    .generatedPlanToolButton svg {
       width: 25px;
       height: 25px;
       display: block;
       object-fit: contain;
       pointer-events: none;
       user-select: none;
+    }
+
+    .generatedPlanToolButton svg {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     /* Navigation controls intentionally look lighter than drawing/action tools. */
@@ -3709,6 +3741,109 @@
       box-shadow: none;
       opacity: 1;
       filter: drop-shadow(0 0 7px rgba(255, 255, 255, 0.48));
+    }
+
+    .generatedPlanTutorialOverlay {
+      position: absolute;
+      inset: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      box-sizing: border-box;
+      background: rgba(0, 0, 0, 0.56);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.28s ease, visibility 0s linear 0.28s;
+    }
+
+    .generatedPlanTutorialOverlay.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition: opacity 0.28s ease;
+    }
+
+    .generatedPlanTutorialCard {
+      width: min(570px, calc(100vw - 120px));
+      max-height: calc(100% - 44px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 24px;
+      background: rgba(18, 18, 18, 0.96);
+      box-shadow: 0 26px 80px rgba(0, 0, 0, 0.52);
+      transform: translateY(10px) scale(0.98);
+      transition: transform 0.34s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .generatedPlanTutorialOverlay.open .generatedPlanTutorialCard {
+      transform: translateY(0) scale(1);
+    }
+
+    .generatedPlanTutorialVideoWrap {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      min-height: 0;
+      background: #050505;
+      overflow: hidden;
+    }
+
+    .generatedPlanTutorialVideo {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      background: #050505;
+    }
+
+    .generatedPlanTutorialBody {
+      padding: 20px 22px 22px;
+      text-align: center;
+    }
+
+    .generatedPlanTutorialDescription {
+      max-width: 470px;
+      margin: 0 auto;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 13px;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    .generatedPlanTutorialGotItButton {
+      min-width: 118px;
+      min-height: 40px;
+      margin-top: 18px;
+      padding: 0 22px;
+      border: 0;
+      border-radius: 999px;
+      background: #c9222e;
+      color: #fff;
+      cursor: pointer;
+      font-size: 10px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0.055em;
+      text-transform: uppercase;
+      box-shadow: 0 10px 28px rgba(201, 34, 46, 0.24);
+      transition: background 0.18s ease, transform 0.18s ease;
+    }
+
+    .generatedPlanTutorialGotItButton:hover {
+      background: #df2937;
+      transform: translateY(-1px);
+    }
+
+    .generatedPlanTutorialGotItButton:active {
+      transform: translateY(0) scale(0.98);
     }
 
     .generatedPlanHint {
@@ -4172,9 +4307,34 @@
         min-width: 42px;
       }
 
-      .generatedPlanToolButton img {
+      .generatedPlanToolButton img,
+      .generatedPlanToolButton svg {
         width: 23px;
         height: 23px;
+      }
+
+      .generatedPlanTutorialOverlay {
+        padding: 16px;
+      }
+
+      .generatedPlanTutorialCard {
+        width: min(520px, calc(100vw - 52px));
+        max-height: calc(100% - 20px);
+        border-radius: 18px;
+      }
+
+      .generatedPlanTutorialBody {
+        padding: 16px 16px 17px;
+      }
+
+      .generatedPlanTutorialDescription {
+        font-size: 11px;
+        line-height: 1.45;
+      }
+
+      .generatedPlanTutorialGotItButton {
+        min-height: 36px;
+        margin-top: 14px;
       }
 
       .generatedPlanHint {
@@ -5173,6 +5333,15 @@
             </button>
           </div>
 
+          <div class="generatedPlanToolGroup generatedPlanSelectionTools" aria-label="Wall selection controls">
+            <button class="generatedPlanToolButton" id="generatedPlanSelectAllButton" type="button" aria-label="Select all walls" title="Select all walls">
+              <img src="select all.png" alt="" aria-hidden="true" />
+            </button>
+            <button class="generatedPlanToolButton" id="generatedPlanClearSelectionButton" type="button" aria-label="Clear wall selection" title="Clear wall selection">
+              <img src="undo.png" alt="" aria-hidden="true" />
+            </button>
+          </div>
+
           <div class="generatedPlanToolGroup generatedPlanRunTools" aria-label="Run controls">
             <button class="generatedPlanToolButton" id="generatedPlanUndoButton" type="button" aria-label="Undo last point" title="Undo last point">
               <img src="undo.png" alt="" aria-hidden="true" />
@@ -5194,12 +5363,29 @@
           <button class="generatedPlanActionButton primary" id="generatedPlanChooseWallsButton" type="button" data-show-phase="draw">SELECT RANDOM PLANK WALLS</button>
 
           <button class="generatedPlanActionButton" id="generatedPlanBackToDrawButton" type="button" data-show-phase="select">BACK</button>
-          <button class="generatedPlanActionButton" id="generatedPlanSelectAllButton" type="button" data-show-phase="select">SELECT ALL</button>
-          <button class="generatedPlanActionButton" id="generatedPlanClearSelectionButton" type="button" data-show-phase="select">CLEAR SELECTION</button>
           <button class="generatedPlanActionButton primary" id="generatedPlanGenerateButton" type="button" data-show-phase="select">GENERATE INSTALLATION PLAN</button>
 
           <button class="generatedPlanActionButton" id="generatedPlanEditWallsButton" type="button" data-show-phase="generated">EDIT WALLS</button>
           <button class="generatedPlanActionButton" id="generatedPlanFitFooterButton" type="button" data-show-phase="generated">FIT PLAN</button>
+        </div>
+      </div>
+
+      <div class="generatedPlanTutorialOverlay" id="generatedPlanTutorialOverlay" aria-hidden="true">
+        <div class="generatedPlanTutorialCard" role="dialog" aria-modal="true" aria-describedby="generatedPlanTutorialDescription">
+          <div class="generatedPlanTutorialVideoWrap">
+            <video
+              class="generatedPlanTutorialVideo"
+              id="generatedPlanTutorialVideo"
+              muted
+              loop
+              playsinline
+              preload="metadata"
+            ></video>
+          </div>
+          <div class="generatedPlanTutorialBody">
+            <p class="generatedPlanTutorialDescription" id="generatedPlanTutorialDescription"></p>
+            <button class="generatedPlanTutorialGotItButton" id="generatedPlanTutorialGotItButton" type="button">GOT IT</button>
+          </div>
         </div>
       </div>
 
@@ -9128,6 +9314,10 @@
       const drawToolButtons = Array.from(document.querySelectorAll("[data-generated-plan-tool]"));
       const planZoomOutButton = document.querySelector("#generatedPlanZoomOutButton");
       const planZoomInButton = document.querySelector("#generatedPlanZoomInButton");
+      const tutorialOverlay = document.querySelector("#generatedPlanTutorialOverlay");
+      const tutorialVideo = document.querySelector("#generatedPlanTutorialVideo");
+      const tutorialDescription = document.querySelector("#generatedPlanTutorialDescription");
+      const tutorialGotItButton = document.querySelector("#generatedPlanTutorialGotItButton");
 
       if (!launchButton || !overlay || !canvas || !viewport) return;
 
@@ -9178,6 +9368,7 @@
       let drawAutoPanVelocityY = 0;
       let drawAutoPanLastTime = 0;
       let lastDrawPointer = null;
+      let tutorialSeenThisOpen = { draw: false, select: false };
 
       const isFinePointer = window.matchMedia && window.matchMedia("(pointer: fine)").matches;
 
@@ -9492,6 +9683,54 @@
         return segments;
       }
 
+      const PLAN_TUTORIALS = {
+        draw: {
+          src: "draw.mp4",
+          description: "Draw the walls that match your installation layout to generate a tailored installation plan."
+        },
+        select: {
+          src: "select.mp4",
+          description: "Select the walls that will receive Random Plank, then generate a tailored installation plan for those walls."
+        }
+      };
+
+      function closePlanTutorial() {
+        if (!tutorialOverlay) return;
+        tutorialOverlay.classList.remove("open");
+        tutorialOverlay.setAttribute("aria-hidden", "true");
+        if (tutorialVideo) {
+          tutorialVideo.pause();
+        }
+      }
+
+      function showPlanTutorial(kind) {
+        const config = PLAN_TUTORIALS[kind];
+        if (!config || !tutorialOverlay || !tutorialVideo || !tutorialDescription) return;
+        if (!overlay.classList.contains("open")) return;
+        if (tutorialSeenThisOpen[kind]) return;
+
+        tutorialSeenThisOpen[kind] = true;
+        tutorialDescription.textContent = config.description;
+
+        const nextSrc = config.src;
+        const currentSrc = tutorialVideo.getAttribute("src") || "";
+        if (currentSrc !== nextSrc) {
+          tutorialVideo.pause();
+          tutorialVideo.setAttribute("src", nextSrc);
+          tutorialVideo.load();
+        } else {
+          try { tutorialVideo.currentTime = 0; } catch (error) {}
+        }
+
+        tutorialOverlay.classList.add("open");
+        tutorialOverlay.setAttribute("aria-hidden", "false");
+
+        const playPromise = tutorialVideo.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => {});
+        }
+      }
+
       function setPhase(nextPhase) {
         if (nextPhase !== "draw") stopDrawAutoPan(true);
         phase = nextPhase;
@@ -9520,6 +9759,10 @@
 
         updateDrawingToolUi();
         renderPlanner();
+
+        if (nextPhase === "draw" || nextPhase === "select") {
+          requestAnimationFrame(() => showPlanTutorial(nextPhase));
+        }
       }
 
       function updateViewportTransform() {
@@ -10654,6 +10897,8 @@
         overlay.setAttribute("aria-hidden", "false");
         document.body.classList.add("generatedPlanBuilderOpen");
         document.body.classList.remove("generatedPlanModelMode");
+        tutorialSeenThisOpen = { draw: false, select: false };
+        closePlanTutorial();
         setPhase(phase === "generated" ? "generated" : phase);
         requestAnimationFrame(() => {
           if (phase === "generated") fitGeneratedPlan();
@@ -10661,6 +10906,7 @@
       }
 
       function closePlanner() {
+        closePlanTutorial();
         overlay.classList.remove("open", "isMini");
         clearMiniWindowSizeStyles();
         overlay.setAttribute("aria-hidden", "true");
@@ -10703,6 +10949,14 @@
         topLaunchButton.addEventListener("click", (event) => {
           event.stopPropagation();
           openPlanner();
+        });
+      }
+
+      if (tutorialGotItButton) {
+        tutorialGotItButton.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          closePlanTutorial();
         });
       }
 
