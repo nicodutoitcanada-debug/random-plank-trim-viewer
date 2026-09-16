@@ -3459,6 +3459,7 @@
       display: grid;
       grid-template-rows: auto 1fr auto;
       overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.30);
       border-radius: 28px;
       background: rgba(20, 20, 20, 0.84);
       color: #fff;
@@ -3592,6 +3593,75 @@
 
     .generatedPlanOverlay[data-phase="generated"] .generatedPlanCanvas.isPanning {
       cursor: grabbing;
+    }
+
+    .generatedPlanOverlay[data-phase="draw"] .generatedPlanCanvas.isPanTool {
+      cursor: grab;
+    }
+
+    .generatedPlanCanvas.isPanning {
+      cursor: grabbing !important;
+    }
+
+    .generatedPlanDrawTools {
+      position: absolute;
+      left: 50%;
+      bottom: 16px;
+      z-index: 6;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      transform: translateX(-50%);
+      pointer-events: auto;
+    }
+
+    .generatedPlanOverlay[data-phase="draw"] .generatedPlanDrawTools {
+      display: flex;
+    }
+
+    .generatedPlanToolButton {
+      width: 46px;
+      height: 46px;
+      min-width: 46px;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.25);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-sizing: border-box;
+      backdrop-filter: blur(9px);
+      -webkit-backdrop-filter: blur(9px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+      transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .generatedPlanToolButton:hover {
+      background: rgba(0, 0, 0, 0.42);
+      transform: translateY(-2px);
+    }
+
+    .generatedPlanToolButton.isActive {
+      background: #c9222e;
+      border-color: rgba(255, 255, 255, 0.24);
+      box-shadow: 0 8px 26px rgba(201, 34, 46, 0.28);
+    }
+
+    .generatedPlanToolButton:active {
+      transform: translateY(0) scale(0.96);
+    }
+
+    .generatedPlanToolButton img {
+      width: 25px;
+      height: 25px;
+      display: block;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
     }
 
     .generatedPlanHint {
@@ -4038,6 +4108,22 @@
       .generatedPlanCanvasWrap {
         margin: 10px 12px 0;
         border-radius: 16px;
+      }
+
+      .generatedPlanDrawTools {
+        bottom: 10px;
+        gap: 7px;
+      }
+
+      .generatedPlanToolButton {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+      }
+
+      .generatedPlanToolButton img {
+        width: 23px;
+        height: 23px;
       }
 
       .generatedPlanHint {
@@ -5013,7 +5099,26 @@
             <text class="generatedPlanAngleText" id="generatedPlanAngleText" x="0" y="0"></text>
           </g>
         </svg>
-        <div class="generatedPlanHint" id="generatedPlanHint">90° SNAP ON · Hold SHIFT for any angle · Right-click or FINISH RUN to stop drawing.</div>
+
+        <div class="generatedPlanDrawTools" id="generatedPlanDrawTools" role="toolbar" aria-label="Drawing tools">
+          <button class="generatedPlanToolButton isActive" type="button" data-generated-plan-tool="draw" aria-label="Draw wall" aria-pressed="true" title="Draw wall">
+            <img src="draw.png" alt="" aria-hidden="true" />
+          </button>
+          <button class="generatedPlanToolButton" type="button" data-generated-plan-tool="angle" aria-label="Draw wall at an angle" aria-pressed="false" title="Draw wall at an angle (SHIFT)">
+            <img src="draw angle.png" alt="" aria-hidden="true" />
+          </button>
+          <button class="generatedPlanToolButton" type="button" data-generated-plan-tool="pan" aria-label="Pan drawing" aria-pressed="false" title="Pan drawing">
+            <img src="pan.png" alt="" aria-hidden="true" />
+          </button>
+          <button class="generatedPlanToolButton" id="generatedPlanZoomOutButton" type="button" aria-label="Zoom out" title="Zoom out">
+            <img src="zoom out.png" alt="" aria-hidden="true" />
+          </button>
+          <button class="generatedPlanToolButton" id="generatedPlanZoomInButton" type="button" aria-label="Zoom in" title="Zoom in">
+            <img src="zoom in.png" alt="" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div class="generatedPlanHint" id="generatedPlanHint">90° SNAP ON · Hold SHIFT for any angle · Middle-drag to pan · Right-click or FINISH RUN to stop drawing.</div>
         <div class="generatedPlanEmptyState" id="generatedPlanEmptyState">Click anywhere to place the first point, then keep clicking to draw your walls.</div>
       </div>
 
@@ -8957,6 +9062,9 @@
       const clearSelectionButton = document.querySelector("#generatedPlanClearSelectionButton");
       const generateButton = document.querySelector("#generatedPlanGenerateButton");
       const editWallsButton = document.querySelector("#generatedPlanEditWallsButton");
+      const drawToolButtons = Array.from(document.querySelectorAll("[data-generated-plan-tool]"));
+      const planZoomOutButton = document.querySelector("#generatedPlanZoomOutButton");
+      const planZoomInButton = document.querySelector("#generatedPlanZoomInButton");
 
       if (!launchButton || !overlay || !canvas || !viewport) return;
 
@@ -8978,6 +9086,8 @@
       let viewPanY = 0;
       let isPanning = false;
       let panPointerId = null;
+      let panInteractionMode = null;
+      let drawingTool = "draw";
       let lastPanClientX = 0;
       let lastPanClientY = 0;
       let miniWindowWidth = null;
@@ -9006,6 +9116,36 @@
       let lastDrawPointer = null;
 
       const isFinePointer = window.matchMedia && window.matchMedia("(pointer: fine)").matches;
+
+      function isFreeAngleMode(event) {
+        return drawingTool === "angle" || Boolean(event && event.shiftKey);
+      }
+
+      function updateDrawingToolUi() {
+        drawToolButtons.forEach((button) => {
+          const isActive = button.dataset.generatedPlanTool === drawingTool;
+          button.classList.toggle("isActive", isActive);
+          button.setAttribute("aria-pressed", isActive ? "true" : "false");
+        });
+        canvas.classList.toggle("isPanTool", phase === "draw" && drawingTool === "pan");
+      }
+
+      function setDrawingTool(nextTool) {
+        if (!nextTool || !["draw", "angle", "pan"].includes(nextTool)) return;
+        drawingTool = nextTool;
+        updateDrawingToolUi();
+
+        if (drawingTool === "pan") {
+          stopDrawAutoPan(true);
+          previewLine.setAttribute("visibility", "hidden");
+          hideAngleGuide();
+          return;
+        }
+
+        if (phase === "draw" && lastDrawPointer && currentRun && currentRun.points.length) {
+          refreshDrawPreviewFromPointer();
+        }
+      }
 
       function createSvg(name, attrs = {}) {
         const element = document.createElementNS(SVG_NS, name);
@@ -9043,7 +9183,7 @@
         return best ? copyPoint(best) : point;
       }
 
-      function screenToSvg(event) {
+      function screenToCanvas(event) {
         const svgPoint = canvas.createSVGPoint();
         svgPoint.x = event.clientX;
         svgPoint.y = event.clientY;
@@ -9053,8 +9193,35 @@
         return { x: local.x, y: local.y };
       }
 
+      function screenToSvg(event) {
+        const local = screenToCanvas(event);
+        const safeScale = Math.max(0.0001, viewScale);
+        return {
+          x: (local.x - viewPanX) / safeScale,
+          y: (local.y - viewPanY) / safeScale
+        };
+      }
+
+      function zoomPlannerAt(anchorPoint, direction, duration = 220) {
+        const oldScale = viewScale;
+        const factor = direction === "in" ? 1.14 : (1 / 1.14);
+        const newScale = Math.max(0.35, Math.min(4.5, oldScale * factor));
+        if (Math.abs(newScale - oldScale) < 0.0001) return;
+
+        const contentX = (anchorPoint.x - viewPanX) / Math.max(0.0001, oldScale);
+        const contentY = (anchorPoint.y - viewPanY) / Math.max(0.0001, oldScale);
+        const targetPanX = anchorPoint.x - contentX * newScale;
+        const targetPanY = anchorPoint.y - contentY * newScale;
+
+        animateViewportTo(newScale, targetPanX, targetPanY, duration);
+      }
+
+      function zoomPlannerFromButton(direction) {
+        zoomPlannerAt({ x: 500, y: 300 }, direction, 240);
+      }
+
       function applyOrthogonalSnap(point, event) {
-        if (!currentRun || !currentRun.points.length || event.shiftKey) {
+        if (!currentRun || !currentRun.points.length || isFreeAngleMode(event)) {
           return snapToExistingPoint(point);
         }
 
@@ -9082,7 +9249,7 @@
         // measure the new wall against.
         if (
           phase !== "draw" ||
-          !event.shiftKey ||
+          !isFreeAngleMode(event) ||
           !currentRun ||
           currentRun.points.length < 2
         ) {
@@ -9115,16 +9282,30 @@
 
         const degrees = Math.min(180, Math.max(0, Math.round(Math.abs(delta) * 180 / Math.PI)));
         const radius = Math.max(34, Math.min(68, Math.min(previousLength, nextLength) * 0.34));
-        const arcEndAngle = startAngle + delta;
+        const direction = delta > 0 ? 1 : -1;
+        const fullArcEndAngle = startAngle + delta;
+
+        // Leave a small amount of negative space between the green angle guide
+        // and both wall rays. This keeps the guide from visually sitting on top
+        // of either the existing wall or the live preview line.
+        const edgeGapDistance = 11;
+        const edgeGapAngle = Math.min(
+          edgeGapDistance / radius,
+          Math.abs(delta) * 0.16
+        );
+        const visibleStartAngle = startAngle + direction * edgeGapAngle;
+        const visibleEndAngle = fullArcEndAngle - direction * edgeGapAngle;
+        const visibleDelta = visibleEndAngle - visibleStartAngle;
+
         const start = {
-          x: vertex.x + Math.cos(startAngle) * radius,
-          y: vertex.y + Math.sin(startAngle) * radius
+          x: vertex.x + Math.cos(visibleStartAngle) * radius,
+          y: vertex.y + Math.sin(visibleStartAngle) * radius
         };
         const end = {
-          x: vertex.x + Math.cos(arcEndAngle) * radius,
-          y: vertex.y + Math.sin(arcEndAngle) * radius
+          x: vertex.x + Math.cos(visibleEndAngle) * radius,
+          y: vertex.y + Math.sin(visibleEndAngle) * radius
         };
-        const sweepFlag = delta > 0 ? 1 : 0;
+        const sweepFlag = visibleDelta > 0 ? 1 : 0;
 
         angleArc.setAttribute(
           "d",
@@ -9132,10 +9313,9 @@
         );
 
         // Rounded chevron arrowhead at the end of the green arc.
-        const direction = delta > 0 ? 1 : -1;
         const tangent = {
-          x: -Math.sin(arcEndAngle) * direction,
-          y: Math.cos(arcEndAngle) * direction
+          x: -Math.sin(visibleEndAngle) * direction,
+          y: Math.cos(visibleEndAngle) * direction
         };
         const normal = { x: -tangent.y, y: tangent.x };
         const arrowBack = 15;
@@ -9227,28 +9407,31 @@
           title.textContent = "BUILD YOUR INSTALLATION PLAN";
           stepText.textContent = "STEP 1 — Draw the walls in your project.";
           hint.textContent = isFinePointer
-            ? "90° SNAP ON · Hold SHIFT for any angle · Right-click or FINISH RUN to stop drawing."
-            : "90° SNAP ON · Tap points to draw · Use FINISH RUN when you want to begin a separate wall run.";
+            ? "90° SNAP ON · Hold SHIFT or use ANGLE for any angle · Middle-drag to pan · Right-click or FINISH RUN to stop drawing."
+            : "90° SNAP ON · Use ANGLE for any angle · Use PAN to move the drawing · FINISH RUN starts a separate wall run.";
           status.textContent = "Draw one or more wall runs. Separate runs are allowed.";
         } else if (nextPhase === "select") {
           title.textContent = "SELECT RANDOM PLANK WALLS";
           stepText.textContent = "STEP 2 — Click the walls that will receive Random Plank.";
-          hint.textContent = "Selected walls are highlighted red. Use SELECT ALL if the entire drawing is Random Plank.";
+          hint.textContent = "Selected walls are highlighted red. Use SELECT ALL if the entire drawing is Random Plank. Middle-drag to pan.";
           status.textContent = "Disconnected selected walls will be planned as separate installation runs.";
         } else {
           title.textContent = "YOUR INSTALLATION PLAN";
           stepText.textContent = "Click any hotspot to view that installation condition on the 3D model.";
-          hint.textContent = "Scroll or pinch to zoom the plan. Drag to pan. The planner prefers STARTER and avoids INSIDE START START when possible.";
+          hint.textContent = "Scroll or pinch to zoom the plan. Drag or middle-drag to pan. The planner prefers STARTER and avoids INSIDE START START when possible.";
         }
 
+        updateDrawingToolUi();
         renderPlanner();
       }
 
       function updateViewportTransform() {
-        viewport.setAttribute(
-          "transform",
-          `matrix(${viewScale} 0 0 ${viewScale} ${viewPanX} ${viewPanY})`
-        );
+        const transform = `matrix(${viewScale} 0 0 ${viewScale} ${viewPanX} ${viewPanY})`;
+        viewport.setAttribute("transform", transform);
+        // Keep the live preview and angle guide locked to the same zoom/pan
+        // transform as the wall geometry while drawing.
+        if (previewLine) previewLine.setAttribute("transform", transform);
+        if (angleGuide) angleGuide.setAttribute("transform", transform);
       }
 
       function cancelViewportEase() {
@@ -9284,6 +9467,10 @@
           viewPanX = startPanX + (targetPanX - startPanX) * eased;
           viewPanY = startPanY + (targetPanY - startPanY) * eased;
           updateViewportTransform();
+
+          if (phase === "draw" && lastDrawPointer && currentRun && currentRun.points.length) {
+            refreshDrawPreviewFromPointer();
+          }
 
           if (t < 1) {
             viewportEaseFrame = requestAnimationFrame(tick);
@@ -9429,9 +9616,10 @@
 
           const moving = Math.hypot(drawAutoPanVelocityX, drawAutoPanVelocityY) > 0.0015;
           if (moving) {
+            const safeScale = Math.max(0.0001, viewScale);
             translateDraftGeometry(
-              drawAutoPanVelocityX * dt,
-              drawAutoPanVelocityY * dt
+              (drawAutoPanVelocityX * dt) / safeScale,
+              (drawAutoPanVelocityY * dt) / safeScale
             );
             renderPlanner();
             refreshDrawPreviewFromPointer();
@@ -10507,6 +10695,30 @@
         setPhase("select");
       });
 
+      drawToolButtons.forEach((button) => {
+        button.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          setDrawingTool(button.dataset.generatedPlanTool);
+        });
+      });
+
+      if (planZoomOutButton) {
+        planZoomOutButton.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          zoomPlannerFromButton("out");
+        });
+      }
+
+      if (planZoomInButton) {
+        planZoomInButton.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          zoomPlannerFromButton("in");
+        });
+      }
+
       canvas.addEventListener("contextmenu", (event) => {
         if (phase !== "draw") return;
         event.preventDefault();
@@ -10516,6 +10728,7 @@
       canvas.addEventListener("click", (event) => {
         if (phase !== "draw") return;
         if (event.button !== 0) return;
+        if (drawingTool === "pan") return;
 
         let point = screenToSvg(event);
         point = applyOrthogonalSnap(point, event);
@@ -10531,7 +10744,44 @@
       });
 
       canvas.addEventListener("pointermove", (event) => {
+        if (isPanning && event.pointerId === panPointerId) {
+          const rect = canvas.getBoundingClientRect();
+          const dx = (event.clientX - lastPanClientX) * (1000 / Math.max(1, rect.width));
+          const dy = (event.clientY - lastPanClientY) * (600 / Math.max(1, rect.height));
+          const now = performance.now();
+          const dt = Math.max(1, now - lastPanMoveTime);
+          lastPanMoveTime = now;
+          lastPanClientX = event.clientX;
+          lastPanClientY = event.clientY;
+
+          if (panInteractionMode === "draft") {
+            const safeScale = Math.max(0.0001, viewScale);
+            translateDraftGeometry(dx / safeScale, dy / safeScale);
+            renderPlanner();
+          } else {
+            viewPanX += dx;
+            viewPanY += dy;
+
+            // Blend the latest drag speed so releasing the pointer continues with
+            // a short, natural ease rather than stopping abruptly.
+            const instantVX = dx / dt;
+            const instantVY = dy / dt;
+            panVelocityX = panVelocityX * 0.55 + instantVX * 0.45;
+            panVelocityY = panVelocityY * 0.55 + instantVY * 0.45;
+            updateViewportTransform();
+          }
+          return;
+        }
+
         if (phase === "draw") {
+          if (drawingTool === "pan") {
+            lastDrawPointer = null;
+            stopDrawAutoPan(false);
+            previewLine.setAttribute("visibility", "hidden");
+            hideAngleGuide();
+            return;
+          }
+
           if (!currentRun || !currentRun.points.length) {
             lastDrawPointer = null;
             previewLine.setAttribute("visibility", "hidden");
@@ -10559,27 +10809,6 @@
           updateAngleGuide(point, event);
           return;
         }
-
-        if (phase === "generated" && isPanning && event.pointerId === panPointerId) {
-          const rect = canvas.getBoundingClientRect();
-          const dx = (event.clientX - lastPanClientX) * (1000 / Math.max(1, rect.width));
-          const dy = (event.clientY - lastPanClientY) * (600 / Math.max(1, rect.height));
-          const now = performance.now();
-          const dt = Math.max(1, now - lastPanMoveTime);
-          lastPanMoveTime = now;
-          lastPanClientX = event.clientX;
-          lastPanClientY = event.clientY;
-          viewPanX += dx;
-          viewPanY += dy;
-
-          // Blend the latest drag speed so releasing the pointer continues with
-          // a short, natural ease rather than stopping abruptly.
-          const instantVX = dx / dt;
-          const instantVY = dy / dt;
-          panVelocityX = panVelocityX * 0.55 + instantVX * 0.45;
-          panVelocityY = panVelocityY * 0.55 + instantVY * 0.45;
-          updateViewportTransform();
-        }
       });
 
       canvas.addEventListener("pointerleave", () => {
@@ -10591,7 +10820,7 @@
       });
 
       window.addEventListener("keyup", (event) => {
-        if (event.key === "Shift") hideAngleGuide();
+        if (event.key === "Shift" && drawingTool !== "angle") hideAngleGuide();
       });
 
       if (resizeHandle && planWindow) {
@@ -10658,49 +10887,96 @@
       });
 
       canvas.addEventListener("pointerdown", (event) => {
-        if (phase !== "generated") return;
-        if (event.target.closest && event.target.closest(".generatedPlanHotspot")) return;
-        if (event.button !== 0 && event.pointerType === "mouse") return;
+        const isMouse = event.pointerType === "mouse";
+        const isMiddleButton = isMouse && event.button === 1;
+        const isPrimaryButton = !isMouse || event.button === 0;
+        const generatedPrimaryPan = phase === "generated" && isPrimaryButton;
+        const drawToolPan = phase === "draw" && drawingTool === "pan" && isPrimaryButton;
+        const middleButtonPan = isMiddleButton && ["draw", "select", "generated"].includes(phase);
+
+        if (!generatedPrimaryPan && !drawToolPan && !middleButtonPan) return;
+        if (
+          phase === "generated" &&
+          !isMiddleButton &&
+          event.target.closest &&
+          event.target.closest(".generatedPlanHotspot")
+        ) return;
+
+        event.preventDefault();
         cancelViewportEase();
         cancelPanInertia();
+        stopDrawAutoPan(true);
+
         isPanning = true;
         panPointerId = event.pointerId;
+        panInteractionMode = phase === "generated" ? "viewport" : "draft";
         lastPanClientX = event.clientX;
         lastPanClientY = event.clientY;
         lastPanMoveTime = performance.now();
         panVelocityX = 0;
         panVelocityY = 0;
         canvas.classList.add("isPanning");
+
+        if (panInteractionMode === "draft") {
+          previewLine.setAttribute("visibility", "hidden");
+          hideAngleGuide();
+        }
+
         try { canvas.setPointerCapture(event.pointerId); } catch (error) {}
       });
 
       function endPan(event) {
         if (!isPanning) return;
         if (event && panPointerId !== null && event.pointerId !== panPointerId) return;
+
+        const finishedMode = panInteractionMode;
         isPanning = false;
         panPointerId = null;
+        panInteractionMode = null;
         canvas.classList.remove("isPanning");
-        startPanInertia();
+
+        if (finishedMode === "viewport") {
+          startPanInertia();
+          return;
+        }
+
+        panVelocityX = 0;
+        panVelocityY = 0;
+
+        // After a middle-button pan during drawing, immediately reconnect the
+        // live preview to the released pointer position so drawing can continue
+        // without requiring an extra mouse move.
+        if (
+          event &&
+          phase === "draw" &&
+          drawingTool !== "pan" &&
+          currentRun &&
+          currentRun.points.length
+        ) {
+          lastDrawPointer = {
+            clientX: event.clientX,
+            clientY: event.clientY,
+            shiftKey: event.shiftKey,
+            altKey: event.altKey,
+            ctrlKey: event.ctrlKey,
+            metaKey: event.metaKey
+          };
+          refreshDrawPreviewFromPointer();
+        }
       }
 
       canvas.addEventListener("pointerup", endPan);
       canvas.addEventListener("pointercancel", endPan);
+      canvas.addEventListener("auxclick", (event) => {
+        if (event.button === 1) event.preventDefault();
+      });
 
       canvas.addEventListener("wheel", (event) => {
-        if (phase !== "generated") return;
         event.preventDefault();
         cancelPanInertia();
 
-        const point = screenToSvg(event);
-        const oldScale = viewScale;
-        const factor = event.deltaY < 0 ? 1.12 : 0.89;
-        const newScale = Math.max(0.35, Math.min(4.5, oldScale * factor));
-        const contentX = (point.x - viewPanX) / oldScale;
-        const contentY = (point.y - viewPanY) / oldScale;
-        const targetPanX = point.x - contentX * newScale;
-        const targetPanY = point.y - contentY * newScale;
-
-        animateViewportTo(newScale, targetPanX, targetPanY, 220);
+        const anchor = screenToCanvas(event);
+        zoomPlannerAt(anchor, event.deltaY < 0 ? "in" : "out", 190);
       }, { passive: false });
 
       document.addEventListener("generatedPlanModelBack", () => {
@@ -10726,6 +11002,7 @@
         }
       });
 
+      updateDrawingToolUi();
       renderPlanner();
     }
 
