@@ -3989,6 +3989,83 @@
       stroke-linecap: round;
       pointer-events: none;
       vector-effect: non-scaling-stroke;
+      transition: stroke 0.12s ease, stroke-width 0.12s ease, filter 0.12s ease;
+    }
+
+    /* Make closing a wall run feel magnetic and unmistakable. When the live
+       endpoint snaps back onto the first point, the preview turns green and a
+       pulsing target appears directly over the closing node. */
+    .generatedPlanPreview.isClosingSnap {
+      stroke: #76ef63;
+      stroke-width: 4;
+      stroke-dasharray: 6 7;
+      filter: drop-shadow(0 0 7px rgba(118, 239, 99, 0.72));
+    }
+
+    .generatedPlanSnapFeedback {
+      pointer-events: none;
+    }
+
+    .generatedPlanSnapHalo,
+    .generatedPlanSnapCore,
+    .generatedPlanSnapBurst {
+      transform-box: fill-box;
+      transform-origin: center;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .generatedPlanSnapHalo {
+      fill: rgba(118, 239, 99, 0.10);
+      stroke: #76ef63;
+      stroke-width: 3;
+      opacity: 0.85;
+      filter: drop-shadow(0 0 8px rgba(118, 239, 99, 0.72));
+      animation: generatedPlanSnapArmed 0.72s ease-in-out infinite alternate;
+    }
+
+    .generatedPlanSnapCore {
+      fill: #8dff78;
+      stroke: rgba(255, 255, 255, 0.96);
+      stroke-width: 2;
+      filter: drop-shadow(0 0 7px rgba(118, 239, 99, 0.95));
+      animation: generatedPlanSnapCorePulse 0.72s ease-in-out infinite alternate;
+    }
+
+    .generatedPlanSnapBurst {
+      fill: none;
+      stroke: #8dff78;
+      stroke-width: 5;
+      opacity: 0;
+    }
+
+    .generatedPlanSnapFeedback.isConfirmed .generatedPlanSnapBurst {
+      animation: generatedPlanSnapConfirm 0.62s cubic-bezier(0.12, 0.8, 0.18, 1) both;
+    }
+
+    .generatedPlanSnapFeedback.isConfirmed .generatedPlanSnapCore {
+      animation: generatedPlanSnapConfirmCore 0.42s cubic-bezier(0.12, 0.8, 0.18, 1) both;
+    }
+
+    @keyframes generatedPlanSnapArmed {
+      from { opacity: 0.56; transform: scale(0.86); }
+      to { opacity: 1; transform: scale(1.18); }
+    }
+
+    @keyframes generatedPlanSnapCorePulse {
+      from { transform: scale(0.88); }
+      to { transform: scale(1.14); }
+    }
+
+    @keyframes generatedPlanSnapConfirm {
+      0% { opacity: 1; transform: scale(0.45); stroke-width: 6; }
+      70% { opacity: 0.7; }
+      100% { opacity: 0; transform: scale(2.8); stroke-width: 1; }
+    }
+
+    @keyframes generatedPlanSnapConfirmCore {
+      0% { transform: scale(0.8); }
+      45% { transform: scale(1.55); }
+      100% { transform: scale(1); }
     }
 
 
@@ -5303,6 +5380,11 @@
       <div class="generatedPlanCanvasWrap" id="generatedPlanCanvasWrap">
         <svg class="generatedPlanCanvas" id="generatedPlanCanvas" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" aria-label="Installation plan drawing canvas">
           <g id="generatedPlanViewport"></g>
+          <g class="generatedPlanSnapFeedback" id="generatedPlanSnapFeedback" visibility="hidden" aria-hidden="true">
+            <circle class="generatedPlanSnapBurst" id="generatedPlanSnapBurst" cx="0" cy="0" r="18"></circle>
+            <circle class="generatedPlanSnapHalo" id="generatedPlanSnapHalo" cx="0" cy="0" r="18"></circle>
+            <circle class="generatedPlanSnapCore" id="generatedPlanSnapCore" cx="0" cy="0" r="6.5"></circle>
+          </g>
           <line class="generatedPlanPreview" id="generatedPlanPreview" x1="0" y1="0" x2="0" y2="0" visibility="hidden"></line>
           <g class="generatedPlanAngleGuide" id="generatedPlanAngleGuide" visibility="hidden" aria-hidden="true">
             <path class="generatedPlanAngleArc" id="generatedPlanAngleArc" d=""></path>
@@ -9289,6 +9371,10 @@
       const canvas = document.querySelector("#generatedPlanCanvas");
       const viewport = document.querySelector("#generatedPlanViewport");
       const previewLine = document.querySelector("#generatedPlanPreview");
+      const snapFeedback = document.querySelector("#generatedPlanSnapFeedback");
+      const snapBurst = document.querySelector("#generatedPlanSnapBurst");
+      const snapHalo = document.querySelector("#generatedPlanSnapHalo");
+      const snapCore = document.querySelector("#generatedPlanSnapCore");
       const angleGuide = document.querySelector("#generatedPlanAngleGuide");
       const angleArc = document.querySelector("#generatedPlanAngleArc");
       const angleArrow = document.querySelector("#generatedPlanAngleArrow");
@@ -9359,6 +9445,7 @@
       let panVelocityX = 0;
       let panVelocityY = 0;
       let lastPanMoveTime = 0;
+      let closingSnapFeedbackTimer = null;
 
       // Drawing-edge auto-pan state. The draft geometry itself is translated
       // while drawing so the user can keep extending a run beyond the space
@@ -9425,6 +9512,7 @@
         if (drawingTool === "pan") {
           stopDrawAutoPan(true);
           previewLine.setAttribute("visibility", "hidden");
+          hideClosingSnapFeedback();
           hideAngleGuide();
           return;
         }
@@ -9470,6 +9558,63 @@
         return best ? copyPoint(best) : point;
       }
 
+      function isClosingSnapPoint(point) {
+        if (!point || !currentRun || currentRun.points.length < 3) return false;
+        const first = currentRun.points[0];
+        const last = currentRun.points[currentRun.points.length - 1];
+        // Once the loop is already closed, do not keep advertising another close.
+        if (pointDistance(first, last) < 0.75) return false;
+        return pointDistance(point, first) < 0.75;
+      }
+
+      function positionClosingSnapFeedback(point) {
+        if (!snapFeedback || !point) return;
+        [snapBurst, snapHalo, snapCore].forEach((element) => {
+          if (!element) return;
+          element.setAttribute("cx", point.x.toFixed(2));
+          element.setAttribute("cy", point.y.toFixed(2));
+        });
+      }
+
+      function hideClosingSnapFeedback({ keepConfirmation = true } = {}) {
+        if (previewLine) previewLine.classList.remove("isClosingSnap");
+        if (!snapFeedback) return;
+        if (keepConfirmation && snapFeedback.classList.contains("isConfirmed")) return;
+        snapFeedback.classList.remove("isArmed", "isConfirmed");
+        snapFeedback.setAttribute("visibility", "hidden");
+      }
+
+      function showClosingSnapFeedback(point) {
+        if (!snapFeedback || !point) return;
+        if (closingSnapFeedbackTimer !== null) {
+          clearTimeout(closingSnapFeedbackTimer);
+          closingSnapFeedbackTimer = null;
+        }
+        positionClosingSnapFeedback(point);
+        snapFeedback.setAttribute("visibility", "visible");
+        snapFeedback.classList.remove("isConfirmed");
+        snapFeedback.classList.add("isArmed");
+        if (previewLine) previewLine.classList.add("isClosingSnap");
+      }
+
+      function confirmClosingSnapFeedback(point) {
+        if (!snapFeedback || !point) return;
+        if (closingSnapFeedbackTimer !== null) clearTimeout(closingSnapFeedbackTimer);
+        positionClosingSnapFeedback(point);
+        snapFeedback.setAttribute("visibility", "visible");
+        snapFeedback.classList.add("isArmed");
+        snapFeedback.classList.remove("isConfirmed");
+        // Force the confirmation animation to restart even on quick repeated snaps.
+        void snapFeedback.getBoundingClientRect();
+        snapFeedback.classList.add("isConfirmed");
+        if (previewLine) previewLine.classList.remove("isClosingSnap");
+        closingSnapFeedbackTimer = setTimeout(() => {
+          closingSnapFeedbackTimer = null;
+          snapFeedback.classList.remove("isArmed", "isConfirmed");
+          snapFeedback.setAttribute("visibility", "hidden");
+        }, 720);
+      }
+
       function screenToCanvas(event) {
         const svgPoint = canvas.createSVGPoint();
         svgPoint.x = event.clientX;
@@ -9489,9 +9634,9 @@
         };
       }
 
-      function zoomPlannerAt(anchorPoint, direction, duration = 220) {
+      function zoomPlannerAt(anchorPoint, direction, duration = 220, easingMode = "standard", zoomFactor = 1.20) {
         const oldScale = viewScale;
-        const factor = direction === "in" ? 1.14 : (1 / 1.14);
+        const factor = direction === "in" ? zoomFactor : (1 / zoomFactor);
         const newScale = Math.max(0.35, Math.min(4.5, oldScale * factor));
         if (Math.abs(newScale - oldScale) < 0.0001) return;
 
@@ -9500,11 +9645,15 @@
         const targetPanX = anchorPoint.x - contentX * newScale;
         const targetPanY = anchorPoint.y - contentY * newScale;
 
-        animateViewportTo(newScale, targetPanX, targetPanY, duration);
+        animateViewportTo(newScale, targetPanX, targetPanY, duration, easingMode);
       }
 
       function zoomPlannerFromButton(direction) {
-        zoomPlannerAt({ x: 500, y: 300 }, direction, 240);
+        // Match the feel of the planner pan: respond immediately, then glide into
+        // the destination with the same friction-style deceleration used by pan
+        // inertia. This is intentionally not a symmetrical motion-graphics ease;
+        // the pan feels natural because the release velocity decays smoothly.
+        zoomPlannerAt({ x: 500, y: 300 }, direction, 420, "panInertia", 1.25);
       }
 
       function applyOrthogonalSnap(point, event) {
@@ -9633,10 +9782,11 @@
         angleGuide.setAttribute("visibility", "visible");
       }
 
-      function finishCurrentRun() {
+      function finishCurrentRun({ keepSnapConfirmation = false } = {}) {
         stopDrawAutoPan(true);
         previewPoint = null;
         previewLine.setAttribute("visibility", "hidden");
+        hideClosingSnapFeedback({ keepConfirmation: keepSnapConfirmation });
         hideAngleGuide();
         if (!currentRun) return;
 
@@ -9733,6 +9883,7 @@
 
       function setPhase(nextPhase) {
         if (nextPhase !== "draw") stopDrawAutoPan(true);
+        hideClosingSnapFeedback({ keepConfirmation: false });
         phase = nextPhase;
         if (nextPhase !== "select") selectionPanMode = false;
         overlay.dataset.phase = nextPhase;
@@ -9771,6 +9922,7 @@
         // Keep the live preview and angle guide locked to the same zoom/pan
         // transform as the wall geometry while drawing.
         if (previewLine) previewLine.setAttribute("transform", transform);
+        if (snapFeedback) snapFeedback.setAttribute("transform", transform);
         if (angleGuide) angleGuide.setAttribute("transform", transform);
       }
 
@@ -9790,7 +9942,7 @@
         panVelocityY = 0;
       }
 
-      function animateViewportTo(targetScale, targetPanX, targetPanY, duration = 260) {
+      function animateViewportTo(targetScale, targetPanX, targetPanY, duration = 260, easingMode = "standard") {
         cancelViewportEase();
         cancelPanInertia();
 
@@ -9801,8 +9953,31 @@
 
         const tick = (now) => {
           const t = Math.min(1, (now - startTime) / Math.max(1, duration));
-          // Smooth ease-out: quick enough to feel responsive, but settles softly.
-          const eased = 1 - Math.pow(1 - t, 3);
+
+          let eased;
+          if (easingMode === "panInertia") {
+            // Use the same 0.88-per-frame decay that makes released panning feel
+            // good. Integrating that decaying velocity gives a quick response and
+            // a long, soft settle without making the overall zoom take longer.
+            const frictionPerFrame = 0.88;
+            const frameMs = 16.667;
+            const decay = -Math.log(frictionPerFrame) / frameMs;
+            const elapsed = t * duration;
+            const normalizer = 1 - Math.exp(-decay * duration);
+            eased = normalizer > 0.000001
+              ? (1 - Math.exp(-decay * elapsed)) / normalizer
+              : t;
+          } else if (easingMode === "cinematicZoom") {
+            eased = t < 0.5
+              ? 0.5 * Math.pow(2 * t, 4)
+              : 1 - 0.5 * Math.pow(2 * (1 - t), 4);
+          } else {
+            // Soft cubic ease-in/out for normal viewport moves.
+            eased = t < 0.5
+              ? 4 * t * t * t
+              : 1 - Math.pow(-2 * t + 2, 3) / 2;
+          }
+
           viewScale = startScale + (targetScale - startScale) * eased;
           viewPanX = startPanX + (targetPanX - startPanX) * eased;
           viewPanY = startPanY + (targetPanY - startPanY) * eased;
@@ -9815,6 +9990,12 @@
           if (t < 1) {
             viewportEaseFrame = requestAnimationFrame(tick);
           } else {
+            // Land exactly on the requested transform so repeated button clicks
+            // always start from a clean, deterministic state.
+            viewScale = targetScale;
+            viewPanX = targetPanX;
+            viewPanY = targetPanY;
+            updateViewportTransform();
             viewportEaseFrame = null;
           }
         };
@@ -9839,6 +10020,10 @@
           viewPanX += panVelocityX * dt;
           viewPanY += panVelocityY * dt;
           updateViewportTransform();
+
+          if (phase === "draw" && drawingTool !== "pan" && lastDrawPointer && currentRun && currentRun.points.length) {
+            refreshDrawPreviewFromPointer();
+          }
 
           // Frame-rate-independent friction gives the drag a gentle ease-out.
           const friction = Math.pow(0.88, dt / 16.667);
@@ -9980,10 +10165,10 @@
       }
 
       function getGeneratedVisualBounds() {
-        // Fit the plan from what is actually visible, not only from the wall
-        // geometry. That means hotspot circles, leader lines and — most
-        // importantly — their title boxes are included in the calculation.
-        if (phase === "generated" && viewport && viewport.childNodes.length) {
+        // FIT PLAN must work while drawing, selecting, and after generation.
+        // In every phase, fit what is actually visible inside the viewport. In
+        // generated mode this also captures hotspot circles, leaders and titles.
+        if (viewport && viewport.childNodes.length) {
           try {
             const box = viewport.getBBox();
             if (
@@ -9991,10 +10176,11 @@
               Number.isFinite(box.y) &&
               Number.isFinite(box.width) &&
               Number.isFinite(box.height) &&
-              box.width > 0 &&
-              box.height > 0
+              box.width >= 0 &&
+              box.height >= 0 &&
+              (box.width > 0 || box.height > 0)
             ) {
-              const visualPad = 18;
+              const visualPad = phase === "generated" ? 18 : 32;
               return {
                 minX: box.x - visualPad,
                 minY: box.y - visualPad,
@@ -10003,13 +10189,32 @@
               };
             }
           } catch (error) {
-            // Fall back to the solver's geometry bounds below.
+            // Fall through to phase-specific geometry below.
           }
         }
 
-        return generatedPlan && generatedPlan.bounds
-          ? generatedPlan.bounds
-          : null;
+        if (phase === "generated") {
+          return generatedPlan && generatedPlan.bounds
+            ? generatedPlan.bounds
+            : null;
+        }
+
+        // Fallback for draft/select mode if getBBox is unavailable: derive bounds
+        // directly from all drawn points, including an in-progress run.
+        const points = [];
+        runs.forEach((run) => run.points.forEach((point) => points.push(point)));
+        if (currentRun) currentRun.points.forEach((point) => points.push(point));
+        if (!points.length) return null;
+
+        const xs = points.map((point) => point.x);
+        const ys = points.map((point) => point.y);
+        const visualPad = 32;
+        return {
+          minX: Math.min(...xs) - visualPad,
+          minY: Math.min(...ys) - visualPad,
+          maxX: Math.max(...xs) + visualPad,
+          maxY: Math.max(...ys) + visualPad
+        };
       }
 
       function getGeneratedFitArea() {
@@ -11086,13 +11291,24 @@
         point = applyOrthogonalSnap(point, event);
 
         if (!currentRun) currentRun = { points: [] };
+        const closesToFirstPoint = isClosingSnapPoint(point);
         const last = currentRun.points[currentRun.points.length - 1];
         if (last && pointDistance(last, point) < MIN_SEGMENT_LENGTH) return;
 
         currentRun.points.push(point);
         previewPoint = point;
         hideAngleGuide();
-        renderPlanner();
+
+        if (closesToFirstPoint) {
+          // Closing back onto the first node completes this wall run. Preserve the
+          // green confirmation burst, commit the run immediately, and leave the
+          // next click ready to begin a completely separate run.
+          confirmClosingSnapFeedback(point);
+          finishCurrentRun({ keepSnapConfirmation: true });
+        } else {
+          renderPlanner();
+          hideClosingSnapFeedback();
+        }
       });
 
       canvas.addEventListener("pointermove", (event) => {
@@ -11130,6 +11346,7 @@
             lastDrawPointer = null;
             stopDrawAutoPan(false);
             previewLine.setAttribute("visibility", "hidden");
+            hideClosingSnapFeedback();
             hideAngleGuide();
             return;
           }
@@ -11137,6 +11354,7 @@
           if (!currentRun || !currentRun.points.length) {
             lastDrawPointer = null;
             previewLine.setAttribute("visibility", "hidden");
+            hideClosingSnapFeedback();
             return;
           }
 
@@ -11158,6 +11376,13 @@
           previewLine.setAttribute("x2", point.x);
           previewLine.setAttribute("y2", point.y);
           previewLine.setAttribute("visibility", "visible");
+
+          if (isClosingSnapPoint(point)) {
+            showClosingSnapFeedback(currentRun.points[0]);
+          } else {
+            hideClosingSnapFeedback();
+          }
+
           updateAngleGuide(point, event);
           return;
         }
@@ -11167,6 +11392,7 @@
         if (phase === "draw") {
           stopDrawAutoPan(false);
           previewLine.setAttribute("visibility", "hidden");
+          hideClosingSnapFeedback({ keepConfirmation: true });
           hideAngleGuide();
         }
       });
@@ -11262,7 +11488,10 @@
 
         isPanning = true;
         panPointerId = event.pointerId;
-        panInteractionMode = (phase === "generated" || phase === "select") ? "viewport" : "draft";
+        // Use the same viewport-based pan in every planner phase. This gives
+        // drawing-mode panning the same smooth inertia/ease as selection and
+        // generated-plan navigation without changing the actual wall geometry.
+        panInteractionMode = "viewport";
         lastPanClientX = event.clientX;
         lastPanClientY = event.clientY;
         lastPanMoveTime = performance.now();
@@ -11270,7 +11499,7 @@
         panVelocityY = 0;
         canvas.classList.add("isPanning");
 
-        if (panInteractionMode === "draft") {
+        if (phase === "draw") {
           previewLine.setAttribute("visibility", "hidden");
           hideAngleGuide();
         }
@@ -11288,17 +11517,10 @@
         panInteractionMode = null;
         canvas.classList.remove("isPanning");
 
-        if (finishedMode === "viewport") {
-          startPanInertia();
-          return;
-        }
-
-        panVelocityX = 0;
-        panVelocityY = 0;
-
         // After a middle-button pan during drawing, immediately reconnect the
         // live preview to the released pointer position so drawing can continue
-        // without requiring an extra mouse move.
+        // without requiring an extra mouse move. Keeping this pointer snapshot
+        // also lets the preview stay attached while the pan eases to a stop.
         if (
           event &&
           phase === "draw" &&
@@ -11316,6 +11538,14 @@
           };
           refreshDrawPreviewFromPointer();
         }
+
+        if (finishedMode === "viewport") {
+          startPanInertia();
+          return;
+        }
+
+        panVelocityX = 0;
+        panVelocityY = 0;
       }
 
       canvas.addEventListener("pointerup", endPan);
@@ -11329,7 +11559,7 @@
         cancelPanInertia();
 
         const anchor = screenToCanvas(event);
-        zoomPlannerAt(anchor, event.deltaY < 0 ? "in" : "out", 190);
+        zoomPlannerAt(anchor, event.deltaY < 0 ? "in" : "out", 190, "standard", 1.20);
       }, { passive: false });
 
       document.addEventListener("generatedPlanModelBack", () => {
