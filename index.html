@@ -4388,7 +4388,8 @@
       vector-effect: non-scaling-stroke;
     }
 
-    .generatedPlanPreview {
+    .generatedPlanPreview,
+    .generatedPlanArcPreview {
       stroke: rgba(255, 255, 255, 0.55);
       stroke-width: 3;
       stroke-dasharray: 8 10;
@@ -4398,10 +4399,60 @@
       transition: stroke 0.12s ease, stroke-width 0.12s ease, filter 0.12s ease;
     }
 
+    .generatedPlanArcPreview {
+      fill: none;
+    }
+
+    /* CURVE drawing/edit handles. These intentionally resemble the thin guide
+       the user sketched: a restrained yellow handle with a small endpoint dot.
+       When a tangent lines up with the adjoining wall it snaps and turns green. */
+    .generatedPlanBezierHandles {
+      pointer-events: none;
+    }
+
+    .generatedPlanBezierHandleLine {
+      stroke: rgba(225, 211, 28, 0.88);
+      stroke-width: 2;
+      fill: none;
+      vector-effect: non-scaling-stroke;
+      pointer-events: none;
+    }
+
+    .generatedPlanBezierHandleDot {
+      fill: #e1d31c;
+      stroke: rgba(20, 20, 20, 0.82);
+      stroke-width: 1.5;
+      vector-effect: non-scaling-stroke;
+      pointer-events: none;
+    }
+
+    .generatedPlanBezierHandles.isEditable .generatedPlanBezierHandleDot {
+      pointer-events: auto;
+      cursor: grab;
+      r: 7;
+    }
+
+    .generatedPlanBezierHandles.isDragging .generatedPlanBezierHandleDot {
+      cursor: grabbing;
+    }
+
+    .generatedPlanBezierHandleLine.isSnapped {
+      stroke: #76ef63;
+      stroke-width: 2.5;
+      filter: drop-shadow(0 0 5px rgba(118, 239, 99, 0.55));
+    }
+
+    .generatedPlanBezierHandleDot.isSnapped {
+      fill: #8dff78;
+      stroke: rgba(255,255,255,0.92);
+      filter: drop-shadow(0 0 5px rgba(118, 239, 99, 0.55));
+    }
+
     /* Make closing a wall run feel magnetic and unmistakable. When the live
        endpoint snaps back onto the first point, the preview turns green and a
        pulsing target appears directly over the closing node. */
-    .generatedPlanPreview.isClosingSnap {
+    .generatedPlanPreview.isClosingSnap,
+    .generatedPlanArcPreview.isClosingSnap {
       stroke: #76ef63;
       stroke-width: 4;
       stroke-dasharray: 6 7;
@@ -5877,6 +5928,13 @@
             <circle class="generatedPlanSnapCore" id="generatedPlanSnapCore" cx="0" cy="0" r="6.5"></circle>
           </g>
           <line class="generatedPlanPreview" id="generatedPlanPreview" x1="0" y1="0" x2="0" y2="0" visibility="hidden"></line>
+          <path class="generatedPlanArcPreview" id="generatedPlanArcPreview" d="" visibility="hidden" aria-hidden="true"></path>
+          <g class="generatedPlanBezierHandles" id="generatedPlanBezierHandles" visibility="hidden" aria-hidden="true">
+            <line class="generatedPlanBezierHandleLine" id="generatedPlanBezierStartLine" x1="0" y1="0" x2="0" y2="0"></line>
+            <line class="generatedPlanBezierHandleLine" id="generatedPlanBezierEndLine" x1="0" y1="0" x2="0" y2="0"></line>
+            <circle class="generatedPlanBezierHandleDot" id="generatedPlanBezierStartDot" data-curve-handle="start" cx="0" cy="0" r="5.5"></circle>
+            <circle class="generatedPlanBezierHandleDot" id="generatedPlanBezierEndDot" data-curve-handle="end" cx="0" cy="0" r="5.5"></circle>
+          </g>
           <g class="generatedPlanAngleGuide" id="generatedPlanAngleGuide" visibility="hidden" aria-hidden="true">
             <path class="generatedPlanAngleArc" id="generatedPlanAngleArc" d=""></path>
             <path class="generatedPlanAngleArrow" id="generatedPlanAngleArrow" d=""></path>
@@ -5904,6 +5962,9 @@
             <button class="generatedPlanToolButton" type="button" data-generated-plan-tool="angle" aria-label="Draw wall at an angle" aria-pressed="false" title="Draw wall at an angle (SHIFT)">
               <img src="draw angle.png" alt="" aria-hidden="true" />
             </button>
+            <button class="generatedPlanToolButton" type="button" data-generated-plan-tool="arch" aria-label="Draw curved wall" aria-pressed="false" title="Draw curved wall (CTRL)">
+              <img src="draw arch.png" alt="" aria-hidden="true" />
+            </button>
           </div>
 
           <div class="generatedPlanToolGroup generatedPlanSelectionTools" aria-label="Wall selection controls">
@@ -5928,7 +5989,7 @@
           </div>
         </div>
 
-        <div class="generatedPlanHint" id="generatedPlanHint">90° SNAP ON · Hold SHIFT for any angle · Middle-drag to pan · Right-click or ACCEPT to stop drawing.</div>
+        <div class="generatedPlanHint" id="generatedPlanHint">90° SNAP ON · SHIFT = any angle · CTRL = curved wall · Middle-drag to pan · Right-click or ACCEPT to stop drawing.</div>
         <div class="generatedPlanEmptyState" id="generatedPlanEmptyState">Click anywhere to place the first point, then keep clicking to draw your walls.</div>
       </div>
 
@@ -9898,6 +9959,12 @@
       const canvas = document.querySelector("#generatedPlanCanvas");
       const viewport = document.querySelector("#generatedPlanViewport");
       const previewLine = document.querySelector("#generatedPlanPreview");
+      const arcPreview = document.querySelector("#generatedPlanArcPreview");
+      const bezierHandles = document.querySelector("#generatedPlanBezierHandles");
+      const bezierStartLine = document.querySelector("#generatedPlanBezierStartLine");
+      const bezierEndLine = document.querySelector("#generatedPlanBezierEndLine");
+      const bezierStartDot = document.querySelector("#generatedPlanBezierStartDot");
+      const bezierEndDot = document.querySelector("#generatedPlanBezierEndDot");
       const snapFeedback = document.querySelector("#generatedPlanSnapFeedback");
       const snapBurst = document.querySelector("#generatedPlanSnapBurst");
       const snapHalo = document.querySelector("#generatedPlanSnapHalo");
@@ -9953,6 +10020,19 @@
       let runs = [];
       let currentRun = null;
       let previewPoint = null;
+      // Curved walls use cubic Bezier segments. The first click locks the chord/end
+      // point; pointer movement adjusts the bulge and the two tangent handles; the
+      // next click accepts the curve. If the start tangent approaches the previous
+      // wall direction it magnetically snaps collinear for a seamless installation.
+      let pendingArc = null;
+      // Selecting CURVE after a run is finished lets the user click a curved-wall
+      // endpoint and drag its Bezier handles to refine the entry/exit tangent.
+      let curveEdit = null;
+      let curveHandleDrag = null;
+      // Pointer capture can cause the synthetic click that follows a Bezier-handle
+      // drag to land on the canvas. Suppress only that immediate click so releasing
+      // a handle accepts the edit instead of accidentally starting a new wall.
+      let suppressCanvasClickUntil = 0;
       let selectedSegments = new Set();
       // Ctrl/Cmd+Z in selection mode restores the previous selection/face state.
       // Keep this separate from drawing undo so each workflow behaves naturally.
@@ -10007,6 +10087,10 @@
         return drawingTool === "angle" || Boolean(event && event.shiftKey);
       }
 
+      function isArchMode(event) {
+        return drawingTool === "arch" || Boolean(event && event.ctrlKey);
+      }
+
       function updateDrawingToolUi() {
         drawToolButtons.forEach((button) => {
           const tool = button.dataset.generatedPlanTool;
@@ -10047,7 +10131,7 @@
       }
 
       function setDrawingTool(nextTool) {
-        if (!nextTool || !["draw", "angle", "pan"].includes(nextTool)) return;
+        if (!nextTool || !["draw", "angle", "arch", "pan"].includes(nextTool)) return;
 
         if (nextTool === "pan" && phase === "select") {
           selectionPanMode = !selectionPanMode;
@@ -10064,12 +10148,27 @@
 
         if (phase !== "draw") return;
 
+        // Leaving ARCH while its end point is locked cancels only the unfinished
+        // curve; accepted wall geometry remains untouched.
+        if (pendingArc && nextTool !== "arch") {
+          pendingArc = null;
+          if (arcPreview) arcPreview.setAttribute("visibility", "hidden");
+        }
+        if (curveEdit && nextTool !== "arch") {
+          curveEdit = null;
+          curveHandleDrag = null;
+        }
+
         drawingTool = nextTool;
+        if (phase === "draw" && !curveEdit) {
+          status.textContent = "Draw one or more wall runs. Separate runs are allowed.";
+        }
         updateDrawingToolUi();
 
         if (drawingTool === "pan") {
           stopDrawAutoPan(true);
           previewLine.setAttribute("visibility", "hidden");
+          if (arcPreview) arcPreview.setAttribute("visibility", "hidden");
           hideClosingSnapFeedback();
           hideAngleGuide();
           return;
@@ -10094,6 +10193,427 @@
 
       function copyPoint(point) {
         return { x: point.x, y: point.y };
+      }
+
+      function ensureRunSegments(run) {
+        if (!run) return [];
+        if (!Array.isArray(run.segments)) run.segments = [];
+        while (run.segments.length < Math.max(0, run.points.length - 1)) {
+          run.segments.push({ type: "line" });
+        }
+        if (run.segments.length > Math.max(0, run.points.length - 1)) {
+          run.segments.length = Math.max(0, run.points.length - 1);
+        }
+        return run.segments;
+      }
+
+      function sampleQuadraticBezier(a, control, b, forcedSteps = null) {
+        const chord = pointDistance(a, b);
+        const controlTravel = pointDistance(a, control) + pointDistance(control, b);
+        const estimate = Math.max(chord, controlTravel);
+        const steps = forcedSteps || Math.max(10, Math.min(56, Math.ceil(estimate / 13)));
+        const points = [];
+        for (let i = 0; i <= steps; i += 1) {
+          const t = i / steps;
+          const mt = 1 - t;
+          points.push({
+            x: mt * mt * a.x + 2 * mt * t * control.x + t * t * b.x,
+            y: mt * mt * a.y + 2 * mt * t * control.y + t * t * b.y
+          });
+        }
+        return points;
+      }
+
+      function sampleCubicBezier(a, control1, control2, b, forcedSteps = null) {
+        const chord = pointDistance(a, b);
+        const controlTravel = pointDistance(a, control1) + pointDistance(control1, control2) + pointDistance(control2, b);
+        const estimate = Math.max(chord, controlTravel);
+        const steps = forcedSteps || Math.max(12, Math.min(72, Math.ceil(estimate / 11)));
+        const points = [];
+        for (let i = 0; i <= steps; i += 1) {
+          const t = i / steps;
+          const mt = 1 - t;
+          points.push({
+            x: mt * mt * mt * a.x + 3 * mt * mt * t * control1.x + 3 * mt * t * t * control2.x + t * t * t * b.x,
+            y: mt * mt * mt * a.y + 3 * mt * mt * t * control1.y + 3 * mt * t * t * control2.y + t * t * t * b.y
+          });
+        }
+        return points;
+      }
+
+      function segmentRenderPoints(segment) {
+        if (!segment) return [];
+        if (segment.type === "arc") {
+          if (segment.control1 && segment.control2) {
+            return sampleCubicBezier(segment.a, segment.control1, segment.control2, segment.b);
+          }
+          // Backward compatibility for any curve created by the earlier quadratic
+          // implementation while this file remains open during development.
+          if (segment.control) return sampleQuadraticBezier(segment.a, segment.control, segment.b);
+        }
+        return [copyPoint(segment.a), copyPoint(segment.b)];
+      }
+
+      function getRunExpandedGeometry(run) {
+        if (!run || !run.points || run.points.length < 2) return { points: [], ranges: [] };
+        const defs = ensureRunSegments(run);
+        const points = [];
+        const ranges = [];
+        for (let i = 0; i < run.points.length - 1; i += 1) {
+          const def = defs[i] || { type: "line" };
+          const logical = {
+            a: run.points[i],
+            b: run.points[i + 1],
+            type: def.type || "line",
+            control: def.control || null,
+            control1: def.control1 || null,
+            control2: def.control2 || null
+          };
+          const sampled = segmentRenderPoints(logical);
+          const start = points.length ? points.length - 1 : 0;
+          if (!points.length) points.push(...sampled.map(copyPoint));
+          else points.push(...sampled.slice(1).map(copyPoint));
+          ranges.push({ start, end: points.length - 1 });
+        }
+        return { points, ranges };
+      }
+
+      function polylinePathD(points) {
+        if (!points || !points.length) return "";
+        return points.map((point, index) => `${index ? "L" : "M"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(" ");
+      }
+
+      function drawPolyline(parent, points, className, extra = {}) {
+        if (!points || points.length < 2) return null;
+        const path = createSvg("path", {
+          d: polylinePathD(points),
+          class: className,
+          fill: "none",
+          ...extra
+        });
+        parent.appendChild(path);
+        return path;
+      }
+
+      function drawPlanSegment(parent, segment, className, extra = {}) {
+        const points = segment.renderPoints || segmentRenderPoints(segment);
+        return points.length > 2
+          ? drawPolyline(parent, points, className, extra)
+          : drawLine(parent, segment.a, segment.b, className, extra);
+      }
+
+      function normalizeVector(vector, fallback = { x: 1, y: 0 }) {
+        const length = Math.hypot(vector.x, vector.y);
+        if (length < 0.0001) return { x: fallback.x, y: fallback.y };
+        return { x: vector.x / length, y: vector.y / length };
+      }
+
+      function angleBetweenDirections(a, b) {
+        const na = normalizeVector(a);
+        const nb = normalizeVector(b);
+        const dot = Math.max(-1, Math.min(1, na.x * nb.x + na.y * nb.y));
+        return Math.acos(dot) * 180 / Math.PI;
+      }
+
+      function lerpDirection(a, b, t) {
+        return normalizeVector({
+          x: a.x * (1 - t) + b.x * t,
+          y: a.y * (1 - t) + b.y * t
+        }, a);
+      }
+
+      function incomingDirectionAtRunEnd(run) {
+        if (!run || !run.points || run.points.length < 2) return null;
+        const segmentIndex = run.points.length - 2;
+        const def = ensureRunSegments(run)[segmentIndex] || { type: "line" };
+        const a = run.points[segmentIndex];
+        const b = run.points[segmentIndex + 1];
+        if (def.type === "arc") {
+          if (def.control2) return normalizeVector({ x: b.x - def.control2.x, y: b.y - def.control2.y });
+          if (def.control) return normalizeVector({ x: b.x - def.control.x, y: b.y - def.control.y });
+        }
+        return normalizeVector({ x: b.x - a.x, y: b.y - a.y });
+      }
+
+      function cubicArcControlsFromPointer(start, end, pointer, previousDirection = null) {
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        const length = Math.max(0.0001, Math.hypot(dx, dy));
+        const chord = { x: dx / length, y: dy / length };
+        const normal = { x: -chord.y, y: chord.x };
+        const midpoint = { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
+        const signedBulge = (pointer.x - midpoint.x) * normal.x + (pointer.y - midpoint.y) * normal.y;
+        const sideSign = signedBulge < 0 ? -1 : 1;
+        const sideNormal = { x: normal.x * sideSign, y: normal.y * sideSign };
+        const absBulge = Math.abs(signedBulge);
+
+        // As the arch grows, rotate the start tangent away from the chord and
+        // toward the natural continuation of the previous wall. This is the
+        // behaviour shown by the user's yellow Photoshop handle.
+        const rawStrength = Math.max(0, Math.min(1, absBulge / Math.max(24, length * 0.34)));
+        const strength = rawStrength * rawStrength * (3 - 2 * rawStrength);
+        const previousCompatible = previousDirection
+          && (previousDirection.x * sideNormal.x + previousDirection.y * sideNormal.y) > 0.24;
+        const startTarget = previousCompatible ? normalizeVector(previousDirection) : sideNormal;
+        let startDirection = lerpDirection(chord, startTarget, strength);
+        let startSnapped = false;
+
+        // A modest magnetic tolerance makes it easy to achieve a mathematically
+        // smooth tangent without requiring pixel-perfect pointer movement.
+        if (previousCompatible && angleBetweenDirections(startDirection, previousDirection) <= 7) {
+          startDirection = normalizeVector(previousDirection);
+          startSnapped = true;
+        }
+
+        // The far end mirrors the arch naturally. It can later be refined with
+        // the editable Bezier handle if another wall continues from that node.
+        const endTarget = { x: -sideNormal.x, y: -sideNormal.y };
+        const endDirection = lerpDirection(chord, endTarget, strength);
+        const handleLength = Math.max(18, Math.min(length * 0.78, length * 0.24 + absBulge * 1.08));
+
+        return {
+          control1: {
+            x: start.x + startDirection.x * handleLength,
+            y: start.y + startDirection.y * handleLength
+          },
+          control2: {
+            x: end.x - endDirection.x * handleLength,
+            y: end.y - endDirection.y * handleLength
+          },
+          startSnapped,
+          signedBulge
+        };
+      }
+
+      function updatePendingArcPreview(pointer) {
+        if (!pendingArc || !arcPreview) return;
+        const controls = cubicArcControlsFromPointer(
+          pendingArc.start,
+          pendingArc.end,
+          pointer,
+          pendingArc.previousDirection
+        );
+        pendingArc.control1 = controls.control1;
+        pendingArc.control2 = controls.control2;
+        pendingArc.startSnapped = controls.startSnapped;
+        pendingArc.signedBulge = controls.signedBulge;
+        const sampled = sampleCubicBezier(
+          pendingArc.start,
+          pendingArc.control1,
+          pendingArc.control2,
+          pendingArc.end
+        );
+        arcPreview.setAttribute("d", polylinePathD(sampled));
+        arcPreview.setAttribute("visibility", "visible");
+        previewLine.setAttribute("visibility", "hidden");
+        hideAngleGuide();
+        updateCurveHandleOverlay();
+      }
+
+      function getCurveEditData() {
+        if (!curveEdit) return null;
+        const run = runs[curveEdit.runIndex];
+        if (!run || curveEdit.segmentIndex < 0 || curveEdit.segmentIndex >= run.points.length - 1) return null;
+        const def = ensureRunSegments(run)[curveEdit.segmentIndex];
+        if (!def || def.type !== "arc") return null;
+
+        // Promote a legacy quadratic curve to cubic controls when it is first edited.
+        if ((!def.control1 || !def.control2) && def.control) {
+          const a = run.points[curveEdit.segmentIndex];
+          const b = run.points[curveEdit.segmentIndex + 1];
+          def.control1 = {
+            x: a.x + (def.control.x - a.x) * (2 / 3),
+            y: a.y + (def.control.y - a.y) * (2 / 3)
+          };
+          def.control2 = {
+            x: b.x + (def.control.x - b.x) * (2 / 3),
+            y: b.y + (def.control.y - b.y) * (2 / 3)
+          };
+        }
+        if (!def.control1 || !def.control2) return null;
+        return {
+          run,
+          def,
+          a: run.points[curveEdit.segmentIndex],
+          b: run.points[curveEdit.segmentIndex + 1]
+        };
+      }
+
+      function adjacentHandleSnapDirection(run, segmentIndex, handleName) {
+        const defs = ensureRunSegments(run);
+        if (handleName === "start") {
+          if (segmentIndex <= 0) return null;
+          const prevDef = defs[segmentIndex - 1] || { type: "line" };
+          const prevA = run.points[segmentIndex - 1];
+          const node = run.points[segmentIndex];
+          if (prevDef.type === "arc") {
+            if (prevDef.control2) return normalizeVector({ x: node.x - prevDef.control2.x, y: node.y - prevDef.control2.y });
+            if (prevDef.control) return normalizeVector({ x: node.x - prevDef.control.x, y: node.y - prevDef.control.y });
+          }
+          return normalizeVector({ x: node.x - prevA.x, y: node.y - prevA.y });
+        }
+
+        if (segmentIndex >= run.points.length - 2) return null;
+        const nextDef = defs[segmentIndex + 1] || { type: "line" };
+        const node = run.points[segmentIndex + 1];
+        const nextB = run.points[segmentIndex + 2];
+        if (nextDef.type === "arc") {
+          if (nextDef.control1) return normalizeVector({ x: nextDef.control1.x - node.x, y: nextDef.control1.y - node.y });
+          if (nextDef.control) return normalizeVector({ x: nextDef.control.x - node.x, y: nextDef.control.y - node.y });
+        }
+        return normalizeVector({ x: nextB.x - node.x, y: nextB.y - node.y });
+      }
+
+      function updateCurveHandleOverlay() {
+        if (!bezierHandles) return;
+        let a = null;
+        let b = null;
+        let c1 = null;
+        let c2 = null;
+        let editable = false;
+        let startSnapped = false;
+        let endSnapped = false;
+
+        if (pendingArc && pendingArc.control1 && pendingArc.control2) {
+          a = pendingArc.start;
+          b = pendingArc.end;
+          c1 = pendingArc.control1;
+          c2 = pendingArc.control2;
+          startSnapped = Boolean(pendingArc.startSnapped);
+        } else {
+          const editData = getCurveEditData();
+          if (editData) {
+            a = editData.a;
+            b = editData.b;
+            c1 = editData.def.control1;
+            c2 = editData.def.control2;
+            editable = true;
+            const prevDir = adjacentHandleSnapDirection(editData.run, curveEdit.segmentIndex, "start");
+            const nextDir = adjacentHandleSnapDirection(editData.run, curveEdit.segmentIndex, "end");
+            if (prevDir) startSnapped = angleBetweenDirections({ x: c1.x - a.x, y: c1.y - a.y }, prevDir) < 0.8;
+            if (nextDir) endSnapped = angleBetweenDirections({ x: b.x - c2.x, y: b.y - c2.y }, nextDir) < 0.8;
+          }
+        }
+
+        if (!a || !b || !c1 || !c2) {
+          bezierHandles.setAttribute("visibility", "hidden");
+          bezierHandles.classList.remove("isEditable", "isDragging");
+          return;
+        }
+
+        bezierStartLine.setAttribute("x1", a.x);
+        bezierStartLine.setAttribute("y1", a.y);
+        bezierStartLine.setAttribute("x2", c1.x);
+        bezierStartLine.setAttribute("y2", c1.y);
+        bezierEndLine.setAttribute("x1", b.x);
+        bezierEndLine.setAttribute("y1", b.y);
+        bezierEndLine.setAttribute("x2", c2.x);
+        bezierEndLine.setAttribute("y2", c2.y);
+        bezierStartDot.setAttribute("cx", c1.x);
+        bezierStartDot.setAttribute("cy", c1.y);
+        bezierEndDot.setAttribute("cx", c2.x);
+        bezierEndDot.setAttribute("cy", c2.y);
+
+        bezierStartLine.classList.toggle("isSnapped", startSnapped);
+        bezierStartDot.classList.toggle("isSnapped", startSnapped);
+        bezierEndLine.classList.toggle("isSnapped", endSnapped);
+        bezierEndDot.classList.toggle("isSnapped", endSnapped);
+        bezierHandles.classList.toggle("isEditable", editable);
+        bezierHandles.classList.toggle("isDragging", Boolean(curveHandleDrag));
+        bezierHandles.setAttribute("visibility", "visible");
+      }
+
+      function findEditableCurveEndpoint(point) {
+        const threshold = 18 / Math.max(0.35, viewScale);
+        let best = null;
+        let bestDistance = threshold;
+        getSegments().forEach((segment) => {
+          if (segment.type !== "arc") return;
+          const da = pointDistance(point, segment.a);
+          const db = pointDistance(point, segment.b);
+          const distance = Math.min(da, db);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            best = { runIndex: segment.runIndex, segmentIndex: segment.segmentIndex };
+          }
+        });
+        return best;
+      }
+
+      function updateCurveEditHandle(handleName, pointer) {
+        const editData = getCurveEditData();
+        if (!editData) return;
+        const endpoint = handleName === "start" ? editData.a : editData.b;
+        let vector = { x: pointer.x - endpoint.x, y: pointer.y - endpoint.y };
+        let length = Math.max(12, Math.hypot(vector.x, vector.y));
+        let direction = normalizeVector(vector);
+        const adjoiningDirection = adjacentHandleSnapDirection(editData.run, curveEdit.segmentIndex, handleName);
+
+        if (adjoiningDirection) {
+          // The END handle points backwards from the node while the tangent itself
+          // points forward into the following wall.
+          const snapHandleDirection = handleName === "start"
+            ? adjoiningDirection
+            : { x: -adjoiningDirection.x, y: -adjoiningDirection.y };
+          if (angleBetweenDirections(direction, snapHandleDirection) <= 7) {
+            direction = snapHandleDirection;
+          }
+        }
+
+        const next = {
+          x: endpoint.x + direction.x * length,
+          y: endpoint.y + direction.y * length
+        };
+        if (handleName === "start") editData.def.control1 = next;
+        else editData.def.control2 = next;
+        renderPlanner();
+      }
+
+      function polylineLength(points) {
+        let total = 0;
+        for (let i = 1; i < points.length; i += 1) total += pointDistance(points[i - 1], points[i]);
+        return total;
+      }
+
+      function pointAtPolylineDistance(points, distance) {
+        if (!points || !points.length) return null;
+        if (distance <= 0) return copyPoint(points[0]);
+        let remaining = distance;
+        for (let i = 1; i < points.length; i += 1) {
+          const a = points[i - 1];
+          const b = points[i];
+          const len = pointDistance(a, b);
+          if (remaining <= len || i === points.length - 1) {
+            const t = len > 0.0001 ? Math.max(0, Math.min(1, remaining / len)) : 0;
+            return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+          }
+          remaining -= len;
+        }
+        return copyPoint(points[points.length - 1]);
+      }
+
+      function slicePolylineByDistance(points, startDistance, endDistance) {
+        const total = polylineLength(points);
+        const start = Math.max(0, Math.min(total, startDistance));
+        const end = Math.max(start, Math.min(total, endDistance));
+        const result = [pointAtPolylineDistance(points, start)];
+        let walked = 0;
+        for (let i = 1; i < points.length; i += 1) {
+          const segLen = pointDistance(points[i - 1], points[i]);
+          const nextWalked = walked + segLen;
+          if (nextWalked > start + 0.001 && nextWalked < end - 0.001) result.push(copyPoint(points[i]));
+          walked = nextWalked;
+        }
+        result.push(pointAtPolylineDistance(points, end));
+        return result.filter(Boolean);
+      }
+
+      function trimPolylineEnds(points, startClearance, endClearance) {
+        const total = polylineLength(points);
+        if (total < 0.001) return points ? points.map(copyPoint) : [];
+        const start = Math.min(startClearance, Math.max(0, total - 1));
+        const end = Math.max(start, total - Math.min(endClearance, Math.max(0, total - start - 1)));
+        return slicePolylineByDistance(points, start, end);
       }
 
       function rememberSelectionState() {
@@ -10123,8 +10643,19 @@
 
       function allPoints() {
         const points = [];
-        runs.forEach((run) => run.points.forEach((point) => points.push(point)));
-        if (currentRun) currentRun.points.forEach((point) => points.push(point));
+        runs.forEach((run) => {
+          const expanded = getRunExpandedGeometry(run);
+          if (expanded.points.length) points.push(...expanded.points);
+          else run.points.forEach((point) => points.push(point));
+        });
+        if (currentRun) {
+          const expanded = getRunExpandedGeometry(currentRun);
+          if (expanded.points.length) points.push(...expanded.points);
+          else currentRun.points.forEach((point) => points.push(point));
+        }
+        if (pendingArc && pendingArc.control1 && pendingArc.control2) {
+          points.push(...sampleCubicBezier(pendingArc.start, pendingArc.control1, pendingArc.control2, pendingArc.end));
+        }
         return points;
       }
 
@@ -10161,6 +10692,7 @@
 
       function hideClosingSnapFeedback({ keepConfirmation = true } = {}) {
         if (previewLine) previewLine.classList.remove("isClosingSnap");
+        if (arcPreview) arcPreview.classList.remove("isClosingSnap");
         if (!snapFeedback) return;
         if (keepConfirmation && snapFeedback.classList.contains("isConfirmed")) return;
         snapFeedback.classList.remove("isArmed", "isConfirmed");
@@ -10178,6 +10710,7 @@
         snapFeedback.classList.remove("isConfirmed");
         snapFeedback.classList.add("isArmed");
         if (previewLine) previewLine.classList.add("isClosingSnap");
+        if (arcPreview && pendingArc) arcPreview.classList.add("isClosingSnap");
       }
 
       function confirmClosingSnapFeedback(point) {
@@ -10191,6 +10724,7 @@
         void snapFeedback.getBoundingClientRect();
         snapFeedback.classList.add("isConfirmed");
         if (previewLine) previewLine.classList.remove("isClosingSnap");
+        if (arcPreview) arcPreview.classList.remove("isClosingSnap");
         closingSnapFeedbackTimer = setTimeout(() => {
           closingSnapFeedbackTimer = null;
           snapFeedback.classList.remove("isArmed", "isConfirmed");
@@ -10367,8 +10901,11 @@
 
       function finishCurrentRun({ keepSnapConfirmation = false } = {}) {
         stopDrawAutoPan(true);
+        pendingArc = null;
+        curveHandleDrag = null;
         previewPoint = null;
         previewLine.setAttribute("visibility", "hidden");
+        if (arcPreview) arcPreview.setAttribute("visibility", "hidden");
         hideClosingSnapFeedback({ keepConfirmation: keepSnapConfirmation });
         hideAngleGuide();
         if (!currentRun) return;
@@ -10381,7 +10918,17 @@
       }
 
       function undoLastPoint() {
+        if (pendingArc) {
+          pendingArc = null;
+          previewPoint = currentRun && currentRun.points.length ? copyPoint(currentRun.points[currentRun.points.length - 1]) : null;
+          if (arcPreview) arcPreview.setAttribute("visibility", "hidden");
+          hideClosingSnapFeedback();
+          renderPlanner();
+          return;
+        }
+
         if (currentRun && currentRun.points.length) {
+          if (currentRun.points.length > 1) ensureRunSegments(currentRun).pop();
           currentRun.points.pop();
           if (!currentRun.points.length) currentRun = null;
           previewPoint = null;
@@ -10393,7 +10940,16 @@
         if (!lastRun) return;
 
         runs.pop();
-        currentRun = { points: lastRun.points.slice() };
+        currentRun = {
+          points: lastRun.points.map(copyPoint),
+          segments: ensureRunSegments(lastRun).map((segment) => ({
+            type: segment.type || "line",
+            control: segment.control ? copyPoint(segment.control) : null,
+            control1: segment.control1 ? copyPoint(segment.control1) : null,
+            control2: segment.control2 ? copyPoint(segment.control2) : null
+          }))
+        };
+        if (currentRun.points.length > 1) currentRun.segments.pop();
         currentRun.points.pop();
         if (!currentRun.points.length) currentRun = null;
         selectedSegments.clear();
@@ -10403,14 +10959,22 @@
       function getSegments() {
         const segments = [];
         runs.forEach((run, runIndex) => {
+          const defs = ensureRunSegments(run);
           for (let i = 0; i < run.points.length - 1; i += 1) {
-            segments.push({
+            const def = defs[i] || { type: "line" };
+            const segment = {
               id: `r${runIndex}s${i}`,
               runIndex,
               segmentIndex: i,
               a: run.points[i],
-              b: run.points[i + 1]
-            });
+              b: run.points[i + 1],
+              type: def.type || "line",
+              control: def.control ? copyPoint(def.control) : null,
+              control1: def.control1 ? copyPoint(def.control1) : null,
+              control2: def.control2 ? copyPoint(def.control2) : null
+            };
+            segment.renderPoints = segmentRenderPoints(segment);
+            segments.push(segment);
           }
         });
         return segments;
@@ -10419,7 +10983,7 @@
       const PLAN_TUTORIALS = {
         draw: {
           src: "draw.mp4",
-          description: "You are drawing in a top-down plan view, as though you are looking down at the walls from above. Draw the walls that match your installation layout to generate a tailored installation plan."
+          description: "You are drawing in a top-down plan view, as though you are looking down at the walls from above. Draw the walls that match your installation layout. Use the CURVE tool (or hold CTRL when placing an endpoint) for curved walls."
         },
         select: {
           src: "select.mp4",
@@ -10932,6 +11496,28 @@
         return tiles;
       }
 
+      function getPdfRandomPlankTileGeometryForPolyline(points, runIndex, segmentIndex) {
+        const length = polylineLength(points);
+        if (length < 10) return [];
+        const plankWidths = [3.5, 9.5, 5.5, 3.5, 5.5, 9.5, 9.5, 3.5, 5.5];
+        const plankScale = 4.05;
+        const gap = 7.5;
+        const endInset = 5;
+        let cursor = endInset;
+        let patternIndex = (runIndex * 2 + segmentIndex * 3) % plankWidths.length;
+        const tiles = [];
+        while (cursor < length - endInset - 5) {
+          const requested = plankWidths[patternIndex % plankWidths.length] * plankScale;
+          const available = length - endInset - cursor;
+          const tileLength = Math.min(requested, available);
+          if (tileLength < 8) break;
+          tiles.push(slicePolylineByDistance(points, cursor, cursor + tileLength));
+          cursor += tileLength + gap;
+          patternIndex += 1;
+        }
+        return tiles;
+      }
+
       function buildPdfHotspotLayout(font, fontSize) {
         const grouped = new Map();
         generatedPlan.events.forEach((eventData) => {
@@ -11088,23 +11674,38 @@
         const red = rgb(0.83, 0.13, 0.18);
 
         generatedPlan.selectedEdges.forEach((edge) => {
-          const a = mapPoint(edge.a);
-          const b = mapPoint(edge.b);
-          page.drawLine({ start: a, end: b, thickness: Math.max(1.5, 5.2 * scale), color: greyWall, opacity: 0.88 });
+          const edgePoints = edge.renderPoints && edge.renderPoints.length >= 2 ? edge.renderPoints : [edge.a, edge.b];
+          for (let i = 1; i < edgePoints.length; i += 1) {
+            page.drawLine({
+              start: mapPoint(edgePoints[i - 1]),
+              end: mapPoint(edgePoints[i]),
+              thickness: Math.max(1.5, 5.2 * scale),
+              color: greyWall,
+              opacity: 0.88
+            });
+          }
 
           const offsetSegment = getRandomPlankOffsetSegment(edge, 13);
-          if (offsetSegment) {
-            const oa = mapPoint(offsetSegment.a);
-            const ob = mapPoint(offsetSegment.b);
-            page.drawLine({ start: oa, end: ob, thickness: Math.max(0.55, 1.1 * scale), color: greyPanel, opacity: 0.32 });
-            getPdfRandomPlankTileGeometry(offsetSegment.a, offsetSegment.b, edge.runIndex, edge.segmentIndex).forEach((tile) => {
+          if (offsetSegment && offsetSegment.points) {
+            for (let i = 1; i < offsetSegment.points.length; i += 1) {
               page.drawLine({
-                start: mapPoint(tile.a),
-                end: mapPoint(tile.b),
-                thickness: Math.max(1.2, 3.4 * scale),
+                start: mapPoint(offsetSegment.points[i - 1]),
+                end: mapPoint(offsetSegment.points[i]),
+                thickness: Math.max(0.55, 1.1 * scale),
                 color: greyPanel,
-                opacity: 0.62
+                opacity: 0.32
               });
+            }
+            getPdfRandomPlankTileGeometryForPolyline(offsetSegment.points, edge.runIndex, edge.segmentIndex).forEach((tilePoints) => {
+              for (let i = 1; i < tilePoints.length; i += 1) {
+                page.drawLine({
+                  start: mapPoint(tilePoints[i - 1]),
+                  end: mapPoint(tilePoints[i]),
+                  thickness: Math.max(1.2, 3.4 * scale),
+                  color: greyPanel,
+                  opacity: 0.62
+                });
+              }
             });
           }
         });
@@ -11112,27 +11713,32 @@
         const eventPoints = generatedPlan.events.map((eventData) => eventData.point);
         const hasEventAt = (point) => eventPoints.some((eventPoint) => pointDistance(point, eventPoint) < 2.2);
         generatedPlan.flowEdges.forEach((flow) => {
-          const dx = flow.b.x - flow.a.x;
-          const dy = flow.b.y - flow.a.y;
-          const length = Math.hypot(dx, dy);
-          if (length < 2) return;
-          const ux = dx / length;
-          const uy = dy / length;
+          const rawPoints = flow.renderPoints && flow.renderPoints.length >= 2 ? flow.renderPoints : [flow.a, flow.b];
+          const totalLength = polylineLength(rawPoints);
+          if (totalLength < 2) return;
           let startClearance = hasEventAt(flow.a) ? 18 : 0;
           let endClearance = hasEventAt(flow.b) ? 27 : 0;
-          const maximumCombinedClearance = Math.max(0, length - 18);
+          const maximumCombinedClearance = Math.max(0, totalLength - 18);
           const requestedClearance = startClearance + endClearance;
           if (requestedClearance > maximumCombinedClearance && requestedClearance > 0) {
             const ratio = maximumCombinedClearance / requestedClearance;
             startClearance *= ratio;
             endClearance *= ratio;
           }
-          const visibleA = { x: flow.a.x + ux * startClearance, y: flow.a.y + uy * startClearance };
-          const visibleB = { x: flow.b.x - ux * endClearance, y: flow.b.y - uy * endClearance };
-          const a = mapPoint(visibleA);
-          const b = mapPoint(visibleB);
-          page.drawLine({ start: a, end: b, thickness: Math.max(1.1, 2.6 * scale), color: red, opacity: 0.94 });
+          const visiblePoints = trimPolylineEnds(rawPoints, startClearance, endClearance);
+          if (visiblePoints.length < 2) return;
+          for (let i = 1; i < visiblePoints.length; i += 1) {
+            page.drawLine({
+              start: mapPoint(visiblePoints[i - 1]),
+              end: mapPoint(visiblePoints[i]),
+              thickness: Math.max(1.1, 2.6 * scale),
+              color: red,
+              opacity: 0.94
+            });
+          }
 
+          const a = mapPoint(visiblePoints[visiblePoints.length - 2]);
+          const b = mapPoint(visiblePoints[visiblePoints.length - 1]);
           const pdx = b.x - a.x;
           const pdy = b.y - a.y;
           const plen = Math.max(0.001, Math.hypot(pdx, pdy));
@@ -11384,6 +11990,10 @@
         if (nextPhase !== "draw") stopDrawAutoPan(true);
         hideClosingSnapFeedback({ keepConfirmation: false });
         phase = nextPhase;
+        if (nextPhase !== "draw") {
+          curveEdit = null;
+          curveHandleDrag = null;
+        }
         if (nextPhase !== "select") selectionPanMode = false;
         overlay.dataset.phase = nextPhase;
         overlay.classList.remove("isMini");
@@ -11393,8 +12003,8 @@
           title.textContent = "CUSTOM INSTALLATION GUIDE BUILDER";
           stepText.textContent = "STEP 1 — Draw the walls in your project.";
           hint.textContent = isFinePointer
-            ? "90° SNAP ON · Hold SHIFT or use ANGLE for any angle · CTRL+Z to undo · Middle-drag to pan · Right-click or ACCEPT to stop drawing."
-            : "90° SNAP ON · Use ANGLE for any angle · Use PAN to move the drawing · ACCEPT starts a separate wall run.";
+            ? "90° SNAP ON · SHIFT = any angle · CTRL = CURVE · CTRL+Z = undo · CURVE can also edit finished arch handles · Middle-drag to pan · Right-click or ACCEPT to stop drawing."
+            : "90° SNAP ON · Use ANGLE or CURVE for special walls · Use PAN to move the drawing · ACCEPT starts a separate wall run.";
           status.textContent = "Draw one or more wall runs. Separate runs are allowed.";
         } else if (nextPhase === "select") {
           title.textContent = "SELECT RANDOM PLANK WALLS";
@@ -11422,6 +12032,8 @@
         // Keep the live preview and angle guide locked to the same zoom/pan
         // transform as the wall geometry while drawing.
         if (previewLine) previewLine.setAttribute("transform", transform);
+        if (arcPreview) arcPreview.setAttribute("transform", transform);
+        if (bezierHandles) bezierHandles.setAttribute("transform", transform);
         if (snapFeedback) snapFeedback.setAttribute("transform", transform);
         if (angleGuide) angleGuide.setAttribute("transform", transform);
       }
@@ -11558,9 +12170,30 @@
             point.x += dx;
             point.y += dy;
           });
+          ensureRunSegments(run).forEach((segment) => {
+            [segment && segment.control, segment && segment.control1, segment && segment.control2].forEach((control) => {
+              if (!control) return;
+              control.x += dx;
+              control.y += dy;
+            });
+          });
         });
         if (currentRun) {
           currentRun.points.forEach((point) => {
+            point.x += dx;
+            point.y += dy;
+          });
+          ensureRunSegments(currentRun).forEach((segment) => {
+            [segment && segment.control, segment && segment.control1, segment && segment.control2].forEach((control) => {
+              if (!control) return;
+              control.x += dx;
+              control.y += dy;
+            });
+          });
+        }
+        if (pendingArc) {
+          [pendingArc.start, pendingArc.end, pendingArc.control1, pendingArc.control2].forEach((point) => {
+            if (!point) return;
             point.x += dx;
             point.y += dy;
           });
@@ -11591,8 +12224,16 @@
           !currentRun.points.length
         ) return;
 
+        if (pendingArc) {
+          const pointer = screenToSvg(lastDrawPointer);
+          updatePendingArcPreview(pointer);
+          return;
+        }
+
         const last = currentRun.points[currentRun.points.length - 1];
-        const point = applyOrthogonalSnap(screenToSvg(lastDrawPointer), lastDrawPointer);
+        const point = isArchMode(lastDrawPointer)
+          ? snapToExistingPoint(screenToSvg(lastDrawPointer))
+          : applyOrthogonalSnap(screenToSvg(lastDrawPointer), lastDrawPointer);
         previewPoint = point;
         previewLine.setAttribute("x1", last.x);
         previewLine.setAttribute("y1", last.y);
@@ -11946,7 +12587,8 @@
           const sourceRun = runs[edge.source.runIndex];
           if (sourceRun && sourceRun.points && sourceRun.points.length >= 2) {
             const sourceClosed = isClosedPointPath(sourceRun.points);
-            const sourceSide = getRandomPlankFaceSideForPath(sourceRun.points, sourceClosed);
+            const sourceExpanded = getRunExpandedGeometry(sourceRun);
+            const sourceSide = getRandomPlankFaceSideForPath(sourceExpanded.points.length ? sourceExpanded.points : sourceRun.points, sourceClosed);
             const firstPoint = graph.nodes.get(firstId).point;
             const secondPoint = graph.nodes.get(secondId).point;
             const sameDirection = pointDistance(firstPoint, edge.source.a) < 2.2
@@ -12045,20 +12687,16 @@
         return result;
       }
 
-      function renderRandomPlankTiles(parent, a, b, runIndex, segmentIndex, className) {
-        const dx = b.x - a.x;
-        const dy = b.y - a.y;
-        const length = Math.hypot(dx, dy);
+      function renderRandomPlankTilesAlongPolyline(parent, points, runIndex, segmentIndex, className) {
+        const length = polylineLength(points);
         if (length < 10) return [];
-        const ux = dx / length;
-        const uy = dy / length;
         const plankWidths = [3.5, 9.5, 5.5, 3.5, 5.5, 9.5, 9.5, 3.5, 5.5];
         const plankScale = 4.05; // common scale preserves 3.5 : 5.5 : 9.5 proportions
         const gap = 7.5;
         const endInset = 5;
         let cursor = endInset;
         let patternIndex = (runIndex * 2 + segmentIndex * 3) % plankWidths.length;
-        const tileLines = [];
+        const tilePaths = [];
 
         while (cursor < length - endInset - 5) {
           const requested = plankWidths[patternIndex % plankWidths.length] * plankScale;
@@ -12066,56 +12704,49 @@
           const tileLength = Math.min(requested, available);
           if (tileLength < 8) break;
 
-          const start = { x: a.x + ux * cursor, y: a.y + uy * cursor };
-          const end = { x: a.x + ux * (cursor + tileLength), y: a.y + uy * (cursor + tileLength) };
-          tileLines.push(drawLine(parent, start, end, className));
+          const tilePoints = slicePolylineByDistance(points, cursor, cursor + tileLength);
+          const element = drawPolyline(parent, tilePoints, className);
+          if (element) tilePaths.push(element);
           cursor += tileLength + gap;
           patternIndex += 1;
         }
 
-        return tileLines;
+        return tilePaths;
+      }
+
+      function renderRandomPlankTiles(parent, a, b, runIndex, segmentIndex, className) {
+        return renderRandomPlankTilesAlongPolyline(parent, [a, b], runIndex, segmentIndex, className);
       }
 
       function getRandomPlankOffsetSegment(segment, offsetDistance = 13) {
         if (!segment || !Number.isInteger(segment.runIndex) || !Number.isInteger(segment.segmentIndex)) return null;
         const run = runs[segment.runIndex];
         if (!run || !run.points || run.points.length < 2) return null;
+        const expanded = getRunExpandedGeometry(run);
+        const range = expanded.ranges[segment.segmentIndex];
+        if (!range || expanded.points.length < 2) return null;
         const closed = isClosedPointPath(run.points);
-        const side = getRandomPlankFaceSideForPath(run.points, closed);
-        const offsetPoints = buildOffsetPolyline(run.points, side, offsetDistance, closed);
-        const a = offsetPoints[segment.segmentIndex];
-        const b = offsetPoints[segment.segmentIndex + 1];
-        if (!a || !b) return null;
-        return { a, b };
+        const side = getRandomPlankFaceSideForPath(expanded.points, closed);
+        const offsetPoints = buildOffsetPolyline(expanded.points, side, offsetDistance, closed);
+        const points = offsetPoints.slice(range.start, range.end + 1);
+        if (points.length < 2) return null;
+        return { a: points[0], b: points[points.length - 1], points };
       }
 
       function renderRandomPlankFacePreview() {
-        const offsetDistance = 13;
-        runs.forEach((run, runIndex) => {
-          if (!run || !run.points || run.points.length < 2) return;
-          const closed = isClosedPointPath(run.points);
-          const side = getRandomPlankFaceSideForPath(run.points, closed);
-          const offsetPoints = buildOffsetPolyline(run.points, side, offsetDistance, closed);
-          if (offsetPoints.length < 2) return;
+        getSegments().forEach((segment) => {
+          if (!selectedSegments.has(segment.id)) return;
+          const offsetSegment = getRandomPlankOffsetSegment(segment, 13);
+          if (!offsetSegment || !offsetSegment.points || offsetSegment.points.length < 2) return;
 
-          for (let i = 0; i < offsetPoints.length - 1; i += 1) {
-            const selected = selectedSegments.has(`r${runIndex}s${i}`);
-
-            // An unselected wall now stays completely clean: only its original
-            // wall line remains. Random Plank appears only after that wall is
-            // explicitly selected, removing any ambiguity about scope.
-            if (!selected) continue;
-
-            drawLine(viewport, offsetPoints[i], offsetPoints[i + 1], "generatedPlanRpGuide isSelected");
-            renderRandomPlankTiles(
-              viewport,
-              offsetPoints[i],
-              offsetPoints[i + 1],
-              runIndex,
-              i,
-              "generatedPlanRpPlank isSelected"
-            );
-          }
+          drawPolyline(viewport, offsetSegment.points, "generatedPlanRpGuide isSelected");
+          renderRandomPlankTilesAlongPolyline(
+            viewport,
+            offsetSegment.points,
+            segment.runIndex,
+            segment.segmentIndex,
+            "generatedPlanRpPlank isSelected"
+          );
         });
       }
 
@@ -12178,6 +12809,10 @@
 
       function findSelectedSegmentForFlow(flow) {
         if (!generatedPlan || !generatedPlan.selectedEdges) return null;
+        if (flow && flow.segmentId) {
+          const direct = generatedPlan.selectedEdges.find((segment) => segment.id === flow.segmentId);
+          if (direct) return direct;
+        }
         return generatedPlan.selectedEdges.find((segment) => {
           const sameDirection = pointDistance(flow.a, segment.a) < 2.2
             && pointDistance(flow.b, segment.b) < 2.2;
@@ -12202,16 +12837,14 @@
             const offsetSegment = getRandomPlankOffsetSegment(segment, 13);
             if (!offsetSegment) return;
 
-            drawLine(
+            drawPolyline(
               viewport,
-              offsetSegment.a,
-              offsetSegment.b,
+              offsetSegment.points,
               "generatedPlanRpGuide isGenerated"
             );
-            const lines = renderRandomPlankTiles(
+            const lines = renderRandomPlankTilesAlongPolyline(
               viewport,
-              offsetSegment.a,
-              offsetSegment.b,
+              offsetSegment.points,
               segment.runIndex,
               segment.segmentIndex,
               "generatedPlanRpPlank isGenerated"
@@ -12241,16 +12874,15 @@
 
         segments.forEach((segment) => {
           const selected = selectedSegments.has(segment.id);
-          const wall = drawLine(
+          const wall = drawPlanSegment(
             viewport,
-            segment.a,
-            segment.b,
+            segment,
             `generatedPlanWall${selected ? " isSelected" : ""}`
           );
           wall.dataset.segmentId = segment.id;
 
           if (phase === "select") {
-            const hit = drawLine(viewport, segment.a, segment.b, "generatedPlanWallHit");
+            const hit = drawPlanSegment(viewport, segment, "generatedPlanWallHit");
             hit.dataset.segmentId = segment.id;
             hit.addEventListener("click", (event) => {
               event.stopPropagation();
@@ -12280,8 +12912,16 @@
         });
 
         if (currentRun && currentRun.points.length) {
+          const defs = ensureRunSegments(currentRun);
           for (let i = 0; i < currentRun.points.length - 1; i += 1) {
-            drawLine(viewport, currentRun.points[i], currentRun.points[i + 1], "generatedPlanWall");
+            drawPlanSegment(viewport, {
+              a: currentRun.points[i],
+              b: currentRun.points[i + 1],
+              type: (defs[i] && defs[i].type) || "line",
+              control: defs[i] && defs[i].control ? defs[i].control : null,
+              control1: defs[i] && defs[i].control1 ? defs[i].control1 : null,
+              control2: defs[i] && defs[i].control2 ? defs[i].control2 : null
+            }, "generatedPlanWall");
           }
         }
       }
@@ -12300,8 +12940,18 @@
             else if (pointDistance(edge.b, point) < 2.2) other = edge.a;
             if (!other) return;
 
-            const dx = other.x - point.x;
-            const dy = other.y - point.y;
+            let dx = other.x - point.x;
+            let dy = other.y - point.y;
+            if (edge.renderPoints && edge.renderPoints.length > 2) {
+              const pts = edge.renderPoints;
+              if (pointDistance(edge.a, point) < 2.2) {
+                dx = pts[1].x - pts[0].x;
+                dy = pts[1].y - pts[0].y;
+              } else {
+                dx = pts[pts.length - 2].x - pts[pts.length - 1].x;
+                dy = pts[pts.length - 2].y - pts[pts.length - 1].y;
+              }
+            }
             const length = Math.hypot(dx, dy);
             if (length > bestLength) {
               bestLength = length;
@@ -12448,7 +13098,7 @@
         if (!generatedPlan) return;
 
         generatedPlan.selectedEdges.forEach((edge) => {
-          drawLine(viewport, edge.a, edge.b, "generatedPlanBaseWall");
+          drawPlanSegment(viewport, edge, "generatedPlanBaseWall");
         });
 
         // Keep the Random Plank material visible in the finished plan. It sits
@@ -12461,20 +13111,15 @@
         const hasEventAt = (point) => eventPoints.some((eventPoint) => pointDistance(point, eventPoint) < 2.2);
 
         generatedPlan.flowEdges.forEach((flow) => {
-          const dx = flow.b.x - flow.a.x;
-          const dy = flow.b.y - flow.a.y;
-          const length = Math.hypot(dx, dy);
-          if (length < 2) return;
+          const rawPoints = flow.renderPoints && flow.renderPoints.length >= 2
+            ? flow.renderPoints
+            : [flow.a, flow.b];
+          const totalLength = polylineLength(rawPoints);
+          if (totalLength < 2) return;
 
-          const ux = dx / length;
-          const uy = dy / length;
           let startClearance = hasEventAt(flow.a) ? 18 : 0;
           let endClearance = hasEventAt(flow.b) ? 27 : 0;
-
-          // Never consume a short segment completely. The arrow remains on the
-          // wall, but its tip stops just before the destination hotspot instead
-          // of disappearing underneath the hotspot circle.
-          const maximumCombinedClearance = Math.max(0, length - 18);
+          const maximumCombinedClearance = Math.max(0, totalLength - 18);
           const requestedClearance = startClearance + endClearance;
           if (requestedClearance > maximumCombinedClearance && requestedClearance > 0) {
             const ratio = maximumCombinedClearance / requestedClearance;
@@ -12482,18 +13127,15 @@
             endClearance *= ratio;
           }
 
-          const visibleA = {
-            x: flow.a.x + ux * startClearance,
-            y: flow.a.y + uy * startClearance
-          };
-          const visibleB = {
-            x: flow.b.x - ux * endClearance,
-            y: flow.b.y - uy * endClearance
-          };
-
-          drawLine(viewport, visibleA, visibleB, "generatedPlanFlow");
-          drawLine(viewport, visibleA, visibleB, "generatedPlanFlowMotion");
-          drawRoundedArrowHead(viewport, visibleA, visibleB);
+          const visiblePoints = trimPolylineEnds(rawPoints, startClearance, endClearance);
+          if (visiblePoints.length < 2) return;
+          drawPolyline(viewport, visiblePoints, "generatedPlanFlow");
+          drawPolyline(viewport, visiblePoints, "generatedPlanFlowMotion");
+          drawRoundedArrowHead(
+            viewport,
+            visiblePoints[visiblePoints.length - 2],
+            visiblePoints[visiblePoints.length - 1]
+          );
         });
 
         const grouped = new Map();
@@ -12566,6 +13208,7 @@
         } else {
           renderDraftOrSelection();
         }
+        updateCurveHandleOverlay();
 
         const hasGeometry = getSegments().length > 0 || (currentRun && currentRun.points.length > 0);
         emptyState.classList.toggle("isHidden", Boolean(hasGeometry));
@@ -12597,6 +13240,69 @@
           isRightAngle: Math.abs(normalized - 90) <= RIGHT_ANGLE_TOLERANCE,
           // On screen coordinates, a positive turn puts the tight/inside face
           // on the right side of the path; a negative turn puts it on the left.
+          cornerInsideSide: signed >= 0 ? "right" : "left"
+        };
+      }
+
+      function getEdgeBetween(graph, aId, bId) {
+        return graph.edges.find((edge) =>
+          (edge.a === aId && edge.b === bId) || (edge.a === bId && edge.b === aId)
+        ) || null;
+      }
+
+      function tangentForSourceSegment(source, atPoint, travelTowardPoint) {
+        if (!source) return { x: 1, y: 0 };
+        const a = source.a;
+        const b = source.b;
+        let vector;
+        if (source.type === "arc" && (source.control1 || source.control2 || source.control)) {
+          if (pointDistance(atPoint, a) < 2.2) {
+            // Natural tangent leaving A. Reverse it when this is an incoming leg.
+            const control = source.control1 || source.control;
+            vector = { x: control.x - a.x, y: control.y - a.y };
+            if (travelTowardPoint) vector = { x: -vector.x, y: -vector.y };
+          } else {
+            // Natural tangent arriving at B. Reverse it when this is an outgoing leg.
+            const control = source.control2 || source.control;
+            vector = { x: b.x - control.x, y: b.y - control.y };
+            if (!travelTowardPoint) vector = { x: -vector.x, y: -vector.y };
+          }
+        } else {
+          if (travelTowardPoint) {
+            const other = pointDistance(atPoint, a) < 2.2 ? b : a;
+            vector = { x: atPoint.x - other.x, y: atPoint.y - other.y };
+          } else {
+            const other = pointDistance(atPoint, a) < 2.2 ? b : a;
+            vector = { x: other.x - atPoint.x, y: other.y - atPoint.y };
+          }
+        }
+        const length = Math.max(0.0001, Math.hypot(vector.x, vector.y));
+        return { x: vector.x / length, y: vector.y / length };
+      }
+
+      function getGraphCornerGeometry(prevId, currentId, nextId, graph) {
+        const current = graph.nodes.get(currentId).point;
+        const incomingEdge = getEdgeBetween(graph, prevId, currentId);
+        const outgoingEdge = getEdgeBetween(graph, currentId, nextId);
+        const incoming = tangentForSourceSegment(incomingEdge && incomingEdge.source, current, true);
+        const outgoing = tangentForSourceSegment(outgoingEdge && outgoingEdge.source, current, false);
+        const dot = incoming.x * outgoing.x + incoming.y * outgoing.y;
+        const cross = incoming.x * outgoing.y - incoming.y * outgoing.x;
+        const signed = Math.atan2(cross, dot) * 180 / Math.PI;
+        const normalized = Math.abs(signed);
+        const hasArc = Boolean(
+          (incomingEdge && incomingEdge.source && incomingEdge.source.type === "arc") ||
+          (outgoingEdge && outgoingEdge.source && outgoingEdge.source.type === "arc")
+        );
+        return {
+          signed,
+          normalized,
+          hasArc,
+          isStraight: normalized <= STRAIGHT_TOLERANCE,
+          // A curved wall does not use the bent 90° corner trims. If its tangent
+          // is not smooth enough to continue, it resolves to a terminate/start
+          // transition even when the tangent happens to be near 90°.
+          isRightAngle: !hasArc && Math.abs(normalized - 90) <= RIGHT_ANGLE_TOLERANCE,
           cornerInsideSide: signed >= 0 ? "right" : "left"
         };
       }
@@ -12736,10 +13442,13 @@
         for (let i = 1; i < pathNodeIds.length - 1; i += 1) {
           const nodeId = pathNodeIds[i];
           if (skipNodeIds.has(nodeId)) continue;
-          const prev = graph.nodes.get(pathNodeIds[i - 1]).point;
           const current = graph.nodes.get(nodeId).point;
-          const next = graph.nodes.get(pathNodeIds[i + 1]).point;
-          const type = classifyInternalNode(prev, current, next, faceSide);
+          const corner = getGraphCornerGeometry(pathNodeIds[i - 1], nodeId, pathNodeIds[i + 1], graph);
+          const type = corner.isStraight
+            ? "straight"
+            : corner.isRightAngle
+              ? (faceSide === corner.cornerInsideSide ? "insideEndStart" : "outsideStartEnd")
+              : "odd";
 
           if (type === "insideEndStart") {
             events.push({ key: "isEndStart", label: "INSIDE END START", point: copyPoint(current) });
@@ -12754,10 +13463,16 @@
 
       function pushFlowForPath(pathNodeIds, graph, flowEdges) {
         for (let i = 0; i < pathNodeIds.length - 1; i += 1) {
-          flowEdges.push({
-            a: copyPoint(graph.nodes.get(pathNodeIds[i]).point),
-            b: copyPoint(graph.nodes.get(pathNodeIds[i + 1]).point)
-          });
+          const fromId = pathNodeIds[i];
+          const toId = pathNodeIds[i + 1];
+          const edge = getEdgeBetween(graph, fromId, toId);
+          const a = copyPoint(graph.nodes.get(fromId).point);
+          const b = copyPoint(graph.nodes.get(toId).point);
+          let renderPoints = edge && edge.source ? (edge.source.renderPoints || segmentRenderPoints(edge.source)).map(copyPoint) : [copyPoint(a), copyPoint(b)];
+          if (renderPoints.length && pointDistance(renderPoints[0], a) > pointDistance(renderPoints[renderPoints.length - 1], a)) {
+            renderPoints.reverse();
+          }
+          flowEdges.push({ a, b, renderPoints, segmentId: edge && edge.source ? edge.source.id : null });
         }
       }
 
@@ -12817,14 +13532,14 @@
             const meetPoint = graph.nodes.get(meetNodeId).point;
             const loopFaceSide = getRandomPlankFaceSideForGraphPath(ordered, graph, true);
 
-            const startPrev = graph.nodes.get(ordered[(ordered.length - 1) % ordered.length]).point;
-            const startNext = graph.nodes.get(ordered[1 % ordered.length]).point;
-            const startCorner = getCornerGeometry(startPrev, startPoint, startNext);
+            const startPrevId = ordered[(ordered.length - 1) % ordered.length];
+            const startNextId = ordered[1 % ordered.length];
+            const startCorner = getGraphCornerGeometry(startPrevId, ordered[0], startNextId, graph);
             const startIsInside = loopFaceSide === startCorner.cornerInsideSide;
 
-            const meetPrev = graph.nodes.get(ordered[(meetIndex - 1 + ordered.length) % ordered.length]).point;
-            const meetNext = graph.nodes.get(ordered[(meetIndex + 1) % ordered.length]).point;
-            const meetCorner = getCornerGeometry(meetPrev, meetPoint, meetNext);
+            const meetPrevId = ordered[(meetIndex - 1 + ordered.length) % ordered.length];
+            const meetNextId = ordered[(meetIndex + 1) % ordered.length];
+            const meetCorner = getGraphCornerGeometry(meetPrevId, meetNodeId, meetNextId, graph);
             const meetIsInside = loopFaceSide === meetCorner.cornerInsideSide;
 
             if (startCorner.isRightAngle) {
@@ -12859,7 +13574,7 @@
           }
         });
 
-        const points = graph.selected.flatMap((segment) => [segment.a, segment.b]);
+        const points = graph.selected.flatMap((segment) => segment.renderPoints && segment.renderPoints.length ? segment.renderPoints : [segment.a, segment.b]);
         const minX = Math.min(...points.map((point) => point.x));
         const maxX = Math.max(...points.map((point) => point.x));
         const minY = Math.min(...points.map((point) => point.y));
@@ -12892,7 +13607,7 @@
           ? " Junctions are currently treated as separate installation runs."
           : "";
         const faceLabel = generatedPlan.randomPlankSide === "outside" ? "OUTSIDE" : "INSIDE";
-        status.textContent = `${prefix}Random Plank face: ${faceLabel}. Corner trims are used only within ±${RIGHT_ANGLE_TOLERANCE}° of 90°; other angles resolve to STARTER / TERMINATE conditions based on installation flow.${branchNote}`;
+        status.textContent = `${prefix}Random Plank face: ${faceLabel}. Smooth curve transitions continue without a trim. Any sharp transition into or out of a curve resolves to STARTER / TERMINATE; specialized corner trims are reserved for straight-wall corners within ±${RIGHT_ANGLE_TOLERANCE}° of 90°.${branchNote}`;
       }
 
       function waitForModelIdle(callback, tries = 0) {
@@ -13173,6 +13888,9 @@
         event.stopPropagation();
         runs = [];
         currentRun = null;
+        pendingArc = null;
+        curveEdit = null;
+        curveHandleDrag = null;
         previewPoint = null;
         selectedSegments.clear();
         randomPlankSide = "inside";
@@ -13280,6 +13998,7 @@
       canvas.addEventListener("contextmenu", (event) => {
         if (phase !== "draw") return;
         event.preventDefault();
+        if (event.ctrlKey || pendingArc) return;
         finishCurrentRun();
       });
 
@@ -13288,22 +14007,118 @@
         if (event.button !== 0) return;
         if (drawingTool === "pan") return;
 
-        let point = screenToSvg(event);
-        point = applyOrthogonalSnap(point, event);
+        // Releasing a dragged Bezier handle must commit only the handle edit.
+        // Because the canvas owns pointer capture, some browsers synthesize a
+        // normal click immediately after pointerup; without this guard that click
+        // would fall through into the drawing logic and begin a new wall.
+        if (performance.now() < suppressCanvasClickUntil) {
+          suppressCanvasClickUntil = 0;
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
 
-        if (!currentRun) currentRun = { points: [] };
-        const closesToFirstPoint = isClosingSnapPoint(point);
+        const rawPoint = screenToSvg(event);
+
+        // Second click after the arc end has been locked accepts the current
+        // cubic Bezier shape.
+        if (pendingArc) {
+          updatePendingArcPreview(rawPoint);
+          if (!currentRun) return;
+          const closesToFirstPoint = isClosingSnapPoint(pendingArc.end);
+          const acceptedEnd = copyPoint(pendingArc.end);
+          ensureRunSegments(currentRun);
+          currentRun.points.push(copyPoint(pendingArc.end));
+          currentRun.segments.push({
+            type: "arc",
+            control1: copyPoint(pendingArc.control1),
+            control2: copyPoint(pendingArc.control2)
+          });
+          pendingArc = null;
+          if (arcPreview) arcPreview.setAttribute("visibility", "hidden");
+          hideAngleGuide();
+
+          if (closesToFirstPoint) {
+            confirmClosingSnapFeedback(acceptedEnd);
+            finishCurrentRun({ keepSnapConfirmation: true });
+          } else {
+            renderPlanner();
+            hideClosingSnapFeedback();
+          }
+          return;
+        }
+
+        // With no active run, CURVE becomes an edit tool when an existing curve
+        // endpoint is clicked. This exposes both Bezier handles for refinement.
+        if (!currentRun && drawingTool === "arch") {
+          const editHit = findEditableCurveEndpoint(rawPoint);
+          if (editHit) {
+            curveEdit = editHit;
+            renderPlanner();
+            status.textContent = "CURVE EDIT — Drag the yellow Bezier handles to refine the arch. Handles snap green when aligned with an adjoining wall.";
+            return;
+          }
+          if (curveEdit) {
+            curveEdit = null;
+            renderPlanner();
+          }
+        }
+
+        if (!currentRun) currentRun = { points: [], segments: [] };
+        ensureRunSegments(currentRun);
+
+        // First click establishes the run's first node regardless of the active
+        // drawing tool.
+        if (!currentRun.points.length) {
+          const firstPoint = snapToExistingPoint(rawPoint);
+          currentRun.points.push(firstPoint);
+          previewPoint = firstPoint;
+          renderPlanner();
+          return;
+        }
+
         const last = currentRun.points[currentRun.points.length - 1];
-        if (last && pointDistance(last, point) < MIN_SEGMENT_LENGTH) return;
+
+        if (isArchMode(event)) {
+          // In CURVE mode the endpoint is deliberately free-angle. The wall
+          // stays as a straight dotted chord until this click locks the endpoint;
+          // pointer movement then bows it to either side of the chord.
+          const endPoint = snapToExistingPoint(rawPoint);
+          if (pointDistance(last, endPoint) < MIN_SEGMENT_LENGTH) return;
+          const midpoint = { x: (last.x + endPoint.x) / 2, y: (last.y + endPoint.y) / 2 };
+          const previousDirection = incomingDirectionAtRunEnd(currentRun);
+          const initialControls = cubicArcControlsFromPointer(last, endPoint, midpoint, previousDirection);
+          pendingArc = {
+            start: copyPoint(last),
+            end: copyPoint(endPoint),
+            control1: copyPoint(initialControls.control1),
+            control2: copyPoint(initialControls.control2),
+            previousDirection: previousDirection ? copyPoint(previousDirection) : null,
+            startSnapped: Boolean(initialControls.startSnapped),
+            signedBulge: 0
+          };
+          previewPoint = copyPoint(endPoint);
+          previewLine.setAttribute("visibility", "hidden");
+          if (arcPreview) {
+            arcPreview.setAttribute("d", polylinePathD([last, endPoint]));
+            arcPreview.setAttribute("visibility", "visible");
+          }
+          updateCurveHandleOverlay();
+          if (isClosingSnapPoint(endPoint)) showClosingSnapFeedback(currentRun.points[0]);
+          else hideClosingSnapFeedback();
+          return;
+        }
+
+        const point = applyOrthogonalSnap(rawPoint, event);
+        const closesToFirstPoint = isClosingSnapPoint(point);
+        if (pointDistance(last, point) < MIN_SEGMENT_LENGTH) return;
 
         currentRun.points.push(point);
+        currentRun.segments.push({ type: "line" });
         previewPoint = point;
         hideAngleGuide();
 
         if (closesToFirstPoint) {
-          // Closing back onto the first node completes this wall run. Preserve the
-          // green confirmation burst, commit the run immediately, and leave the
-          // next click ready to begin a completely separate run.
           confirmClosingSnapFeedback(point);
           finishCurrentRun({ keepSnapConfirmation: true });
         } else {
@@ -13313,6 +14128,12 @@
       });
 
       canvas.addEventListener("pointermove", (event) => {
+        if (curveHandleDrag && event.pointerId === curveHandleDrag.pointerId) {
+          event.preventDefault();
+          updateCurveEditHandle(curveHandleDrag.handleName, screenToSvg(event));
+          return;
+        }
+
         if (isPanning && event.pointerId === panPointerId) {
           const rect = canvas.getBoundingClientRect();
           const dx = (event.clientX - lastPanClientX) * (1000 / Math.max(1, rect.width));
@@ -13347,6 +14168,7 @@
             lastDrawPointer = null;
             stopDrawAutoPan(false);
             previewLine.setAttribute("visibility", "hidden");
+            if (arcPreview) arcPreview.setAttribute("visibility", "hidden");
             hideClosingSnapFeedback();
             hideAngleGuide();
             return;
@@ -13355,6 +14177,7 @@
           if (!currentRun || !currentRun.points.length) {
             lastDrawPointer = null;
             previewLine.setAttribute("visibility", "hidden");
+            if (arcPreview) arcPreview.setAttribute("visibility", "hidden");
             hideClosingSnapFeedback();
             return;
           }
@@ -13369,14 +14192,30 @@
           };
           ensureDrawAutoPan();
 
+          if (pendingArc) {
+            const pointer = screenToSvg(event);
+            updatePendingArcPreview(pointer);
+            if (isClosingSnapPoint(pendingArc.end)) {
+              showClosingSnapFeedback(currentRun.points[0]);
+              if (arcPreview) arcPreview.classList.add("isClosingSnap");
+            } else {
+              hideClosingSnapFeedback();
+              if (arcPreview) arcPreview.classList.remove("isClosingSnap");
+            }
+            return;
+          }
+
           const last = currentRun.points[currentRun.points.length - 1];
-          const point = applyOrthogonalSnap(screenToSvg(event), event);
+          const point = isArchMode(event)
+            ? snapToExistingPoint(screenToSvg(event))
+            : applyOrthogonalSnap(screenToSvg(event), event);
           previewPoint = point;
           previewLine.setAttribute("x1", last.x);
           previewLine.setAttribute("y1", last.y);
           previewLine.setAttribute("x2", point.x);
           previewLine.setAttribute("y2", point.y);
           previewLine.setAttribute("visibility", "visible");
+          if (arcPreview) arcPreview.setAttribute("visibility", "hidden");
 
           if (isClosingSnapPoint(point)) {
             showClosingSnapFeedback(currentRun.points[0]);
@@ -13393,6 +14232,7 @@
         if (phase === "draw") {
           stopDrawAutoPan(false);
           previewLine.setAttribute("visibility", "hidden");
+          if (arcPreview) arcPreview.setAttribute("visibility", "hidden");
           hideClosingSnapFeedback({ keepConfirmation: true });
           hideAngleGuide();
         }
@@ -13466,6 +14306,17 @@
       });
 
       canvas.addEventListener("pointerdown", (event) => {
+        const curveHandleName = event.target && event.target.dataset ? event.target.dataset.curveHandle : null;
+        if (phase === "draw" && drawingTool === "arch" && curveEdit && curveHandleName) {
+          event.preventDefault();
+          event.stopPropagation();
+          stopDrawAutoPan(true);
+          curveHandleDrag = { pointerId: event.pointerId, handleName: curveHandleName };
+          if (bezierHandles) bezierHandles.classList.add("isDragging");
+          try { canvas.setPointerCapture(event.pointerId); } catch (error) {}
+          return;
+        }
+
         const isMouse = event.pointerType === "mouse";
         const isMiddleButton = isMouse && event.button === 1;
         const isPrimaryButton = !isMouse || event.button === 0;
@@ -13502,6 +14353,7 @@
 
         if (phase === "draw") {
           previewLine.setAttribute("visibility", "hidden");
+          if (arcPreview) arcPreview.setAttribute("visibility", "hidden");
           hideAngleGuide();
         }
 
@@ -13549,6 +14401,27 @@
         panVelocityY = 0;
       }
 
+      function endCurveHandleDrag(event) {
+        if (!curveHandleDrag) return;
+        if (event && event.pointerId !== curveHandleDrag.pointerId) return;
+
+        // A successful pointer release accepts the new Bezier tangent/length.
+        // Block the synthetic click that follows pointerup for a very short window
+        // so nothing else is created at the release position. Pointer-cancel does
+        // not need the guard because it does not generate a normal click.
+        if (!event || event.type === "pointerup") {
+          suppressCanvasClickUntil = performance.now() + 180;
+        }
+
+        curveHandleDrag = null;
+        if (bezierHandles) bezierHandles.classList.remove("isDragging");
+        updateCurveHandleOverlay();
+      }
+
+      if (bezierStartDot) bezierStartDot.addEventListener("click", (event) => event.stopPropagation());
+      if (bezierEndDot) bezierEndDot.addEventListener("click", (event) => event.stopPropagation());
+      canvas.addEventListener("pointerup", endCurveHandleDrag);
+      canvas.addEventListener("pointercancel", endCurveHandleDrag);
       canvas.addEventListener("pointerup", endPan);
       canvas.addEventListener("pointercancel", endPan);
       canvas.addEventListener("auxclick", (event) => {
