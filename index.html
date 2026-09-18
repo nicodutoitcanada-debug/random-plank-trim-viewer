@@ -3846,6 +3846,128 @@
       transform: translateY(0) scale(0.98);
     }
 
+    .generatedPlanReadyOverlay {
+      position: absolute;
+      inset: 0;
+      z-index: 42;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      box-sizing: border-box;
+      background: rgba(0, 0, 0, 0.56);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.28s ease, visibility 0s linear 0.28s;
+    }
+
+    .generatedPlanReadyOverlay.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition: opacity 0.28s ease;
+    }
+
+    .generatedPlanReadyCard {
+      width: min(520px, calc(100vw - 120px));
+      padding: 28px 28px 26px;
+      box-sizing: border-box;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 24px;
+      background: rgba(18, 18, 18, 0.96);
+      box-shadow: 0 26px 80px rgba(0, 0, 0, 0.52);
+      text-align: center;
+      transform: translateY(10px) scale(0.98);
+      transition: transform 0.34s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .generatedPlanReadyOverlay.open .generatedPlanReadyCard {
+      transform: translateY(0) scale(1);
+    }
+
+    .generatedPlanReadyTitle {
+      color: #fff;
+      font-size: 17px;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: 0.045em;
+      text-transform: uppercase;
+    }
+
+    .generatedPlanReadyDescription {
+      max-width: 430px;
+      margin: 12px auto 0;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 13px;
+      line-height: 1.55;
+      font-weight: 400;
+    }
+
+    .generatedPlanReadyCustomGuideNote {
+      max-width: 440px;
+      margin: 14px auto 0;
+      color: #ff5964;
+      font-size: 13px;
+      line-height: 1.45;
+      font-weight: 800;
+    }
+
+    .generatedPlanReadyActions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 22px;
+      flex-wrap: wrap;
+    }
+
+    .generatedPlanReadyButton {
+      min-width: 126px;
+      min-height: 40px;
+      padding: 0 22px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.10);
+      color: #fff;
+      cursor: pointer;
+      font-size: 10px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0.055em;
+      text-transform: uppercase;
+      transition: background 0.18s ease, transform 0.18s ease, opacity 0.18s ease;
+    }
+
+    .generatedPlanReadyButton.primary {
+      border-color: transparent;
+      background: #c9222e;
+      box-shadow: 0 10px 28px rgba(201, 34, 46, 0.24);
+    }
+
+    .generatedPlanReadyButton:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: translateY(-1px);
+    }
+
+    .generatedPlanReadyButton.primary:hover {
+      background: #df2937;
+    }
+
+    .generatedPlanReadyButton:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .generatedPlanReadyButton:disabled {
+      opacity: 0.56;
+      cursor: wait;
+      transform: none;
+    }
+
     .generatedPlanHint {
       position: absolute;
       left: 18px;
@@ -3900,6 +4022,22 @@
       opacity: 0.74;
     }
 
+    .generatedPlanDisclaimer {
+      display: none;
+      grid-column: 1 / -1;
+      margin-top: -5px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 9px;
+      line-height: 1.42;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.52);
+    }
+
+    .generatedPlanOverlay[data-phase="generated"] .generatedPlanDisclaimer {
+      display: block;
+    }
+
     .generatedPlanActions {
       display: flex;
       align-items: center;
@@ -3942,6 +4080,53 @@
       transform: none;
     }
 
+    /* The PDF action is now a prominent custom-guide generator rather than a utility icon. */
+    .generatedPlanActionButton.generatedPlanDownloadIconButton {
+      min-width: 248px;
+      min-height: 42px;
+      padding: 4px 16px 4px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.30);
+      box-shadow: 0 9px 26px rgba(0, 0, 0, 0.20);
+      gap: 9px;
+      opacity: 1;
+    }
+
+    .generatedPlanActionButton.generatedPlanDownloadIconButton:hover {
+      background: rgba(201, 34, 46, 0.86);
+      border-color: rgba(255, 255, 255, 0.20);
+      box-shadow: 0 11px 30px rgba(201, 34, 46, 0.20);
+      opacity: 1;
+      transform: translateY(-1px);
+    }
+
+    .generatedPlanActionButton.generatedPlanDownloadIconButton:active {
+      transform: translateY(0) scale(0.985);
+    }
+
+    .generatedPlanDownloadIconButton img {
+      width: 31px;
+      height: 31px;
+      flex: 0 0 31px;
+      display: block;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+
+    .generatedPlanDownloadLabel {
+      display: inline-block;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .generatedPlanDownloadIconButton.isBusy img {
+      opacity: 0.45;
+      transform: scale(0.88);
+    }
+
     .generatedPlanActionButton[data-show-phase] {
       display: none;
     }
@@ -3965,6 +4150,64 @@
       stroke: #cf2633;
       stroke-width: 7;
       filter: drop-shadow(0 0 8px rgba(207, 38, 51, 0.34));
+    }
+
+    /* Random Plank face preview shown while the user is choosing which walls
+       receive Random Plank. Each short bar represents one of the available
+       plank widths (3.5", 5.5" or 9.5") at a common visual scale. */
+    .generatedPlanRpGuide {
+      stroke: rgba(255, 255, 255, 0.10);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      pointer-events: none;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .generatedPlanRpGuide.isSelected {
+      stroke: rgba(255, 255, 255, 0.20);
+    }
+
+    .generatedPlanRpPlank {
+      stroke: rgba(255, 255, 255, 0.34);
+      stroke-width: 6;
+      stroke-linecap: round;
+      fill: none;
+      pointer-events: none;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .generatedPlanRpPlank.isSelected {
+      stroke: rgba(255, 255, 255, 0.66);
+    }
+
+    /* In the generated plan the Random Plank stays visible as a faint material
+       preview. The planner then lights the individual planks in installation
+       order, holds the completed run briefly, fades the whole material preview
+       back down together, and repeats. */
+    .generatedPlanRpGuide.isGenerated {
+      stroke: rgba(255, 255, 255, 0.13);
+    }
+
+    .generatedPlanRpPlank.isGenerated {
+      stroke: rgba(255, 255, 255, 0.22);
+      stroke-width: 6;
+      opacity: 1;
+      transition:
+        stroke 0.24s cubic-bezier(0.22, 0.8, 0.24, 1),
+        filter 0.24s cubic-bezier(0.22, 0.8, 0.24, 1);
+    }
+
+    .generatedPlanRpPlank.isGenerated.isInstallLit {
+      stroke: rgba(255, 255, 255, 0.92);
+      filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.38));
+    }
+
+    .generatedPlanRpPlank.isGenerated.isInstallReset {
+      transition-duration: 0.48s;
+      stroke: rgba(255, 255, 255, 0.22);
+      filter: none;
     }
 
     .generatedPlanWallHit {
@@ -4414,6 +4657,56 @@
         margin-top: 14px;
       }
 
+      .generatedPlanReadyOverlay {
+        padding: 16px;
+      }
+
+      .generatedPlanReadyCard {
+        width: min(470px, calc(100vw - 52px));
+        padding: 22px 18px 20px;
+        border-radius: 18px;
+      }
+
+      .generatedPlanReadyTitle {
+        font-size: 14px;
+      }
+
+      .generatedPlanReadyDescription {
+        font-size: 11px;
+        line-height: 1.5;
+      }
+
+      .generatedPlanReadyCustomGuideNote {
+        margin-top: 12px;
+        font-size: 11px;
+        line-height: 1.42;
+      }
+
+      .generatedPlanActionButton.generatedPlanDownloadIconButton {
+        min-width: 0;
+        padding-right: 13px;
+      }
+
+      .generatedPlanDownloadIconButton img {
+        width: 27px;
+        height: 27px;
+        flex-basis: 27px;
+      }
+
+      .generatedPlanDownloadLabel {
+        font-size: 8.5px;
+      }
+
+      .generatedPlanReadyActions {
+        margin-top: 18px;
+        gap: 8px;
+      }
+
+      .generatedPlanReadyButton {
+        min-height: 36px;
+        padding: 0 18px;
+      }
+
       .generatedPlanHint {
         left: 10px;
         top: 10px;
@@ -4431,6 +4724,13 @@
 
       .generatedPlanStatus {
         font-size: 9.5px;
+      }
+
+      .generatedPlanDisclaimer {
+        margin-top: 0;
+        padding-top: 8px;
+        font-size: 8.5px;
+        line-height: 1.38;
       }
 
       .generatedPlanActions {
@@ -5367,7 +5667,7 @@
     <div class="generatedPlanWindow" role="dialog" aria-modal="true" aria-labelledby="generatedPlanTitle">
       <div class="generatedPlanHeader">
         <div class="generatedPlanHeadingWrap">
-          <div class="generatedPlanTitle" id="generatedPlanTitle">BUILD YOUR INSTALLATION PLAN</div>
+          <div class="generatedPlanTitle" id="generatedPlanTitle">CUSTOM INSTALLATION GUIDE BUILDER</div>
           <div class="generatedPlanStep" id="generatedPlanStep">STEP 1 — Draw the walls in your project.</div>
         </div>
         <div class="generatedPlanHeaderActions">
@@ -5419,6 +5719,9 @@
             <button class="generatedPlanToolButton" id="generatedPlanSelectAllButton" type="button" aria-label="Select all walls" title="Select all walls">
               <img src="select all.png" alt="" aria-hidden="true" />
             </button>
+            <button class="generatedPlanToolButton" id="generatedPlanRandomPlankSideButton" type="button" aria-label="Random Plank on inside face" title="Random Plank: inside face — click to switch outside">
+              <img id="generatedPlanRandomPlankSideIcon" src="rp is.png" alt="" aria-hidden="true" />
+            </button>
             <button class="generatedPlanToolButton" id="generatedPlanClearSelectionButton" type="button" aria-label="Clear wall selection" title="Clear wall selection">
               <img src="undo.png" alt="" aria-hidden="true" />
             </button>
@@ -5449,6 +5752,13 @@
 
           <button class="generatedPlanActionButton" id="generatedPlanEditWallsButton" type="button" data-show-phase="generated">EDIT WALLS</button>
           <button class="generatedPlanActionButton" id="generatedPlanFitFooterButton" type="button" data-show-phase="generated">FIT PLAN</button>
+          <button class="generatedPlanActionButton generatedPlanDownloadIconButton" id="generatedPlanDownloadFooterButton" type="button" data-show-phase="generated" aria-label="Generate custom PDF installation guide" title="Generate custom PDF installation guide">
+            <img src="download pdf.png" alt="" aria-hidden="true" />
+            <span class="generatedPlanDownloadLabel">GENERATE CUSTOM PDF GUIDE</span>
+          </button>
+        </div>
+        <div class="generatedPlanDisclaimer" id="generatedPlanDisclaimer">
+          Planning disclaimer: This generated plan is based on the information and wall layout provided and our interpretation of the installation conditions. Final site measurements, quantities, cut lists, trim requirements, and installation details remain the responsibility of the contractor/installer and must be verified on site before ordering materials, fabrication, or installation.
         </div>
       </div>
 
@@ -5467,6 +5777,17 @@
           <div class="generatedPlanTutorialBody">
             <p class="generatedPlanTutorialDescription" id="generatedPlanTutorialDescription"></p>
             <button class="generatedPlanTutorialGotItButton" id="generatedPlanTutorialGotItButton" type="button">GOT IT</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="generatedPlanReadyOverlay" id="generatedPlanReadyOverlay" aria-hidden="true">
+        <div class="generatedPlanReadyCard" role="dialog" aria-modal="true" aria-labelledby="generatedPlanReadyTitle" aria-describedby="generatedPlanReadyDescription">
+          <div class="generatedPlanReadyTitle" id="generatedPlanReadyTitle">YOUR INSTALLATION PLAN IS READY</div>
+          <p class="generatedPlanReadyDescription" id="generatedPlanReadyDescription">Click any marked intersection in the generated plan to see how the trim components come together for that condition.</p>
+          <p class="generatedPlanReadyCustomGuideNote"><strong>You can also generate a custom PDF installation guide tailored specifically to this plan.</strong></p>
+          <div class="generatedPlanReadyActions">
+            <button class="generatedPlanReadyButton" id="generatedPlanReadyGotItButton" type="button">GOT IT</button>
           </div>
         </div>
       </div>
@@ -9394,6 +9715,8 @@
       const chooseWallsButton = document.querySelector("#generatedPlanChooseWallsButton");
       const backToDrawButton = document.querySelector("#generatedPlanBackToDrawButton");
       const selectAllButton = document.querySelector("#generatedPlanSelectAllButton");
+      const randomPlankSideButton = document.querySelector("#generatedPlanRandomPlankSideButton");
+      const randomPlankSideIcon = document.querySelector("#generatedPlanRandomPlankSideIcon");
       const clearSelectionButton = document.querySelector("#generatedPlanClearSelectionButton");
       const generateButton = document.querySelector("#generatedPlanGenerateButton");
       const editWallsButton = document.querySelector("#generatedPlanEditWallsButton");
@@ -9404,6 +9727,9 @@
       const tutorialVideo = document.querySelector("#generatedPlanTutorialVideo");
       const tutorialDescription = document.querySelector("#generatedPlanTutorialDescription");
       const tutorialGotItButton = document.querySelector("#generatedPlanTutorialGotItButton");
+      const readyOverlay = document.querySelector("#generatedPlanReadyOverlay");
+      const readyGotItButton = document.querySelector("#generatedPlanReadyGotItButton");
+      const downloadFooterButton = document.querySelector("#generatedPlanDownloadFooterButton");
 
       if (!launchButton || !overlay || !canvas || !viewport) return;
 
@@ -9418,6 +9744,9 @@
       let currentRun = null;
       let previewPoint = null;
       let selectedSegments = new Set();
+      // The installation face is explicit because the same wall geometry can
+      // represent cladding on either side of the wall. Default to the inside.
+      let randomPlankSide = "inside";
       let generatedPlan = null;
       let activeGeneratedHotspotKey = null;
       let viewScale = 1;
@@ -9446,6 +9775,8 @@
       let panVelocityY = 0;
       let lastPanMoveTime = 0;
       let closingSnapFeedbackTimer = null;
+      let generatedRpAnimationTimers = [];
+      let generatedRpAnimationToken = 0;
 
       // Drawing-edge auto-pan state. The draft geometry itself is translated
       // while drawing so the user can keep extending a run beyond the space
@@ -9486,6 +9817,20 @@
         const panCursorActive = (phase === "draw" && drawingTool === "pan")
           || (phase === "select" && selectionPanMode);
         canvas.classList.toggle("isPanTool", panCursorActive);
+      }
+
+      function updateRandomPlankSideUi() {
+        const isInside = randomPlankSide === "inside";
+        if (randomPlankSideIcon) {
+          randomPlankSideIcon.src = isInside ? "rp is.png" : "rp os.png";
+        }
+        if (randomPlankSideButton) {
+          const currentLabel = isInside ? "inside" : "outside";
+          const nextLabel = isInside ? "outside" : "inside";
+          randomPlankSideButton.setAttribute("aria-label", `Random Plank on ${currentLabel} face`);
+          randomPlankSideButton.setAttribute("title", `Random Plank: ${currentLabel} face — click to switch ${nextLabel}`);
+          randomPlankSideButton.setAttribute("aria-pressed", isInside ? "false" : "true");
+        }
       }
 
       function setDrawingTool(nextTool) {
@@ -9836,11 +10181,11 @@
       const PLAN_TUTORIALS = {
         draw: {
           src: "draw.mp4",
-          description: "Draw the walls that match your installation layout to generate a tailored installation plan."
+          description: "You are drawing in a top-down plan view, as though you are looking down at the walls from above. Draw the walls that match your installation layout to generate a tailored installation plan."
         },
         select: {
           src: "select.mp4",
-          description: "Select the walls that will receive Random Plank, then generate a tailored installation plan for those walls."
+          description: "Select the walls that will receive Random Plank. The preview starts on the inside face; use the RP side control to switch it to the outside when required, then generate the installation plan."
         }
       };
 
@@ -9881,6 +10226,340 @@
         }
       }
 
+      function closeGeneratedPlanReadyPopup() {
+        if (!readyOverlay) return;
+        readyOverlay.classList.remove("open");
+        readyOverlay.setAttribute("aria-hidden", "true");
+      }
+
+      function showGeneratedPlanReadyPopup() {
+        if (!readyOverlay || !generatedPlan || !overlay.classList.contains("open")) return;
+        readyOverlay.classList.add("open");
+        readyOverlay.setAttribute("aria-hidden", "false");
+      }
+
+      function setPdfButtonBusy(isBusy) {
+        if (!downloadFooterButton) return;
+        downloadFooterButton.disabled = isBusy;
+        downloadFooterButton.classList.toggle("isBusy", isBusy);
+        downloadFooterButton.setAttribute("aria-label", isBusy ? "Generating custom PDF installation guide" : "Generate custom PDF installation guide");
+        downloadFooterButton.setAttribute("title", isBusy ? "Generating custom guide..." : "Generate custom PDF installation guide");
+        const label = downloadFooterButton.querySelector(".generatedPlanDownloadLabel");
+        if (label) label.textContent = isBusy ? "GENERATING CUSTOM GUIDE..." : "GENERATE CUSTOM PDF GUIDE";
+      }
+
+      function getGeneratedPlanExportSvg() {
+        if (!generatedPlan || !viewport) return null;
+
+        let bounds;
+        try {
+          bounds = viewport.getBBox();
+        } catch (error) {
+          bounds = null;
+        }
+
+        if (!bounds || !Number.isFinite(bounds.width) || !Number.isFinite(bounds.height) || bounds.width <= 0 || bounds.height <= 0) {
+          bounds = { x: 0, y: 0, width: 1000, height: 600 };
+        }
+
+        const padding = 58;
+        const exportX = bounds.x - padding;
+        const exportY = bounds.y - padding;
+        const exportWidth = Math.max(1, bounds.width + padding * 2);
+        const exportHeight = Math.max(1, bounds.height + padding * 2);
+        const clone = viewport.cloneNode(true);
+        clone.removeAttribute("transform");
+        clone.querySelectorAll(".isActive").forEach((node) => node.classList.remove("isActive"));
+        clone.querySelectorAll("[tabindex]").forEach((node) => node.removeAttribute("tabindex"));
+        clone.querySelectorAll(".generatedPlanRpPlank").forEach((node) => {
+          node.classList.remove("isInstallLit", "isInstallReset");
+        });
+
+        const style = `
+          * { font-family: Arial, Helvetica, sans-serif; }
+          .generatedPlanBaseWall { stroke: rgba(255,255,255,0.30); stroke-width: 11; stroke-linecap: round; fill: none; vector-effect: non-scaling-stroke; }
+          .generatedPlanRpGuide.isGenerated { stroke: rgba(255,255,255,0.16); stroke-width: 2; stroke-linecap: round; fill: none; vector-effect: non-scaling-stroke; }
+          .generatedPlanRpPlank.isGenerated { stroke: rgba(255,255,255,0.56); stroke-width: 6; stroke-linecap: round; fill: none; vector-effect: non-scaling-stroke; filter: none; }
+          .generatedPlanFlow { stroke: #d22a36; stroke-width: 5; stroke-linecap: round; fill: none; vector-effect: non-scaling-stroke; }
+          .generatedPlanFlowMotion { stroke: rgba(255,255,255,0.88); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 7 18; fill: none; opacity: 0.9; vector-effect: non-scaling-stroke; }
+          .generatedPlanArrowHead { fill: #d22a36; stroke: #d22a36; stroke-width: 3.5; stroke-linejoin: round; stroke-linecap: round; }
+          .generatedPlanHotspotCore { fill: #121212; stroke: #fff; stroke-width: 4; vector-effect: non-scaling-stroke; }
+          .generatedPlanHotspotDot { fill: #fff; }
+          .generatedPlanHotspotConnector { stroke: rgba(255,255,255,0.92); stroke-width: 1.8; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+          .generatedPlanHotspotLabelBg { fill: rgba(0,0,0,0.82); stroke: rgba(255,255,255,0.14); stroke-width: 1; vector-effect: non-scaling-stroke; }
+          .generatedPlanHotspotLabel { fill: #fff; font-size: 12px; font-weight: 800; letter-spacing: 0.01em; text-anchor: middle; }
+        `;
+
+        // Give the SVG an intrinsic pixel size with exactly the same aspect ratio
+        // as its viewBox. A fixed 2400x1500 raster size can letterbox the artwork,
+        // and a later canvas draw can then make that letterboxed image look stretched.
+        const maxRasterDimension = 2400;
+        let rasterWidth;
+        let rasterHeight;
+        if (exportWidth >= exportHeight) {
+          rasterWidth = maxRasterDimension;
+          rasterHeight = Math.max(1, Math.round(maxRasterDimension * exportHeight / exportWidth));
+        } else {
+          rasterHeight = maxRasterDimension;
+          rasterWidth = Math.max(1, Math.round(maxRasterDimension * exportWidth / exportHeight));
+        }
+
+        const svg = `
+          <svg xmlns="http://www.w3.org/2000/svg"
+               width="${rasterWidth}"
+               height="${rasterHeight}"
+               viewBox="${exportX} ${exportY} ${exportWidth} ${exportHeight}"
+               preserveAspectRatio="xMidYMid meet">
+            <style><![CDATA[${style}]]></style>
+            <rect x="${exportX}" y="${exportY}" width="${exportWidth}" height="${exportHeight}" rx="18" fill="#1b1b1b" />
+            ${clone.outerHTML}
+          </svg>
+        `;
+
+        return { svg, bounds: { x: exportX, y: exportY, width: exportWidth, height: exportHeight } };
+      }
+
+      function decodeBase64ToBytes(base64) {
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i += 1) {
+          bytes[i] = binary.charCodeAt(i) & 0xff;
+        }
+        return bytes;
+      }
+
+      function asciiBytes(value) {
+        const bytes = new Uint8Array(value.length);
+        for (let i = 0; i < value.length; i += 1) {
+          bytes[i] = value.charCodeAt(i) & 0xff;
+        }
+        return bytes;
+      }
+
+      function concatByteArrays(parts) {
+        const total = parts.reduce((sum, part) => sum + part.length, 0);
+        const output = new Uint8Array(total);
+        let offset = 0;
+        parts.forEach((part) => {
+          output.set(part, offset);
+          offset += part.length;
+        });
+        return output;
+      }
+
+      function buildSingleImagePdf(jpegBytes, imageWidth, imageHeight) {
+        // Landscape US Letter in PDF points. The complete page artwork is embedded
+        // as one JPEG, so this exporter has no network or external-library dependency.
+        const pageWidth = 792;
+        const pageHeight = 612;
+        const parts = [];
+        const offsets = [0];
+        let length = 0;
+
+        const push = (bytes) => {
+          parts.push(bytes);
+          length += bytes.length;
+        };
+        const pushAscii = (value) => push(asciiBytes(value));
+        const beginObject = (number) => {
+          offsets[number] = length;
+          pushAscii(`${number} 0 obj\n`);
+        };
+        const endObject = () => pushAscii("\nendobj\n");
+
+        pushAscii("%PDF-1.4\n%LUXPDF\n");
+
+        beginObject(1);
+        pushAscii("<< /Type /Catalog /Pages 2 0 R >>");
+        endObject();
+
+        beginObject(2);
+        pushAscii("<< /Type /Pages /Kids [3 0 R] /Count 1 >>");
+        endObject();
+
+        beginObject(3);
+        pushAscii(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`);
+        endObject();
+
+        beginObject(4);
+        pushAscii(`<< /Type /XObject /Subtype /Image /Width ${imageWidth} /Height ${imageHeight} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpegBytes.length} >>\nstream\n`);
+        push(jpegBytes);
+        pushAscii("\nendstream");
+        endObject();
+
+        const content = `q\n${pageWidth} 0 0 ${pageHeight} 0 0 cm\n/Im0 Do\nQ\n`;
+        beginObject(5);
+        pushAscii(`<< /Length ${asciiBytes(content).length} >>\nstream\n${content}endstream`);
+        endObject();
+
+        const xrefOffset = length;
+        pushAscii("xref\n0 6\n");
+        pushAscii("0000000000 65535 f \n");
+        for (let i = 1; i <= 5; i += 1) {
+          pushAscii(`${String(offsets[i]).padStart(10, "0")} 00000 n \n`);
+        }
+        pushAscii(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`);
+
+        return concatByteArrays(parts);
+      }
+
+      async function exportGeneratedPlanPdf() {
+        if (!generatedPlan) return;
+
+        const exportData = getGeneratedPlanExportSvg();
+        if (!exportData) return;
+
+        setPdfButtonBusy(true);
+
+        let objectUrl = null;
+        let downloadUrl = null;
+        try {
+          const blob = new Blob([exportData.svg], { type: "image/svg+xml;charset=utf-8" });
+          objectUrl = URL.createObjectURL(blob);
+
+          const image = new Image();
+          const loaded = new Promise((resolve, reject) => {
+            image.onload = resolve;
+            image.onerror = () => reject(new Error("Unable to render the installation plan for PDF export."));
+          });
+          image.src = objectUrl;
+          await loaded;
+
+          // First render the fitted plan at high resolution. Keep the canvas at
+          // the exact source aspect ratio — no minimum height — so the drawing can
+          // never be stretched vertically or horizontally during PDF export.
+          const sourceAspect = exportData.bounds.width / Math.max(1, exportData.bounds.height);
+          const planWidth = 2600;
+          const planHeight = Math.max(1, Math.round(planWidth / Math.max(0.0001, sourceAspect)));
+          const planCanvas = document.createElement("canvas");
+          planCanvas.width = planWidth;
+          planCanvas.height = planHeight;
+          const planCtx = planCanvas.getContext("2d", { alpha: false });
+          if (!planCtx) throw new Error("Unable to create the plan canvas.");
+          planCtx.fillStyle = "#1b1b1b";
+          planCtx.fillRect(0, 0, planWidth, planHeight);
+          planCtx.drawImage(image, 0, 0, planWidth, planHeight);
+
+          // Compose the entire PDF page as artwork. This keeps the PDF generator
+          // completely self-contained and gives us reliable typography/layout.
+          const pageCanvas = document.createElement("canvas");
+          pageCanvas.width = 2376;   // 3x landscape Letter points
+          pageCanvas.height = 1836;
+          const ctx = pageCanvas.getContext("2d", { alpha: false });
+          if (!ctx) throw new Error("Unable to create the PDF page canvas.");
+
+          ctx.fillStyle = "#f8f8f8";
+          ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+
+          const marginX = 126;
+          ctx.fillStyle = "#1c1c1c";
+          ctx.font = "700 54px Arial, Helvetica, sans-serif";
+          ctx.textBaseline = "alphabetic";
+          ctx.fillText("RANDOM PLANK INSTALLATION PLAN", marginX, 118);
+
+          ctx.fillStyle = "#666";
+          ctx.font = "400 27px Arial, Helvetica, sans-serif";
+          ctx.fillText("Generated installation sequence and trim conditions", marginX, 166);
+
+          // Reserve a clear footer area for the required site-verification disclaimer.
+          const planTop = 225;
+          const planBottom = 1545;
+          const availableWidth = pageCanvas.width - marginX * 2;
+          const availableHeight = planBottom - planTop;
+          const planAspect = planWidth / planHeight;
+          let drawWidth = availableWidth;
+          let drawHeight = drawWidth / planAspect;
+          if (drawHeight > availableHeight) {
+            drawHeight = availableHeight;
+            drawWidth = drawHeight * planAspect;
+          }
+          const drawX = (pageCanvas.width - drawWidth) / 2;
+          const drawY = planTop + (availableHeight - drawHeight) / 2;
+
+          ctx.strokeStyle = "#d9d9d9";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          if (typeof ctx.roundRect === "function") {
+            ctx.roundRect(drawX - 5, drawY - 5, drawWidth + 10, drawHeight + 10, 12);
+          } else {
+            ctx.rect(drawX - 5, drawY - 5, drawWidth + 10, drawHeight + 10);
+          }
+          ctx.stroke();
+          ctx.drawImage(planCanvas, drawX, drawY, drawWidth, drawHeight);
+
+          // Pull the exact on-screen disclaimer into the PDF so both locations stay
+          // synchronized if the wording is edited later.
+          const disclaimerElement = document.querySelector("#generatedPlanDisclaimer");
+          const disclaimerText = disclaimerElement
+            ? disclaimerElement.textContent.replace(/\s+/g, " ").trim()
+            : "Planning disclaimer: This generated plan is based on the information and wall layout provided and our interpretation of the installation conditions. Final site measurements, quantities, cut lists, trim requirements, and installation details remain the responsibility of the contractor/installer and must be verified on site before ordering materials, fabrication, or installation.";
+
+          const wrapCanvasText = (context, value, x, y, maxWidth, lineHeight) => {
+            const words = String(value).split(/\s+/).filter(Boolean);
+            let line = "";
+            let currentY = y;
+            for (let i = 0; i < words.length; i += 1) {
+              const testLine = line ? `${line} ${words[i]}` : words[i];
+              if (line && context.measureText(testLine).width > maxWidth) {
+                context.fillText(line, x, currentY);
+                line = words[i];
+                currentY += lineHeight;
+              } else {
+                line = testLine;
+              }
+            }
+            if (line) context.fillText(line, x, currentY);
+            return currentY;
+          };
+
+          ctx.strokeStyle = "#dedede";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(marginX, 1595);
+          ctx.lineTo(pageCanvas.width - marginX, 1595);
+          ctx.stroke();
+
+          ctx.fillStyle = "#555";
+          ctx.font = "700 19px Arial, Helvetica, sans-serif";
+          ctx.fillText("SITE VERIFICATION / PLANNING DISCLAIMER", marginX, 1635);
+          ctx.fillStyle = "#666";
+          ctx.font = "400 18px Arial, Helvetica, sans-serif";
+          wrapCanvasText(ctx, disclaimerText.replace(/^Planning disclaimer:\s*/i, ""), marginX, 1670, pageCanvas.width - marginX * 2, 27);
+
+          ctx.fillStyle = "#777";
+          ctx.font = "400 20px Arial, Helvetica, sans-serif";
+          ctx.fillText("LUX Architectural Products", marginX, 1795);
+          ctx.textAlign = "right";
+          ctx.fillText("Use the interactive BUILD PLAN to open each marked trim condition.", pageCanvas.width - marginX, 1795);
+          ctx.textAlign = "left";
+
+          const jpegDataUrl = pageCanvas.toDataURL("image/jpeg", 0.94);
+          const commaIndex = jpegDataUrl.indexOf(",");
+          if (commaIndex < 0) throw new Error("Unable to encode the PDF page image.");
+          const jpegBytes = decodeBase64ToBytes(jpegDataUrl.slice(commaIndex + 1));
+          const pdfBytes = buildSingleImagePdf(jpegBytes, pageCanvas.width, pageCanvas.height);
+          const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
+          downloadUrl = URL.createObjectURL(pdfBlob);
+
+          const date = new Date();
+          const dateStamp = [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
+          const anchor = document.createElement("a");
+          anchor.href = downloadUrl;
+          anchor.download = `Random-Plank-Installation-Plan-${dateStamp}.pdf`;
+          anchor.style.display = "none";
+          document.body.appendChild(anchor);
+          anchor.click();
+          anchor.remove();
+        } catch (error) {
+          console.error("Generated plan PDF export failed:", error);
+          window.alert("The installation plan PDF could not be created. Please try again.");
+        } finally {
+          if (objectUrl) URL.revokeObjectURL(objectUrl);
+          if (downloadUrl) setTimeout(() => URL.revokeObjectURL(downloadUrl), 1500);
+          setPdfButtonBusy(false);
+        }
+      }
+
       function setPhase(nextPhase) {
         if (nextPhase !== "draw") stopDrawAutoPan(true);
         hideClosingSnapFeedback({ keepConfirmation: false });
@@ -9891,7 +10570,7 @@
         document.body.classList.remove("generatedPlanModelMode");
 
         if (nextPhase === "draw") {
-          title.textContent = "BUILD YOUR INSTALLATION PLAN";
+          title.textContent = "CUSTOM INSTALLATION GUIDE BUILDER";
           stepText.textContent = "STEP 1 — Draw the walls in your project.";
           hint.textContent = isFinePointer
             ? "90° SNAP ON · Hold SHIFT or use ANGLE for any angle · Middle-drag to pan · Right-click or ACCEPT to stop drawing."
@@ -9900,7 +10579,7 @@
         } else if (nextPhase === "select") {
           title.textContent = "SELECT RANDOM PLANK WALLS";
           stepText.textContent = "STEP 2 — Click the walls that will receive Random Plank.";
-          hint.textContent = "Selected walls are highlighted red. Use PAN for left-drag navigation, or middle-drag at any time. Scroll or use + / − to zoom.";
+          hint.textContent = `Selected walls are highlighted red. The Random Plank preview is on the ${randomPlankSide.toUpperCase()} face. Use the RP side button to switch faces. PAN, middle-drag, scroll or + / − still navigate the plan.`;
           status.textContent = "Disconnected selected walls will be planned as separate installation runs.";
         } else {
           title.textContent = "YOUR INSTALLATION PLAN";
@@ -9909,6 +10588,7 @@
         }
 
         updateDrawingToolUi();
+        updateRandomPlankSideUi();
         renderPlanner();
 
         if (nextPhase === "draw" || nextPhase === "select") {
@@ -10373,8 +11053,371 @@
         return path;
       }
 
+      function oppositePlanSide(side) {
+        return side === "left" ? "right" : "left";
+      }
+
+      function isClosedPointPath(points) {
+        return Array.isArray(points)
+          && points.length >= 4
+          && pointDistance(points[0], points[points.length - 1]) < 2.2;
+      }
+
+      function polygonScreenArea2(points) {
+        if (!points || points.length < 3) return 0;
+        let area2 = 0;
+        for (let i = 0; i < points.length; i += 1) {
+          const a = points[i];
+          const b = points[(i + 1) % points.length];
+          area2 += a.x * b.y - b.x * a.y;
+        }
+        return area2;
+      }
+
+      // Determine which side of an oriented path represents its geometric
+      // "inside". Closed paths use winding. Open paths use their first real
+      // bend, which makes an L-shape read naturally regardless of draw direction.
+      function getInsideSideForPath(rawPoints, closed = false) {
+        if (!rawPoints || rawPoints.length < 2) return "right";
+        let points = rawPoints.slice();
+        if (closed && points.length > 2 && pointDistance(points[0], points[points.length - 1]) < 2.2) {
+          points = points.slice(0, -1);
+        }
+
+        if (closed && points.length >= 3) {
+          // In SVG/screen coordinates Y grows downward, so positive shoelace
+          // area means the visible polygon runs clockwise and its interior is
+          // on the right-hand side of the path.
+          return polygonScreenArea2(points) >= 0 ? "right" : "left";
+        }
+
+        for (let i = 1; i < points.length - 1; i += 1) {
+          const turn = signedTurnAngle(points[i - 1], points[i], points[i + 1]);
+          const magnitude = Math.abs(turn);
+          if (magnitude > STRAIGHT_TOLERANCE && Math.abs(magnitude - 180) > STRAIGHT_TOLERANCE) {
+            return turn >= 0 ? "right" : "left";
+          }
+        }
+
+        // A single straight wall has no geometric inside. Keep the choice
+        // deterministic; OUTSIDE simply mirrors this side.
+        return "right";
+      }
+
+      function getRandomPlankFaceSideForPath(points, closed = false) {
+        const insideSide = getInsideSideForPath(points, closed);
+        return randomPlankSide === "inside" ? insideSide : oppositePlanSide(insideSide);
+      }
+
+      // Translate the visible side chosen for the ORIGINAL drawn run onto the
+      // direction in which the generated graph happens to traverse that run.
+      // This keeps trim classification perfectly aligned with the dashed RP
+      // preview even when only part of a run is selected or a chain is reversed.
+      function getRandomPlankFaceSideForGraphPath(pathNodeIds, graph, closed = false) {
+        if (!pathNodeIds || pathNodeIds.length < 2) return "right";
+        const firstId = pathNodeIds[0];
+        const secondId = pathNodeIds[1];
+        const edge = graph.edges.find((candidate) =>
+          (candidate.a === firstId && candidate.b === secondId)
+          || (candidate.a === secondId && candidate.b === firstId)
+        );
+
+        if (edge && edge.source && Number.isInteger(edge.source.runIndex)) {
+          const sourceRun = runs[edge.source.runIndex];
+          if (sourceRun && sourceRun.points && sourceRun.points.length >= 2) {
+            const sourceClosed = isClosedPointPath(sourceRun.points);
+            const sourceSide = getRandomPlankFaceSideForPath(sourceRun.points, sourceClosed);
+            const firstPoint = graph.nodes.get(firstId).point;
+            const secondPoint = graph.nodes.get(secondId).point;
+            const sameDirection = pointDistance(firstPoint, edge.source.a) < 2.2
+              && pointDistance(secondPoint, edge.source.b) < 2.2;
+            return sameDirection ? sourceSide : oppositePlanSide(sourceSide);
+          }
+        }
+
+        const fallbackPoints = pathNodeIds.map((nodeId) => graph.nodes.get(nodeId).point);
+        return getRandomPlankFaceSideForPath(fallbackPoints, closed);
+      }
+
+      function getOffsetNormal(a, b, side) {
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const length = Math.max(0.0001, Math.hypot(dx, dy));
+        const ux = dx / length;
+        const uy = dy / length;
+        return side === "right"
+          ? { x: -uy, y: ux }
+          : { x: uy, y: -ux };
+      }
+
+      function intersectOffsetLines(p, d, q, e) {
+        const cross = d.x * e.y - d.y * e.x;
+        if (Math.abs(cross) < 0.00001) return null;
+        const qpx = q.x - p.x;
+        const qpy = q.y - p.y;
+        const t = (qpx * e.y - qpy * e.x) / cross;
+        return { x: p.x + d.x * t, y: p.y + d.y * t };
+      }
+
+      function buildOffsetPolyline(rawPoints, side, offsetDistance, closed = false) {
+        if (!rawPoints || rawPoints.length < 2) return [];
+        let points = rawPoints.map(copyPoint);
+        if (closed && pointDistance(points[0], points[points.length - 1]) < 2.2) {
+          points = points.slice(0, -1);
+        }
+        if (points.length < 2) return [];
+
+        const segmentCount = closed ? points.length : points.length - 1;
+        const segments = [];
+        for (let i = 0; i < segmentCount; i += 1) {
+          const a = points[i];
+          const b = points[(i + 1) % points.length];
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const length = Math.max(0.0001, Math.hypot(dx, dy));
+          const direction = { x: dx / length, y: dy / length };
+          const normal = getOffsetNormal(a, b, side);
+          segments.push({ a, b, direction, normal });
+        }
+
+        const result = [];
+        for (let i = 0; i < points.length; i += 1) {
+          if (!closed && i === 0) {
+            const n = segments[0].normal;
+            result.push({ x: points[i].x + n.x * offsetDistance, y: points[i].y + n.y * offsetDistance });
+            continue;
+          }
+          if (!closed && i === points.length - 1) {
+            const n = segments[segments.length - 1].normal;
+            result.push({ x: points[i].x + n.x * offsetDistance, y: points[i].y + n.y * offsetDistance });
+            continue;
+          }
+
+          const prevSegment = segments[(i - 1 + segments.length) % segments.length];
+          const nextSegment = segments[i % segments.length];
+          const prevShift = {
+            x: points[i].x + prevSegment.normal.x * offsetDistance,
+            y: points[i].y + prevSegment.normal.y * offsetDistance
+          };
+          const nextShift = {
+            x: points[i].x + nextSegment.normal.x * offsetDistance,
+            y: points[i].y + nextSegment.normal.y * offsetDistance
+          };
+          let intersection = intersectOffsetLines(
+            prevShift,
+            prevSegment.direction,
+            nextShift,
+            nextSegment.direction
+          );
+
+          // Very acute corners can create an enormous miter. Clamp those to a
+          // simple averaged join so the preview always remains visually useful.
+          if (!intersection || pointDistance(intersection, points[i]) > offsetDistance * 4.2) {
+            intersection = {
+              x: (prevShift.x + nextShift.x) / 2,
+              y: (prevShift.y + nextShift.y) / 2
+            };
+          }
+          result.push(intersection);
+        }
+
+        if (closed && result.length) result.push(copyPoint(result[0]));
+        return result;
+      }
+
+      function renderRandomPlankTiles(parent, a, b, runIndex, segmentIndex, className) {
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const length = Math.hypot(dx, dy);
+        if (length < 10) return [];
+        const ux = dx / length;
+        const uy = dy / length;
+        const plankWidths = [3.5, 9.5, 5.5, 3.5, 5.5, 9.5, 9.5, 3.5, 5.5];
+        const plankScale = 4.05; // common scale preserves 3.5 : 5.5 : 9.5 proportions
+        const gap = 7.5;
+        const endInset = 5;
+        let cursor = endInset;
+        let patternIndex = (runIndex * 2 + segmentIndex * 3) % plankWidths.length;
+        const tileLines = [];
+
+        while (cursor < length - endInset - 5) {
+          const requested = plankWidths[patternIndex % plankWidths.length] * plankScale;
+          const available = length - endInset - cursor;
+          const tileLength = Math.min(requested, available);
+          if (tileLength < 8) break;
+
+          const start = { x: a.x + ux * cursor, y: a.y + uy * cursor };
+          const end = { x: a.x + ux * (cursor + tileLength), y: a.y + uy * (cursor + tileLength) };
+          tileLines.push(drawLine(parent, start, end, className));
+          cursor += tileLength + gap;
+          patternIndex += 1;
+        }
+
+        return tileLines;
+      }
+
+      function getRandomPlankOffsetSegment(segment, offsetDistance = 13) {
+        if (!segment || !Number.isInteger(segment.runIndex) || !Number.isInteger(segment.segmentIndex)) return null;
+        const run = runs[segment.runIndex];
+        if (!run || !run.points || run.points.length < 2) return null;
+        const closed = isClosedPointPath(run.points);
+        const side = getRandomPlankFaceSideForPath(run.points, closed);
+        const offsetPoints = buildOffsetPolyline(run.points, side, offsetDistance, closed);
+        const a = offsetPoints[segment.segmentIndex];
+        const b = offsetPoints[segment.segmentIndex + 1];
+        if (!a || !b) return null;
+        return { a, b };
+      }
+
+      function renderRandomPlankFacePreview() {
+        const offsetDistance = 13;
+        runs.forEach((run, runIndex) => {
+          if (!run || !run.points || run.points.length < 2) return;
+          const closed = isClosedPointPath(run.points);
+          const side = getRandomPlankFaceSideForPath(run.points, closed);
+          const offsetPoints = buildOffsetPolyline(run.points, side, offsetDistance, closed);
+          if (offsetPoints.length < 2) return;
+
+          for (let i = 0; i < offsetPoints.length - 1; i += 1) {
+            const selected = selectedSegments.has(`r${runIndex}s${i}`);
+
+            // An unselected wall now stays completely clean: only its original
+            // wall line remains. Random Plank appears only after that wall is
+            // explicitly selected, removing any ambiguity about scope.
+            if (!selected) continue;
+
+            drawLine(viewport, offsetPoints[i], offsetPoints[i + 1], "generatedPlanRpGuide isSelected");
+            renderRandomPlankTiles(
+              viewport,
+              offsetPoints[i],
+              offsetPoints[i + 1],
+              runIndex,
+              i,
+              "generatedPlanRpPlank isSelected"
+            );
+          }
+        });
+      }
+
+      function stopGeneratedRandomPlankAnimation() {
+        generatedRpAnimationToken += 1;
+        generatedRpAnimationTimers.forEach((timerId) => clearTimeout(timerId));
+        generatedRpAnimationTimers = [];
+      }
+
+      function startGeneratedRandomPlankAnimation(tileLines) {
+        stopGeneratedRandomPlankAnimation();
+        if (!tileLines || !tileLines.length || phase !== "generated") return;
+
+        const token = generatedRpAnimationToken;
+        const totalTiles = tileLines.length;
+        // Keep short plans from racing past the eye, but cap long plans so a
+        // large project does not take forever to demonstrate its direction.
+        const sequenceDuration = Math.max(1200, Math.min(3300, totalTiles * 82));
+        const stepDelay = totalTiles > 1 ? sequenceDuration / (totalTiles - 1) : 0;
+        const settleAfterLast = 520;
+        const fadeDuration = 500;
+        const dimPause = 420;
+
+        const schedule = (callback, delay) => {
+          const timerId = setTimeout(() => {
+            if (token !== generatedRpAnimationToken || phase !== "generated") return;
+            callback();
+          }, Math.max(0, Math.round(delay)));
+          generatedRpAnimationTimers.push(timerId);
+        };
+
+        const runCycle = () => {
+          if (token !== generatedRpAnimationToken || phase !== "generated") return;
+
+          tileLines.forEach((line) => {
+            line.classList.remove("isInstallLit", "isInstallReset");
+          });
+
+          tileLines.forEach((line, index) => {
+            schedule(() => {
+              line.classList.remove("isInstallReset");
+              line.classList.add("isInstallLit");
+            }, index * stepDelay);
+          });
+
+          const lastLightAt = (totalTiles - 1) * stepDelay;
+          const resetAt = lastLightAt + settleAfterLast;
+          schedule(() => {
+            tileLines.forEach((line) => {
+              line.classList.add("isInstallReset");
+              line.classList.remove("isInstallLit");
+            });
+          }, resetAt);
+
+          schedule(runCycle, resetAt + fadeDuration + dimPause);
+        };
+
+        runCycle();
+      }
+
+      function findSelectedSegmentForFlow(flow) {
+        if (!generatedPlan || !generatedPlan.selectedEdges) return null;
+        return generatedPlan.selectedEdges.find((segment) => {
+          const sameDirection = pointDistance(flow.a, segment.a) < 2.2
+            && pointDistance(flow.b, segment.b) < 2.2;
+          const reverseDirection = pointDistance(flow.a, segment.b) < 2.2
+            && pointDistance(flow.b, segment.a) < 2.2;
+          return sameDirection || reverseDirection;
+        }) || null;
+      }
+
+      function renderGeneratedRandomPlankPanels() {
+        if (!generatedPlan || !generatedPlan.flowEdges || !generatedPlan.flowEdges.length) return [];
+
+        const animatedTiles = [];
+        const renderedSegments = new Map();
+
+        generatedPlan.flowEdges.forEach((flow) => {
+          const segment = findSelectedSegmentForFlow(flow);
+          if (!segment) return;
+
+          let rendered = renderedSegments.get(segment.id);
+          if (!rendered) {
+            const offsetSegment = getRandomPlankOffsetSegment(segment, 13);
+            if (!offsetSegment) return;
+
+            drawLine(
+              viewport,
+              offsetSegment.a,
+              offsetSegment.b,
+              "generatedPlanRpGuide isGenerated"
+            );
+            const lines = renderRandomPlankTiles(
+              viewport,
+              offsetSegment.a,
+              offsetSegment.b,
+              segment.runIndex,
+              segment.segmentIndex,
+              "generatedPlanRpPlank isGenerated"
+            );
+            rendered = { lines, offsetSegment };
+            renderedSegments.set(segment.id, rendered);
+          }
+
+          const followsOriginalDirection = pointDistance(flow.a, segment.a) < 2.2
+            && pointDistance(flow.b, segment.b) < 2.2;
+          if (followsOriginalDirection) {
+            animatedTiles.push(...rendered.lines);
+          } else {
+            animatedTiles.push(...rendered.lines.slice().reverse());
+          }
+        });
+
+        return animatedTiles;
+      }
+
       function renderDraftOrSelection() {
         const segments = getSegments();
+
+        if (phase === "select") {
+          renderRandomPlankFacePreview();
+        }
 
         segments.forEach((segment) => {
           const selected = selectedSegments.has(segment.id);
@@ -10587,6 +11630,12 @@
           drawLine(viewport, edge.a, edge.b, "generatedPlanBaseWall");
         });
 
+        // Keep the Random Plank material visible in the finished plan. It sits
+        // behind the red direction arrows, then repeatedly highlights plank by
+        // plank in the exact installation direction calculated by the planner.
+        const generatedRpTiles = renderGeneratedRandomPlankPanels();
+        startGeneratedRandomPlankAnimation(generatedRpTiles);
+
         const eventPoints = generatedPlan.events.map((eventData) => eventData.point);
         const hasEventAt = (point) => eventPoints.some((eventPoint) => pointDistance(point, eventPoint) < 2.2);
 
@@ -10687,6 +11736,7 @@
       }
 
       function renderPlanner() {
+        stopGeneratedRandomPlankAnimation();
         while (viewport.firstChild) viewport.removeChild(viewport.firstChild);
         updateViewportTransform();
 
@@ -10715,15 +11765,19 @@
         return Math.atan2(cross, dot) * 180 / Math.PI;
       }
 
-      function classifyInternalNode(prev, current, next) {
-        const angle = Math.abs(signedTurnAngle(prev, current, next));
+      function classifyInternalNode(prev, current, next, faceSide) {
+        const signed = signedTurnAngle(prev, current, next);
+        const angle = Math.abs(signed);
         const normalized = angle > 180 ? 360 - angle : angle;
 
         if (normalized <= STRAIGHT_TOLERANCE || Math.abs(normalized - 180) <= STRAIGHT_TOLERANCE) {
           return "straight";
         }
         if (Math.abs(normalized - 90) <= RIGHT_ANGLE_TOLERANCE) {
-          return "insideEndStart";
+          // On screen coordinates, a positive turn puts the tight/inside face
+          // on the right side of the path; a negative turn puts it on the left.
+          const cornerInsideSide = signed >= 0 ? "right" : "left";
+          return faceSide === cornerInsideSide ? "insideEndStart" : "outsideStartEnd";
         }
         return "odd";
       }
@@ -10843,17 +11897,21 @@
         return preferred === first ? chain.nodeIds.slice() : chain.nodeIds.slice().reverse();
       }
 
-      function addInternalEventsForPath(pathNodeIds, graph, events, skipNodeIds = new Set()) {
+      function addInternalEventsForPath(pathNodeIds, graph, events, skipNodeIds = new Set(), explicitFaceSide = null) {
+        const faceSide = explicitFaceSide || getRandomPlankFaceSideForGraphPath(pathNodeIds, graph, false);
+
         for (let i = 1; i < pathNodeIds.length - 1; i += 1) {
           const nodeId = pathNodeIds[i];
           if (skipNodeIds.has(nodeId)) continue;
           const prev = graph.nodes.get(pathNodeIds[i - 1]).point;
           const current = graph.nodes.get(nodeId).point;
           const next = graph.nodes.get(pathNodeIds[i + 1]).point;
-          const type = classifyInternalNode(prev, current, next);
+          const type = classifyInternalNode(prev, current, next, faceSide);
 
           if (type === "insideEndStart") {
             events.push({ key: "isEndStart", label: "INSIDE END START", point: copyPoint(current) });
+          } else if (type === "outsideStartEnd") {
+            events.push({ key: "osStartEnd", label: "OUTSIDE START END", point: copyPoint(current) });
           } else if (type === "odd") {
             events.push({ key: "terminate", label: "TERMINATE", point: copyPoint(current) });
             events.push({ key: "starter", label: "STARTER", point: copyPoint(current) });
@@ -10898,8 +11956,9 @@
             events.push({ key: "terminate", label: "TERMINATE", point: copyPoint(endPoint) });
             pushFlowForPath(path, graph, flowEdges);
 
+            const pathFaceSide = getRandomPlankFaceSideForGraphPath(path, graph, false);
             const before = events.length;
-            addInternalEventsForPath(path, graph, events);
+            addInternalEventsForPath(path, graph, events, new Set(), pathFaceSide);
             for (let i = before; i < events.length; i += 1) {
               if (events[i].key === "starter" && i > before) oddTurnCount += 1;
             }
@@ -10923,15 +11982,30 @@
             const routeB = [ordered[0]].concat(ordered.slice(meetIndex).reverse());
             const startPoint = graph.nodes.get(ordered[0]).point;
             const meetPoint = graph.nodes.get(meetNodeId).point;
+            const loopFaceSide = getRandomPlankFaceSideForGraphPath(ordered, graph, true);
 
-            events.push({ key: "osStartStart", label: "OUTSIDE START START", point: copyPoint(startPoint) });
-            events.push({ key: "osEndEnd", label: "OUTSIDE END END", point: copyPoint(meetPoint) });
+            const startPrev = graph.nodes.get(ordered[(ordered.length - 1) % ordered.length]).point;
+            const startNext = graph.nodes.get(ordered[1 % ordered.length]).point;
+            const startCornerInsideSide = signedTurnAngle(startPrev, startPoint, startNext) >= 0 ? "right" : "left";
+            const startIsInside = loopFaceSide === startCornerInsideSide;
+
+            const meetPrev = graph.nodes.get(ordered[(meetIndex - 1 + ordered.length) % ordered.length]).point;
+            const meetNext = graph.nodes.get(ordered[(meetIndex + 1) % ordered.length]).point;
+            const meetCornerInsideSide = signedTurnAngle(meetPrev, meetPoint, meetNext) >= 0 ? "right" : "left";
+            const meetIsInside = loopFaceSide === meetCornerInsideSide;
+
+            events.push(startIsInside
+              ? { key: "isStartStart", label: "INSIDE START START", point: copyPoint(startPoint) }
+              : { key: "osStartStart", label: "OUTSIDE START START", point: copyPoint(startPoint) });
+            events.push(meetIsInside
+              ? { key: "isEndEnd", label: "INSIDE END END", point: copyPoint(meetPoint) }
+              : { key: "osEndEnd", label: "OUTSIDE END END", point: copyPoint(meetPoint) });
             pushFlowForPath(routeA, graph, flowEdges);
             pushFlowForPath(routeB, graph, flowEdges);
 
             const skip = new Set([ordered[0], meetNodeId]);
-            addInternalEventsForPath(routeA, graph, events, skip);
-            addInternalEventsForPath(routeB, graph, events, skip);
+            addInternalEventsForPath(routeA, graph, events, skip, getRandomPlankFaceSideForGraphPath(routeA, graph, false));
+            addInternalEventsForPath(routeB, graph, events, skip, getRandomPlankFaceSideForGraphPath(routeB, graph, false));
           }
         });
 
@@ -10949,7 +12023,8 @@
           openRunCount,
           loopCount,
           oddTurnCount,
-          branchWarning
+          branchWarning,
+          randomPlankSide
         };
       }
 
@@ -10966,7 +12041,8 @@
         const branchNote = generatedPlan.branchWarning
           ? " Junctions are currently treated as separate installation runs."
           : "";
-        status.textContent = `${prefix}Plan rule: STARTER is preferred; 90° turns use INSIDE END START; odd angles terminate and restart.${branchNote}`;
+        const faceLabel = generatedPlan.randomPlankSide === "outside" ? "OUTSIDE" : "INSIDE";
+        status.textContent = `${prefix}Random Plank face: ${faceLabel}. 90° trim conditions are calculated from that face; odd angles terminate and restart.${branchNote}`;
       }
 
       function waitForModelIdle(callback, tries = 0) {
@@ -11104,6 +12180,7 @@
         document.body.classList.remove("generatedPlanModelMode");
         tutorialSeenThisOpen = { draw: false, select: false };
         closePlanTutorial();
+        closeGeneratedPlanReadyPopup();
         setPhase(phase === "generated" ? "generated" : phase);
         requestAnimationFrame(() => {
           if (phase === "generated") fitGeneratedPlan();
@@ -11112,6 +12189,7 @@
 
       function closePlanner() {
         closePlanTutorial();
+        closeGeneratedPlanReadyPopup();
         overlay.classList.remove("open", "isMini");
         clearMiniWindowSizeStyles();
         overlay.setAttribute("aria-hidden", "true");
@@ -11165,6 +12243,22 @@
         });
       }
 
+      if (readyGotItButton) {
+        readyGotItButton.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          closeGeneratedPlanReadyPopup();
+        });
+      }
+
+      if (downloadFooterButton) {
+        downloadFooterButton.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          exportGeneratedPlanPdf();
+        });
+      }
+
       closeButton.addEventListener("click", (event) => {
         event.stopPropagation();
         closePlanner();
@@ -11201,7 +12295,9 @@
         currentRun = null;
         previewPoint = null;
         selectedSegments.clear();
+        randomPlankSide = "inside";
         generatedPlan = null;
+        updateRandomPlankSideUi();
         resetViewport();
         renderPlanner();
       });
@@ -11225,6 +12321,19 @@
         renderPlanner();
       });
 
+      if (randomPlankSideButton) {
+        randomPlankSideButton.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          randomPlankSide = randomPlankSide === "inside" ? "outside" : "inside";
+          updateRandomPlankSideUi();
+          if (phase === "select") {
+            hint.textContent = `Selected walls are highlighted red. The Random Plank preview is on the ${randomPlankSide.toUpperCase()} face. Use the RP side button to switch faces. PAN, middle-drag, scroll or + / − still navigate the plan.`;
+          }
+          renderPlanner();
+        });
+      }
+
       clearSelectionButton.addEventListener("click", (event) => {
         event.stopPropagation();
         selectedSegments.clear();
@@ -11239,7 +12348,10 @@
         activeGeneratedHotspotKey = null;
         setPhase("generated");
         updateGeneratedStatus();
-        requestAnimationFrame(fitGeneratedPlan);
+        requestAnimationFrame(() => {
+          fitGeneratedPlan();
+          window.setTimeout(showGeneratedPlanReadyPopup, 260);
+        });
       });
 
       editWallsButton.addEventListener("click", (event) => {
