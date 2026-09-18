@@ -3968,6 +3968,169 @@
       transform: none;
     }
 
+    .generatedPlanProjectNameOverlay {
+      position: absolute;
+      inset: 0;
+      z-index: 46;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      box-sizing: border-box;
+      background: rgba(0, 0, 0, 0.60);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.28s ease, visibility 0s linear 0.28s;
+    }
+
+    .generatedPlanProjectNameOverlay.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition: opacity 0.28s ease;
+    }
+
+    .generatedPlanProjectNameCard {
+      width: min(520px, calc(100vw - 120px));
+      padding: 30px 30px 27px;
+      box-sizing: border-box;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 24px;
+      background: rgba(18, 18, 18, 0.97);
+      box-shadow: 0 26px 80px rgba(0, 0, 0, 0.54);
+      text-align: center;
+      transform: translateY(10px) scale(0.98);
+      transition: transform 0.34s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .generatedPlanProjectNameOverlay.open .generatedPlanProjectNameCard {
+      transform: translateY(0) scale(1);
+    }
+
+    .generatedPlanProjectNameTitle {
+      color: #fff;
+      font-size: 17px;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: 0.045em;
+      text-transform: uppercase;
+    }
+
+    .generatedPlanProjectNameDescription {
+      max-width: 430px;
+      margin: 12px auto 0;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 12.5px;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    .generatedPlanProjectNameField {
+      margin-top: 21px;
+      text-align: left;
+    }
+
+    .generatedPlanProjectNameLabel {
+      display: block;
+      margin: 0 0 8px 4px;
+      color: rgba(255, 255, 255, 0.64);
+      font-size: 9px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0.075em;
+      text-transform: uppercase;
+    }
+
+    .generatedPlanProjectNameInput {
+      width: 100%;
+      height: 48px;
+      padding: 0 16px;
+      box-sizing: border-box;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 13px;
+      outline: 0;
+      background: rgba(255, 255, 255, 0.07);
+      color: #fff;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .generatedPlanProjectNameInput::placeholder {
+      color: rgba(255, 255, 255, 0.30);
+    }
+
+    .generatedPlanProjectNameInput:focus {
+      border-color: rgba(255, 255, 255, 0.42);
+      background: rgba(255, 255, 255, 0.10);
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.055);
+    }
+
+    .generatedPlanProjectNameInput.invalid {
+      border-color: rgba(255, 89, 100, 0.90);
+      box-shadow: 0 0 0 3px rgba(201, 34, 46, 0.12);
+      animation: generatedPlanProjectNameNudge 0.34s ease;
+    }
+
+    @keyframes generatedPlanProjectNameNudge {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .generatedPlanProjectNameActions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 22px;
+      flex-wrap: wrap;
+    }
+
+    .generatedPlanProjectNameButton {
+      min-width: 126px;
+      min-height: 40px;
+      padding: 0 22px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.10);
+      color: #fff;
+      cursor: pointer;
+      font-size: 10px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0.055em;
+      text-transform: uppercase;
+      transition: background 0.18s ease, transform 0.18s ease;
+    }
+
+    .generatedPlanProjectNameButton.primary {
+      border-color: transparent;
+      background: #c9222e;
+      box-shadow: 0 10px 28px rgba(201, 34, 46, 0.24);
+    }
+
+    .generatedPlanProjectNameButton:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: translateY(-1px);
+    }
+
+    .generatedPlanProjectNameButton.primary:hover {
+      background: #df2937;
+    }
+
+    .generatedPlanProjectNameButton:active {
+      transform: translateY(0) scale(0.98);
+    }
+
     .generatedPlanHint {
       position: absolute;
       left: 18px;
@@ -4680,6 +4843,34 @@
         margin-top: 12px;
         font-size: 11px;
         line-height: 1.42;
+      }
+
+      .generatedPlanProjectNameOverlay {
+        padding: 16px;
+      }
+
+      .generatedPlanProjectNameCard {
+        width: min(470px, calc(100vw - 52px));
+        padding: 22px 18px 20px;
+        border-radius: 18px;
+      }
+
+      .generatedPlanProjectNameTitle {
+        font-size: 14px;
+      }
+
+      .generatedPlanProjectNameDescription {
+        font-size: 11px;
+      }
+
+      .generatedPlanProjectNameInput {
+        height: 44px;
+        font-size: 12px;
+      }
+
+      .generatedPlanProjectNameActions {
+        margin-top: 18px;
+        gap: 8px;
       }
 
       .generatedPlanActionButton.generatedPlanDownloadIconButton {
@@ -5754,7 +5945,7 @@
           <button class="generatedPlanActionButton" id="generatedPlanFitFooterButton" type="button" data-show-phase="generated">FIT PLAN</button>
           <button class="generatedPlanActionButton generatedPlanDownloadIconButton" id="generatedPlanDownloadFooterButton" type="button" data-show-phase="generated" aria-label="Generate custom PDF installation guide" title="Generate custom PDF installation guide">
             <img src="download pdf.png" alt="" aria-hidden="true" />
-            <span class="generatedPlanDownloadLabel">GENERATE CUSTOM PDF GUIDE</span>
+            <span class="generatedPlanDownloadLabel">GENERATE CUSTOM INSTALLATION GUIDE</span>
           </button>
         </div>
         <div class="generatedPlanDisclaimer" id="generatedPlanDisclaimer">
@@ -5788,6 +5979,21 @@
           <p class="generatedPlanReadyCustomGuideNote"><strong>You can also generate a custom PDF installation guide tailored specifically to this plan.</strong></p>
           <div class="generatedPlanReadyActions">
             <button class="generatedPlanReadyButton" id="generatedPlanReadyGotItButton" type="button">GOT IT</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="generatedPlanProjectNameOverlay" id="generatedPlanProjectNameOverlay" aria-hidden="true">
+        <div class="generatedPlanProjectNameCard" role="dialog" aria-modal="true" aria-labelledby="generatedPlanProjectNameTitle" aria-describedby="generatedPlanProjectNameDescription">
+          <div class="generatedPlanProjectNameTitle" id="generatedPlanProjectNameTitle">NAME YOUR CUSTOM GUIDE</div>
+          <p class="generatedPlanProjectNameDescription" id="generatedPlanProjectNameDescription">Enter the project name you would like displayed on the cover of this custom Random Plank installation guide.</p>
+          <div class="generatedPlanProjectNameField">
+            <label class="generatedPlanProjectNameLabel" for="generatedPlanProjectNameInput">Project name</label>
+            <input class="generatedPlanProjectNameInput" id="generatedPlanProjectNameInput" type="text" autocomplete="off" maxlength="90" placeholder="Enter project name" />
+          </div>
+          <div class="generatedPlanProjectNameActions">
+            <button class="generatedPlanProjectNameButton" id="generatedPlanProjectNameCancelButton" type="button">CANCEL</button>
+            <button class="generatedPlanProjectNameButton primary" id="generatedPlanProjectNameGenerateButton" type="button">GENERATE GUIDE</button>
           </div>
         </div>
       </div>
@@ -9729,6 +9935,10 @@
       const tutorialGotItButton = document.querySelector("#generatedPlanTutorialGotItButton");
       const readyOverlay = document.querySelector("#generatedPlanReadyOverlay");
       const readyGotItButton = document.querySelector("#generatedPlanReadyGotItButton");
+      const projectNameOverlay = document.querySelector("#generatedPlanProjectNameOverlay");
+      const projectNameInput = document.querySelector("#generatedPlanProjectNameInput");
+      const projectNameCancelButton = document.querySelector("#generatedPlanProjectNameCancelButton");
+      const projectNameGenerateButton = document.querySelector("#generatedPlanProjectNameGenerateButton");
       const downloadFooterButton = document.querySelector("#generatedPlanDownloadFooterButton");
 
       if (!launchButton || !overlay || !canvas || !viewport) return;
@@ -10238,6 +10448,61 @@
         readyOverlay.setAttribute("aria-hidden", "false");
       }
 
+      function closeProjectNamePrompt(value = null) {
+        if (!projectNameOverlay) {
+          if (projectNamePromptResolve) {
+            const resolve = projectNamePromptResolve;
+            projectNamePromptResolve = null;
+            resolve(value);
+          }
+          return;
+        }
+
+        projectNameOverlay.classList.remove("open");
+        projectNameOverlay.setAttribute("aria-hidden", "true");
+        if (projectNameInput) projectNameInput.classList.remove("invalid");
+
+        if (projectNamePromptResolve) {
+          const resolve = projectNamePromptResolve;
+          projectNamePromptResolve = null;
+          resolve(value);
+        }
+      }
+
+      function submitProjectNamePrompt() {
+        if (!projectNameInput) return;
+        const value = projectNameInput.value.trim();
+        if (!value) {
+          projectNameInput.classList.remove("invalid");
+          void projectNameInput.offsetWidth;
+          projectNameInput.classList.add("invalid");
+          projectNameInput.focus({ preventScroll: true });
+          return;
+        }
+        closeProjectNamePrompt(value);
+      }
+
+      function requestCustomGuideProjectName() {
+        if (!projectNameOverlay || !projectNameInput) {
+          return Promise.resolve(lastCustomGuideProjectName || "PROJECT");
+        }
+
+        if (projectNamePromptResolve) closeProjectNamePrompt(null);
+        projectNameInput.value = lastCustomGuideProjectName || "";
+        projectNameInput.classList.remove("invalid");
+        projectNameOverlay.classList.add("open");
+        projectNameOverlay.setAttribute("aria-hidden", "false");
+
+        requestAnimationFrame(() => {
+          projectNameInput.focus({ preventScroll: true });
+          projectNameInput.select();
+        });
+
+        return new Promise((resolve) => {
+          projectNamePromptResolve = resolve;
+        });
+      }
+
       function setPdfButtonBusy(isBusy) {
         if (!downloadFooterButton) return;
         downloadFooterButton.disabled = isBusy;
@@ -10245,7 +10510,7 @@
         downloadFooterButton.setAttribute("aria-label", isBusy ? "Generating custom PDF installation guide" : "Generate custom PDF installation guide");
         downloadFooterButton.setAttribute("title", isBusy ? "Generating custom guide..." : "Generate custom PDF installation guide");
         const label = downloadFooterButton.querySelector(".generatedPlanDownloadLabel");
-        if (label) label.textContent = isBusy ? "GENERATING CUSTOM GUIDE..." : "GENERATE CUSTOM PDF GUIDE";
+        if (label) label.textContent = isBusy ? "GENERATING CUSTOM GUIDE..." : "GENERATE CUSTOM INSTALLATION GUIDE";
       }
 
       function getGeneratedPlanExportSvg() {
@@ -10403,159 +10668,623 @@
         return concatByteArrays(parts);
       }
 
+      const CUSTOM_GUIDE_ASSET_BASE = "";
+      const CUSTOM_GUIDE_FILES = {
+        general: "GENERAL.pdf",
+        boxBase: "BOX BASE.pdf",
+        starter: "STARTER.pdf",
+        isEndStart: "INSIDE END START.pdf",
+        isEndEnd: "INSIDE END END.pdf",
+        isStartStart: "INSIDE START START.pdf",
+        osEndEnd: "OUTSIDE END END.pdf",
+        osStartEnd: "OUTSIDE START END.pdf",
+        osStartStart: "OUTSIDE START START.pdf",
+        terminate: "TERMINATE.pdf",
+        lastPage: "LAST PAGE.pdf",
+        logo: "logo.png"
+      };
+
+      let customGuidePdfLibPromise = null;
+      let lastCustomGuideProjectName = "";
+      let projectNamePromptResolve = null;
+
+      function customGuideAssetUrl(fileName) {
+        if (!CUSTOM_GUIDE_ASSET_BASE) return encodeURI(fileName);
+        return `${CUSTOM_GUIDE_ASSET_BASE.replace(/\/$/, "")}/${encodeURIComponent(fileName).replace(/%2F/gi, "/")}`;
+      }
+
+      function loadExternalScript(src) {
+        return new Promise((resolve, reject) => {
+          const existing = Array.from(document.scripts).find((script) => script.src === new URL(src, window.location.href).href);
+          if (existing) {
+            if (window.PDFLib && window.PDFLib.PDFDocument) {
+              resolve();
+              return;
+            }
+            existing.addEventListener("load", resolve, { once: true });
+            existing.addEventListener("error", () => reject(new Error(`Unable to load ${src}`)), { once: true });
+            return;
+          }
+
+          const script = document.createElement("script");
+          script.src = src;
+          script.async = true;
+          script.onload = resolve;
+          script.onerror = () => reject(new Error(`Unable to load ${src}`));
+          document.head.appendChild(script);
+        });
+      }
+
+      async function ensureCustomGuidePdfLib() {
+        if (window.PDFLib && window.PDFLib.PDFDocument) return window.PDFLib;
+        if (customGuidePdfLibPromise) return customGuidePdfLibPromise;
+
+        customGuidePdfLibPromise = (async () => {
+          const candidates = [
+            "pdf-lib.min.js",
+            "https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js",
+            "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"
+          ];
+
+          let lastError = null;
+          for (const src of candidates) {
+            try {
+              await loadExternalScript(src);
+              if (window.PDFLib && window.PDFLib.PDFDocument) return window.PDFLib;
+            } catch (error) {
+              lastError = error;
+            }
+          }
+
+          throw lastError || new Error("The PDF assembly library could not be loaded.");
+        })();
+
+        try {
+          return await customGuidePdfLibPromise;
+        } catch (error) {
+          customGuidePdfLibPromise = null;
+          throw error;
+        }
+      }
+
+      async function fetchCustomGuideAsset(fileName, asArrayBuffer = true) {
+        const response = await fetch(customGuideAssetUrl(fileName), { cache: "no-cache" });
+        if (!response.ok) {
+          throw new Error(`${fileName} could not be loaded (${response.status}).`);
+        }
+        return asArrayBuffer ? response.arrayBuffer() : response.blob();
+      }
+
+      function getOrderedGeneratedEvents() {
+        if (!generatedPlan) return [];
+        const ordered = [];
+        const consumed = new Set();
+
+        const pushEventsAtPoint = (point) => {
+          generatedPlan.events.forEach((eventData, index) => {
+            if (consumed.has(index)) return;
+            if (pointDistance(eventData.point, point) <= 2.2) {
+              consumed.add(index);
+              ordered.push(eventData);
+            }
+          });
+        };
+
+        generatedPlan.flowEdges.forEach((flow) => {
+          pushEventsAtPoint(flow.a);
+          pushEventsAtPoint(flow.b);
+        });
+
+        generatedPlan.events.forEach((eventData, index) => {
+          if (!consumed.has(index)) ordered.push(eventData);
+        });
+
+        return ordered;
+      }
+
+      function getCustomGuideConditionOrder() {
+        const fileByKey = {
+          starter: CUSTOM_GUIDE_FILES.starter,
+          isEndStart: CUSTOM_GUIDE_FILES.isEndStart,
+          isEndEnd: CUSTOM_GUIDE_FILES.isEndEnd,
+          isStartStart: CUSTOM_GUIDE_FILES.isStartStart,
+          osEndEnd: CUSTOM_GUIDE_FILES.osEndEnd,
+          osStartEnd: CUSTOM_GUIDE_FILES.osStartEnd,
+          osStartStart: CUSTOM_GUIDE_FILES.osStartStart,
+          terminate: CUSTOM_GUIDE_FILES.terminate
+        };
+
+        const result = [];
+        const seen = new Set();
+        getOrderedGeneratedEvents().forEach((eventData) => {
+          if (!fileByKey[eventData.key] || seen.has(eventData.key)) return;
+          seen.add(eventData.key);
+          result.push({ key: eventData.key, label: eventData.label, file: fileByKey[eventData.key] });
+        });
+        return result;
+      }
+
+      function getCustomGuideSequenceDescription(projectName) {
+        const ordered = getOrderedGeneratedEvents();
+        const labels = [];
+        ordered.forEach((eventData) => {
+          const label = eventData.label;
+          if (!labels.length || labels[labels.length - 1] !== label) labels.push(label);
+        });
+
+        const quotedProject = projectName ? `“${projectName}”` : "this project";
+        let sequenceSentence = `For ${quotedProject}, follow the red arrows in the plan above to install Random Plank in the calculated direction.`;
+        if (labels.length) {
+          sequenceSentence += ` The marked installation conditions occur in this sequence: ${labels.join(" > ")}.`;
+        }
+        sequenceSentence += " Click any labeled intersection marker in the plan to jump directly to the matching installation detail in this custom guide. The GENERAL section immediately following this page contains important project-wide information and should be read in full before installation begins.";
+        return sequenceSentence;
+      }
+
+      function sanitizeGuideFileName(value) {
+        const safe = String(value || "project")
+          .trim()
+          .replace(/[\\/:*?\"<>|]+/g, "-")
+          .replace(/\s+/g, "-")
+          .replace(/-+/g, "-")
+          .replace(/^-|-$/g, "");
+        return safe || "project";
+      }
+
+      function toPdfWinAnsiText(value) {
+        // pdf-lib's built-in Helvetica/HelveticaBold fonts use WinAnsi encoding.
+        // Normalize punctuation/symbols that fall outside that encoding so a project
+        // name or generated sentence can never abort the custom-guide export.
+        return String(value == null ? "" : value)
+          .replace(/\u00a0/g, " ")
+          .replace(/[\u2010\u2011\u2012\u2013\u2014\u2015]/g, "-")
+          .replace(/[\u2018\u2019\u201a\u201b]/g, "'")
+          .replace(/[\u201c\u201d\u201e\u201f]/g, '\"')
+          .replace(/\u2026/g, "...")
+          .replace(/[\u2190\u2192]/g, ">")
+          .replace(/\u2022/g, "-")
+          .replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/g, "?");
+      }
+
+      function wrapPdfText(font, text, size, maxWidth) {
+        const words = toPdfWinAnsiText(text).split(/\s+/).filter(Boolean);
+        const lines = [];
+        let line = "";
+        words.forEach((word) => {
+          const test = line ? `${line} ${word}` : word;
+          if (line && font.widthOfTextAtSize(test, size) > maxWidth) {
+            lines.push(line);
+            line = word;
+          } else {
+            line = test;
+          }
+        });
+        if (line) lines.push(line);
+        return lines;
+      }
+
+      function drawWrappedPdfText(page, font, text, options) {
+        const { x, y, size, maxWidth, lineHeight, color } = options;
+        const lines = wrapPdfText(font, text, size, maxWidth);
+        let cursorY = y;
+        lines.forEach((line) => {
+          page.drawText(line, { x, y: cursorY, size, font, color });
+          cursorY -= lineHeight;
+        });
+        return cursorY;
+      }
+
+      function getPdfRandomPlankTileGeometry(a, b, runIndex, segmentIndex) {
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const length = Math.hypot(dx, dy);
+        if (length < 10) return [];
+        const ux = dx / length;
+        const uy = dy / length;
+        const plankWidths = [3.5, 9.5, 5.5, 3.5, 5.5, 9.5, 9.5, 3.5, 5.5];
+        const plankScale = 4.05;
+        const gap = 7.5;
+        const endInset = 5;
+        let cursor = endInset;
+        let patternIndex = (runIndex * 2 + segmentIndex * 3) % plankWidths.length;
+        const tiles = [];
+
+        while (cursor < length - endInset - 5) {
+          const requested = plankWidths[patternIndex % plankWidths.length] * plankScale;
+          const available = length - endInset - cursor;
+          const tileLength = Math.min(requested, available);
+          if (tileLength < 8) break;
+          tiles.push({
+            a: { x: a.x + ux * cursor, y: a.y + uy * cursor },
+            b: { x: a.x + ux * (cursor + tileLength), y: a.y + uy * (cursor + tileLength) }
+          });
+          cursor += tileLength + gap;
+          patternIndex += 1;
+        }
+        return tiles;
+      }
+
+      function buildPdfHotspotLayout(font, fontSize) {
+        const grouped = new Map();
+        generatedPlan.events.forEach((eventData) => {
+          const key = `${eventData.point.x.toFixed(1)}|${eventData.point.y.toFixed(1)}`;
+          if (!grouped.has(key)) grouped.set(key, []);
+          grouped.get(key).push(eventData);
+        });
+
+        const singles = [];
+        grouped.forEach((eventsAtNode) => {
+          if (eventsAtNode.length === 1) singles.push(eventsAtNode[0]);
+        });
+        const forcedLabelBelow = new Map();
+        const unvisited = new Set(singles);
+        const proximity = 118;
+        while (unvisited.size) {
+          const seed = unvisited.values().next().value;
+          unvisited.delete(seed);
+          const cluster = [seed];
+          const queue = [seed];
+          while (queue.length) {
+            const current = queue.shift();
+            Array.from(unvisited).forEach((candidate) => {
+              if (pointDistance(current.point, candidate.point) <= proximity) {
+                unvisited.delete(candidate);
+                cluster.push(candidate);
+                queue.push(candidate);
+              }
+            });
+          }
+          if (cluster.length > 1) {
+            cluster.sort((a, b) => {
+              const dy = a.point.y - b.point.y;
+              return Math.abs(dy) > 4 ? dy : a.point.x - b.point.x;
+            });
+            cluster.forEach((eventData, index) => forcedLabelBelow.set(eventData, index % 2 === 1));
+          }
+        }
+
+        const layouts = [];
+        grouped.forEach((eventsAtNode) => {
+          eventsAtNode.forEach((eventData, indexAtNode) => {
+            const totalAtNode = eventsAtNode.length;
+            const normal = getHotspotPlacementNormal(eventData.point);
+            const spread = totalAtNode > 2 ? 64 : 54;
+            const hotspotOffset = totalAtNode > 1
+              ? (indexAtNode - (totalAtNode - 1) / 2) * spread
+              : 0;
+            const x = eventData.point.x + normal.x * hotspotOffset;
+            const y = eventData.point.y + normal.y * hotspotOffset;
+            const label = eventData.label;
+            const labelWidth = Math.max(100, label.length * 7.2 + 46);
+            const labelHeight = 29;
+            const lane = Math.floor(indexAtNode / 2);
+            const isBelow = totalAtNode > 1
+              ? indexAtNode % 2 === 1
+              : forcedLabelBelow.get(eventData) === true;
+            const verticalGap = (totalAtNode > 1 ? 58 : 50) + lane * 38;
+            const labelY = y + (isBelow ? verticalGap : -verticalGap);
+            let labelShiftX;
+            if (totalAtNode > 1) {
+              labelShiftX = indexAtNode % 2 === 0 ? -30 : 30;
+            } else if (Math.abs(normal.x) > 0.28) {
+              labelShiftX = normal.x > 0 ? 30 : -30;
+            } else {
+              labelShiftX = x > 500 ? -30 : 30;
+            }
+            const labelX = x + labelShiftX;
+            layouts.push({ eventData, x, y, labelX, labelY, labelWidth, labelHeight, fontSize });
+          });
+        });
+        return layouts;
+      }
+
+      function drawCustomGuideVectorPlan(page, pdfLib, regularFont, boldFont) {
+        const { rgb } = pdfLib;
+        const pageWidth = page.getWidth();
+        const planRect = { x: 48, y: 315, width: pageWidth - 96, height: 325 };
+        const labelPadding = 112;
+        const minX = generatedPlan.bounds.minX - labelPadding;
+        const minY = generatedPlan.bounds.minY - labelPadding;
+        const maxX = generatedPlan.bounds.maxX + labelPadding;
+        const maxY = generatedPlan.bounds.maxY + labelPadding;
+        const sourceWidth = Math.max(120, maxX - minX);
+        const sourceHeight = Math.max(120, maxY - minY);
+        const scale = Math.min(planRect.width / sourceWidth, planRect.height / sourceHeight);
+        const contentWidth = sourceWidth * scale;
+        const contentHeight = sourceHeight * scale;
+        const originX = planRect.x + (planRect.width - contentWidth) / 2;
+        const originY = planRect.y + (planRect.height - contentHeight) / 2;
+
+        const mapPoint = (point) => ({
+          x: originX + (point.x - minX) * scale,
+          y: originY + (maxY - point.y) * scale
+        });
+
+        const greyWall = rgb(0.67, 0.68, 0.69);
+        const greyPanel = rgb(0.66, 0.67, 0.68);
+        const connector = rgb(0.60, 0.61, 0.62);
+        const black = rgb(0.03, 0.03, 0.035);
+        const white = rgb(1, 1, 1);
+        const red = rgb(0.83, 0.13, 0.18);
+
+        generatedPlan.selectedEdges.forEach((edge) => {
+          const a = mapPoint(edge.a);
+          const b = mapPoint(edge.b);
+          page.drawLine({ start: a, end: b, thickness: Math.max(1.5, 5.2 * scale), color: greyWall, opacity: 0.88 });
+
+          const offsetSegment = getRandomPlankOffsetSegment(edge, 13);
+          if (offsetSegment) {
+            const oa = mapPoint(offsetSegment.a);
+            const ob = mapPoint(offsetSegment.b);
+            page.drawLine({ start: oa, end: ob, thickness: Math.max(0.55, 1.1 * scale), color: greyPanel, opacity: 0.32 });
+            getPdfRandomPlankTileGeometry(offsetSegment.a, offsetSegment.b, edge.runIndex, edge.segmentIndex).forEach((tile) => {
+              page.drawLine({
+                start: mapPoint(tile.a),
+                end: mapPoint(tile.b),
+                thickness: Math.max(1.2, 3.4 * scale),
+                color: greyPanel,
+                opacity: 0.62
+              });
+            });
+          }
+        });
+
+        const eventPoints = generatedPlan.events.map((eventData) => eventData.point);
+        const hasEventAt = (point) => eventPoints.some((eventPoint) => pointDistance(point, eventPoint) < 2.2);
+        generatedPlan.flowEdges.forEach((flow) => {
+          const dx = flow.b.x - flow.a.x;
+          const dy = flow.b.y - flow.a.y;
+          const length = Math.hypot(dx, dy);
+          if (length < 2) return;
+          const ux = dx / length;
+          const uy = dy / length;
+          let startClearance = hasEventAt(flow.a) ? 18 : 0;
+          let endClearance = hasEventAt(flow.b) ? 27 : 0;
+          const maximumCombinedClearance = Math.max(0, length - 18);
+          const requestedClearance = startClearance + endClearance;
+          if (requestedClearance > maximumCombinedClearance && requestedClearance > 0) {
+            const ratio = maximumCombinedClearance / requestedClearance;
+            startClearance *= ratio;
+            endClearance *= ratio;
+          }
+          const visibleA = { x: flow.a.x + ux * startClearance, y: flow.a.y + uy * startClearance };
+          const visibleB = { x: flow.b.x - ux * endClearance, y: flow.b.y - uy * endClearance };
+          const a = mapPoint(visibleA);
+          const b = mapPoint(visibleB);
+          page.drawLine({ start: a, end: b, thickness: Math.max(1.1, 2.6 * scale), color: red, opacity: 0.94 });
+
+          const pdx = b.x - a.x;
+          const pdy = b.y - a.y;
+          const plen = Math.max(0.001, Math.hypot(pdx, pdy));
+          const pux = pdx / plen;
+          const puy = pdy / plen;
+          const headLength = Math.max(7, Math.min(14, plen * 0.20));
+          const halfWidth = Math.max(4, headLength * 0.48);
+          const base = { x: b.x - pux * headLength, y: b.y - puy * headLength };
+          const px = -puy;
+          const py = pux;
+          page.drawLine({ start: b, end: { x: base.x + px * halfWidth, y: base.y + py * halfWidth }, thickness: 3.4, color: red });
+          page.drawLine({ start: b, end: { x: base.x - px * halfWidth, y: base.y - py * halfWidth }, thickness: 3.4, color: red });
+        });
+
+        const links = [];
+        const hotspotLayouts = buildPdfHotspotLayout(boldFont, 7.5);
+        hotspotLayouts.forEach((layout) => {
+          const hot = mapPoint({ x: layout.x, y: layout.y });
+          const labelCenter = mapPoint({ x: layout.labelX, y: layout.labelY });
+          const labelWidth = layout.labelWidth * scale;
+          const labelHeight = layout.labelHeight * scale;
+          const radius = Math.max(8.5, 17 * scale);
+
+          page.drawLine({ start: labelCenter, end: hot, thickness: 0.7, color: connector, opacity: 0.9 });
+          page.drawRectangle({
+            x: labelCenter.x - labelWidth / 2,
+            y: labelCenter.y - labelHeight / 2,
+            width: labelWidth,
+            height: labelHeight,
+            color: black,
+            opacity: 0.96
+          });
+
+          const textSize = Math.max(5.9, Math.min(8.8, 12 * scale));
+          const textWidth = boldFont.widthOfTextAtSize(layout.eventData.label, textSize);
+          page.drawText(layout.eventData.label, {
+            x: labelCenter.x - textWidth / 2,
+            y: labelCenter.y - textSize * 0.34,
+            size: textSize,
+            font: boldFont,
+            color: white
+          });
+
+          page.drawCircle({ x: hot.x, y: hot.y, size: radius, color: black, borderColor: white, borderWidth: 1.1 });
+          page.drawCircle({ x: hot.x, y: hot.y, size: Math.max(2.2, radius * 0.27), color: white });
+
+          links.push({
+            key: layout.eventData.key,
+            rect: {
+              x: Math.min(hot.x - radius - 3, labelCenter.x - labelWidth / 2),
+              y: Math.min(hot.y - radius - 3, labelCenter.y - labelHeight / 2),
+              width: Math.max(hot.x + radius + 3, labelCenter.x + labelWidth / 2) - Math.min(hot.x - radius - 3, labelCenter.x - labelWidth / 2),
+              height: Math.max(hot.y + radius + 3, labelCenter.y + labelHeight / 2) - Math.min(hot.y - radius - 3, labelCenter.y - labelHeight / 2)
+            }
+          });
+        });
+
+        return links;
+      }
+
+      function addPdfInternalLink(pdfDoc, page, rect, destinationPage, pdfLib) {
+        const { PDFName, PDFArray } = pdfLib;
+        const context = pdfDoc.context;
+        const destination = context.obj([destinationPage.ref, PDFName.of("Fit")]);
+        const action = context.obj({ S: PDFName.of("GoTo"), D: destination });
+        const annotation = context.obj({
+          Type: PDFName.of("Annot"),
+          Subtype: PDFName.of("Link"),
+          Rect: context.obj([rect.x, rect.y, rect.x + rect.width, rect.y + rect.height]),
+          Border: context.obj([0, 0, 0]),
+          A: action
+        });
+        const annotationRef = context.register(annotation);
+        let annotations = page.node.lookupMaybe(PDFName.of("Annots"), PDFArray);
+        if (!annotations) {
+          annotations = context.obj([]);
+          page.node.set(PDFName.of("Annots"), annotations);
+        }
+        annotations.push(annotationRef);
+      }
+
+      async function appendCustomGuidePdf(pdfDoc, fileName, pdfLib) {
+        const bytes = await fetchCustomGuideAsset(fileName, true);
+        const source = await pdfLib.PDFDocument.load(bytes, { ignoreEncryption: true });
+        const indices = source.getPageIndices();
+        const copied = await pdfDoc.copyPages(source, indices);
+        const startIndex = pdfDoc.getPageCount();
+        copied.forEach((page) => pdfDoc.addPage(page));
+        return { startIndex, pageCount: copied.length };
+      }
+
+      async function createCustomGuideCover(pdfDoc, projectName, pdfLib) {
+        const { StandardFonts, rgb } = pdfLib;
+        const page = pdfDoc.addPage([612, 792]);
+        const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+        const lightGrey = rgb(0.90, 0.91, 0.92);
+        const dark = rgb(0.04, 0.04, 0.045);
+        const medium = rgb(0.31, 0.32, 0.34);
+        const disclaimerGrey = rgb(0.34, 0.35, 0.37);
+        const red = rgb(0.82, 0.12, 0.17);
+
+        page.drawRectangle({ x: 0, y: 0, width: 612, height: 792, color: lightGrey });
+
+        let titleSize = 24;
+        const titleMaxWidth = 315;
+        const titleText = toPdfWinAnsiText(projectName.toUpperCase());
+        while (titleSize > 14 && boldFont.widthOfTextAtSize(titleText, titleSize) > titleMaxWidth) titleSize -= 1;
+        page.drawText(titleText, { x: 36, y: 742, size: titleSize, font: boldFont, color: dark });
+        page.drawText("INSTALLATION GUIDE", { x: 36, y: 720, size: 16.5, font: regularFont, color: medium });
+
+        try {
+          const logoBytes = await fetchCustomGuideAsset(CUSTOM_GUIDE_FILES.logo, true);
+          const logoImage = await pdfDoc.embedPng(logoBytes);
+          const maxW = 108;
+          const maxH = 48;
+          const scale = Math.min(maxW / logoImage.width, maxH / logoImage.height, 1);
+          const w = logoImage.width * scale;
+          const h = logoImage.height * scale;
+          page.drawImage(logoImage, { x: 612 - 36 - w, y: 720, width: w, height: h });
+        } catch (error) {
+          page.drawText("LUX", { x: 508, y: 730, size: 28, font: boldFont, color: dark });
+        }
+
+        const hotspotLinks = drawCustomGuideVectorPlan(page, pdfLib, regularFont, boldFont);
+
+        const description = getCustomGuideSequenceDescription(projectName);
+        const descBottom = drawWrappedPdfText(page, regularFont, description, {
+          x: 72,
+          y: 258,
+          size: 10.4,
+          maxWidth: 468,
+          lineHeight: 14.2,
+          color: dark
+        });
+
+        page.drawText("PROJECT-SPECIFIC GUIDE", { x: 72, y: descBottom - 14, size: 8.3, font: boldFont, color: red });
+        page.drawText("Only installation-condition sections used by this generated plan are included.", {
+          x: 72,
+          y: descBottom - 28,
+          size: 8.2,
+          font: regularFont,
+          color: medium
+        });
+
+        const disclaimerElement = document.querySelector("#generatedPlanDisclaimer");
+        const disclaimerText = disclaimerElement
+          ? disclaimerElement.textContent.replace(/\s+/g, " ").trim().replace(/^Planning disclaimer:\s*/i, "")
+          : "This generated plan is based on the information and wall layout provided and our interpretation of the installation conditions. Final site measurements, quantities, cut lists, trim requirements, and installation details remain the responsibility of the contractor/installer and must be verified on site before ordering materials, fabrication, or installation.";
+
+        page.drawLine({ start: { x: 36, y: 92 }, end: { x: 576, y: 92 }, thickness: 0.6, color: rgb(0.70, 0.71, 0.72) });
+        page.drawText("SITE VERIFICATION / PLANNING DISCLAIMER", { x: 36, y: 77, size: 6.9, font: boldFont, color: disclaimerGrey });
+        drawWrappedPdfText(page, regularFont, disclaimerText, {
+          x: 36,
+          y: 64,
+          size: 6.2,
+          maxWidth: 540,
+          lineHeight: 8.0,
+          color: disclaimerGrey
+        });
+
+        return { page, hotspotLinks };
+      }
+
       async function exportGeneratedPlanPdf() {
         if (!generatedPlan) return;
 
-        const exportData = getGeneratedPlanExportSvg();
-        if (!exportData) return;
+        const projectName = await requestCustomGuideProjectName();
+        if (projectName === null) return;
+        lastCustomGuideProjectName = projectName;
 
         setPdfButtonBusy(true);
-
-        let objectUrl = null;
         let downloadUrl = null;
+
         try {
-          const blob = new Blob([exportData.svg], { type: "image/svg+xml;charset=utf-8" });
-          objectUrl = URL.createObjectURL(blob);
+          const pdfLib = await ensureCustomGuidePdfLib();
+          const pdfDoc = await pdfLib.PDFDocument.create();
+          pdfDoc.setTitle(`${projectName} - Random Plank Custom Installation Guide`);
+          pdfDoc.setAuthor("LUX Architectural Products");
+          pdfDoc.setSubject("Project-specific Random Plank installation guide");
+          pdfDoc.setCreator("LUX Custom Installation Guide Builder");
+          pdfDoc.setProducer("LUX Custom Installation Guide Builder");
 
-          const image = new Image();
-          const loaded = new Promise((resolve, reject) => {
-            image.onload = resolve;
-            image.onerror = () => reject(new Error("Unable to render the installation plan for PDF export."));
+          const { page: coverPage, hotspotLinks } = await createCustomGuideCover(pdfDoc, projectName, pdfLib);
+
+          // Page 2 onward is assembled from the modular guide PDFs. GENERAL and
+          // BOX BASE always appear; only condition sections actually used by the
+          // generated plan are added after them. LAST PAGE always closes the guide.
+          await appendCustomGuidePdf(pdfDoc, CUSTOM_GUIDE_FILES.general, pdfLib);
+          await appendCustomGuidePdf(pdfDoc, CUSTOM_GUIDE_FILES.boxBase, pdfLib);
+
+          const sectionDestinationPages = new Map();
+          const conditionSections = getCustomGuideConditionOrder();
+          for (const section of conditionSections) {
+            const result = await appendCustomGuidePdf(pdfDoc, section.file, pdfLib);
+            sectionDestinationPages.set(section.key, pdfDoc.getPage(result.startIndex));
+          }
+
+          await appendCustomGuidePdf(pdfDoc, CUSTOM_GUIDE_FILES.lastPage, pdfLib);
+
+          // Turn the actual plan intersections into PDF navigation buttons. Each
+          // destination is resolved only after the custom document has been built,
+          // so page-number changes caused by omitted sections can never break links.
+          hotspotLinks.forEach(({ key, rect }) => {
+            const destinationPage = sectionDestinationPages.get(key);
+            if (!destinationPage) return;
+            addPdfInternalLink(pdfDoc, coverPage, rect, destinationPage, pdfLib);
           });
-          image.src = objectUrl;
-          await loaded;
 
-          // First render the fitted plan at high resolution. Keep the canvas at
-          // the exact source aspect ratio — no minimum height — so the drawing can
-          // never be stretched vertically or horizontally during PDF export.
-          const sourceAspect = exportData.bounds.width / Math.max(1, exportData.bounds.height);
-          const planWidth = 2600;
-          const planHeight = Math.max(1, Math.round(planWidth / Math.max(0.0001, sourceAspect)));
-          const planCanvas = document.createElement("canvas");
-          planCanvas.width = planWidth;
-          planCanvas.height = planHeight;
-          const planCtx = planCanvas.getContext("2d", { alpha: false });
-          if (!planCtx) throw new Error("Unable to create the plan canvas.");
-          planCtx.fillStyle = "#1b1b1b";
-          planCtx.fillRect(0, 0, planWidth, planHeight);
-          planCtx.drawImage(image, 0, 0, planWidth, planHeight);
-
-          // Compose the entire PDF page as artwork. This keeps the PDF generator
-          // completely self-contained and gives us reliable typography/layout.
-          const pageCanvas = document.createElement("canvas");
-          pageCanvas.width = 2376;   // 3x landscape Letter points
-          pageCanvas.height = 1836;
-          const ctx = pageCanvas.getContext("2d", { alpha: false });
-          if (!ctx) throw new Error("Unable to create the PDF page canvas.");
-
-          ctx.fillStyle = "#f8f8f8";
-          ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-
-          const marginX = 126;
-          ctx.fillStyle = "#1c1c1c";
-          ctx.font = "700 54px Arial, Helvetica, sans-serif";
-          ctx.textBaseline = "alphabetic";
-          ctx.fillText("RANDOM PLANK INSTALLATION PLAN", marginX, 118);
-
-          ctx.fillStyle = "#666";
-          ctx.font = "400 27px Arial, Helvetica, sans-serif";
-          ctx.fillText("Generated installation sequence and trim conditions", marginX, 166);
-
-          // Reserve a clear footer area for the required site-verification disclaimer.
-          const planTop = 225;
-          const planBottom = 1545;
-          const availableWidth = pageCanvas.width - marginX * 2;
-          const availableHeight = planBottom - planTop;
-          const planAspect = planWidth / planHeight;
-          let drawWidth = availableWidth;
-          let drawHeight = drawWidth / planAspect;
-          if (drawHeight > availableHeight) {
-            drawHeight = availableHeight;
-            drawWidth = drawHeight * planAspect;
-          }
-          const drawX = (pageCanvas.width - drawWidth) / 2;
-          const drawY = planTop + (availableHeight - drawHeight) / 2;
-
-          ctx.strokeStyle = "#d9d9d9";
-          ctx.lineWidth = 3;
-          ctx.beginPath();
-          if (typeof ctx.roundRect === "function") {
-            ctx.roundRect(drawX - 5, drawY - 5, drawWidth + 10, drawHeight + 10, 12);
-          } else {
-            ctx.rect(drawX - 5, drawY - 5, drawWidth + 10, drawHeight + 10);
-          }
-          ctx.stroke();
-          ctx.drawImage(planCanvas, drawX, drawY, drawWidth, drawHeight);
-
-          // Pull the exact on-screen disclaimer into the PDF so both locations stay
-          // synchronized if the wording is edited later.
-          const disclaimerElement = document.querySelector("#generatedPlanDisclaimer");
-          const disclaimerText = disclaimerElement
-            ? disclaimerElement.textContent.replace(/\s+/g, " ").trim()
-            : "Planning disclaimer: This generated plan is based on the information and wall layout provided and our interpretation of the installation conditions. Final site measurements, quantities, cut lists, trim requirements, and installation details remain the responsibility of the contractor/installer and must be verified on site before ordering materials, fabrication, or installation.";
-
-          const wrapCanvasText = (context, value, x, y, maxWidth, lineHeight) => {
-            const words = String(value).split(/\s+/).filter(Boolean);
-            let line = "";
-            let currentY = y;
-            for (let i = 0; i < words.length; i += 1) {
-              const testLine = line ? `${line} ${words[i]}` : words[i];
-              if (line && context.measureText(testLine).width > maxWidth) {
-                context.fillText(line, x, currentY);
-                line = words[i];
-                currentY += lineHeight;
-              } else {
-                line = testLine;
-              }
-            }
-            if (line) context.fillText(line, x, currentY);
-            return currentY;
-          };
-
-          ctx.strokeStyle = "#dedede";
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.moveTo(marginX, 1595);
-          ctx.lineTo(pageCanvas.width - marginX, 1595);
-          ctx.stroke();
-
-          ctx.fillStyle = "#555";
-          ctx.font = "700 19px Arial, Helvetica, sans-serif";
-          ctx.fillText("SITE VERIFICATION / PLANNING DISCLAIMER", marginX, 1635);
-          ctx.fillStyle = "#666";
-          ctx.font = "400 18px Arial, Helvetica, sans-serif";
-          wrapCanvasText(ctx, disclaimerText.replace(/^Planning disclaimer:\s*/i, ""), marginX, 1670, pageCanvas.width - marginX * 2, 27);
-
-          ctx.fillStyle = "#777";
-          ctx.font = "400 20px Arial, Helvetica, sans-serif";
-          ctx.fillText("LUX Architectural Products", marginX, 1795);
-          ctx.textAlign = "right";
-          ctx.fillText("Use the interactive BUILD PLAN to open each marked trim condition.", pageCanvas.width - marginX, 1795);
-          ctx.textAlign = "left";
-
-          const jpegDataUrl = pageCanvas.toDataURL("image/jpeg", 0.94);
-          const commaIndex = jpegDataUrl.indexOf(",");
-          if (commaIndex < 0) throw new Error("Unable to encode the PDF page image.");
-          const jpegBytes = decodeBase64ToBytes(jpegDataUrl.slice(commaIndex + 1));
-          const pdfBytes = buildSingleImagePdf(jpegBytes, pageCanvas.width, pageCanvas.height);
+          const pdfBytes = await pdfDoc.save({ useObjectStreams: false });
           const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
           downloadUrl = URL.createObjectURL(pdfBlob);
 
-          const date = new Date();
-          const dateStamp = [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
           const anchor = document.createElement("a");
           anchor.href = downloadUrl;
-          anchor.download = `Random-Plank-Installation-Plan-${dateStamp}.pdf`;
+          anchor.download = `${sanitizeGuideFileName(projectName)}-Random-Plank-Custom-Installation-Guide.pdf`;
           anchor.style.display = "none";
           document.body.appendChild(anchor);
           anchor.click();
           anchor.remove();
         } catch (error) {
-          console.error("Generated plan PDF export failed:", error);
-          window.alert("The installation plan PDF could not be created. Please try again.");
+          console.error("Custom installation guide generation failed:", error);
+          const errorMessage = error && error.message ? String(error.message) : "Unknown PDF generation error.";
+          const looksLikeAssetError = /could not be loaded|unable to load|failed to fetch|pdf assembly library/i.test(errorMessage);
+          const guidance = looksLikeAssetError
+            ? "\n\nCheck that GENERAL.pdf, BOX BASE.pdf, the required condition PDFs, LAST PAGE.pdf, and logo.png are beside this page (or update CUSTOM_GUIDE_ASSET_BASE). A local pdf-lib.min.js beside the page is recommended, although online fallbacks are also supported."
+            : "\n\nThe guide assets were reached; this error occurred while building the PDF itself. Please report the exact message above.";
+          window.alert(
+            "The custom installation guide could not be generated.\n\n" + errorMessage + guidance
+          );
         } finally {
-          if (objectUrl) URL.revokeObjectURL(objectUrl);
-          if (downloadUrl) setTimeout(() => URL.revokeObjectURL(downloadUrl), 1500);
+          if (downloadUrl) setTimeout(() => URL.revokeObjectURL(downloadUrl), 2500);
           setPdfButtonBusy(false);
         }
       }
@@ -12181,6 +12910,7 @@
         tutorialSeenThisOpen = { draw: false, select: false };
         closePlanTutorial();
         closeGeneratedPlanReadyPopup();
+        closeProjectNamePrompt(null);
         setPhase(phase === "generated" ? "generated" : phase);
         requestAnimationFrame(() => {
           if (phase === "generated") fitGeneratedPlan();
@@ -12248,6 +12978,35 @@
           event.preventDefault();
           event.stopPropagation();
           closeGeneratedPlanReadyPopup();
+        });
+      }
+
+      if (projectNameCancelButton) {
+        projectNameCancelButton.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          closeProjectNamePrompt(null);
+        });
+      }
+
+      if (projectNameGenerateButton) {
+        projectNameGenerateButton.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          submitProjectNamePrompt();
+        });
+      }
+
+      if (projectNameInput) {
+        projectNameInput.addEventListener("input", () => projectNameInput.classList.remove("invalid"));
+        projectNameInput.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            submitProjectNamePrompt();
+          } else if (event.key === "Escape") {
+            event.preventDefault();
+            closeProjectNamePrompt(null);
+          }
         });
       }
 
