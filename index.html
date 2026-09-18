@@ -11006,6 +11006,56 @@
         return layouts;
       }
 
+      function drawPdfRoundedRect(page, {
+        x,
+        y,
+        width,
+        height,
+        radius,
+        color,
+        opacity = 1,
+        borderColor = null,
+        borderWidth = 0,
+        backgroundColor = null
+      }) {
+        const drawFillShape = (sx, sy, sw, sh, sr, fillColor, fillOpacity = 1) => {
+          if (sw <= 0 || sh <= 0) return;
+          const r = Math.max(0, Math.min(sr, sw / 2, sh / 2));
+          if (r <= 0.01) {
+            page.drawRectangle({ x: sx, y: sy, width: sw, height: sh, color: fillColor, opacity: fillOpacity });
+            return;
+          }
+
+          page.drawRectangle({ x: sx + r, y: sy, width: Math.max(0.01, sw - r * 2), height: sh, color: fillColor, opacity: fillOpacity });
+          page.drawRectangle({ x: sx, y: sy + r, width: sw, height: Math.max(0.01, sh - r * 2), color: fillColor, opacity: fillOpacity });
+          page.drawCircle({ x: sx + r, y: sy + r, size: r, color: fillColor, opacity: fillOpacity });
+          page.drawCircle({ x: sx + sw - r, y: sy + r, size: r, color: fillColor, opacity: fillOpacity });
+          page.drawCircle({ x: sx + r, y: sy + sh - r, size: r, color: fillColor, opacity: fillOpacity });
+          page.drawCircle({ x: sx + sw - r, y: sy + sh - r, size: r, color: fillColor, opacity: fillOpacity });
+        };
+
+        if (borderColor && borderWidth > 0) {
+          drawFillShape(x, y, width, height, radius, borderColor, 1);
+
+          // The cover page has a fixed light-grey background. Pre-composite the
+          // translucent black label fill against that grey so the inside retains
+          // the same visual density as rgba(0,0,0,0.78) without the opaque border
+          // leaking through the semi-transparent fill.
+          const inset = Math.min(borderWidth, width / 4, height / 4);
+          const innerX = x + inset;
+          const innerY = y + inset;
+          const innerW = width - inset * 2;
+          const innerH = height - inset * 2;
+          const innerR = Math.max(0, radius - inset);
+          // When a fully opaque pre-composited fill is supplied, use it directly.
+          // Otherwise retain the requested transparency.
+          drawFillShape(innerX, innerY, innerW, innerH, innerR, color, opacity);
+          return;
+        }
+
+        drawFillShape(x, y, width, height, radius, color, opacity);
+      }
+
       function drawCustomGuideVectorPlan(page, pdfLib, regularFont, boldFont) {
         const { rgb } = pdfLib;
         const pageWidth = page.getWidth();
@@ -11032,6 +11082,8 @@
         const greyPanel = rgb(0.66, 0.67, 0.68);
         const connector = rgb(0.60, 0.61, 0.62);
         const black = rgb(0.03, 0.03, 0.035);
+        const labelBorder = rgb(0.50, 0.50, 0.50);
+        const coverBackground = rgb(0.90, 0.91, 0.92);
         const white = rgb(1, 1, 1);
         const red = rgb(0.83, 0.13, 0.18);
 
@@ -11105,13 +11157,20 @@
           const radius = Math.max(8.5, 17 * scale);
 
           page.drawLine({ start: labelCenter, end: hot, thickness: 0.7, color: connector, opacity: 0.9 });
-          page.drawRectangle({
+          drawPdfRoundedRect(page, {
             x: labelCenter.x - labelWidth / 2,
             y: labelCenter.y - labelHeight / 2,
             width: labelWidth,
             height: labelHeight,
-            color: black,
-            opacity: 0.96
+            radius: Math.max(3.4, Math.min(labelHeight / 2 - 0.15, 9 * scale)),
+            // rgba(0,0,0,0.78) composited against the fixed light-grey cover
+            // is approximately 20% grey. Using that as an opaque fill keeps the
+            // visible density identical while allowing a true opaque grey border.
+            color: rgb(0.20, 0.20, 0.20),
+            opacity: 1,
+            borderColor: labelBorder,
+            borderWidth: Math.max(0.65, Math.min(1.05, 1.2 * scale)),
+            backgroundColor: coverBackground
           });
 
           const textSize = Math.max(5.9, Math.min(8.8, 12 * scale));
@@ -11124,7 +11183,7 @@
             color: white
           });
 
-          page.drawCircle({ x: hot.x, y: hot.y, size: radius, color: black, borderColor: white, borderWidth: 1.1 });
+          page.drawCircle({ x: hot.x, y: hot.y, size: radius, color: black, borderColor: white, borderWidth: Math.max(1.8, Math.min(2.5, 2.6 * scale)) });
           page.drawCircle({ x: hot.x, y: hot.y, size: Math.max(2.2, radius * 0.27), color: white });
 
           links.push({
@@ -11151,6 +11210,10 @@
           Subtype: PDFName.of("Link"),
           Rect: context.obj([rect.x, rect.y, rect.x + rect.width, rect.y + rect.height]),
           Border: context.obj([0, 0, 0]),
+          // PDF does not have a dependable browser-style hover state. The native
+          // Link annotation highlight mode gives supported viewers visible press
+          // feedback without changing the printed artwork.
+          H: PDFName.of("I"),
           A: action
         });
         const annotationRef = context.register(annotation);
