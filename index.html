@@ -9946,7 +9946,7 @@
       const SVG_NS = "http://www.w3.org/2000/svg";
       const SNAP_DISTANCE = 15;
       const MIN_SEGMENT_LENGTH = 10;
-      const RIGHT_ANGLE_TOLERANCE = 12;
+      const RIGHT_ANGLE_TOLERANCE = 6;
       const STRAIGHT_TOLERANCE = 9;
 
       let phase = "draw";
@@ -9954,6 +9954,9 @@
       let currentRun = null;
       let previewPoint = null;
       let selectedSegments = new Set();
+      // Ctrl/Cmd+Z in selection mode restores the previous selection/face state.
+      // Keep this separate from drawing undo so each workflow behaves naturally.
+      let selectionUndoStack = [];
       // The installation face is explicit because the same wall geometry can
       // represent cladding on either side of the wall. Default to the inside.
       let randomPlankSide = "inside";
@@ -10091,6 +10094,31 @@
 
       function copyPoint(point) {
         return { x: point.x, y: point.y };
+      }
+
+      function rememberSelectionState() {
+        if (phase !== "select") return;
+        selectionUndoStack.push({
+          selectedIds: Array.from(selectedSegments),
+          randomPlankSide
+        });
+        // More than enough for normal editing while preventing an unbounded stack.
+        if (selectionUndoStack.length > 100) selectionUndoStack.shift();
+      }
+
+      function clearSelectionUndoHistory() {
+        selectionUndoStack = [];
+      }
+
+      function undoSelectionChange() {
+        if (phase !== "select" || !selectionUndoStack.length) return false;
+        const previous = selectionUndoStack.pop();
+        selectedSegments = new Set(previous.selectedIds || []);
+        randomPlankSide = previous.randomPlankSide === "outside" ? "outside" : "inside";
+        updateRandomPlankSideUi();
+        hint.textContent = `Selected walls are highlighted red. The Random Plank preview is on the ${randomPlankSide.toUpperCase()} face. Use the RP side button to switch faces. CTRL+Z undoes selection changes. PAN, middle-drag, scroll or + / − still navigate the plan.`;
+        renderPlanner();
+        return true;
       }
 
       function allPoints() {
@@ -11302,13 +11330,13 @@
           title.textContent = "CUSTOM INSTALLATION GUIDE BUILDER";
           stepText.textContent = "STEP 1 — Draw the walls in your project.";
           hint.textContent = isFinePointer
-            ? "90° SNAP ON · Hold SHIFT or use ANGLE for any angle · Middle-drag to pan · Right-click or ACCEPT to stop drawing."
+            ? "90° SNAP ON · Hold SHIFT or use ANGLE for any angle · CTRL+Z to undo · Middle-drag to pan · Right-click or ACCEPT to stop drawing."
             : "90° SNAP ON · Use ANGLE for any angle · Use PAN to move the drawing · ACCEPT starts a separate wall run.";
           status.textContent = "Draw one or more wall runs. Separate runs are allowed.";
         } else if (nextPhase === "select") {
           title.textContent = "SELECT RANDOM PLANK WALLS";
           stepText.textContent = "STEP 2 — Click the walls that will receive Random Plank.";
-          hint.textContent = `Selected walls are highlighted red. The Random Plank preview is on the ${randomPlankSide.toUpperCase()} face. Use the RP side button to switch faces. PAN, middle-drag, scroll or + / − still navigate the plan.`;
+          hint.textContent = `Selected walls are highlighted red. The Random Plank preview is on the ${randomPlankSide.toUpperCase()} face. Use the RP side button to switch faces. CTRL+Z undoes selection changes. PAN, middle-drag, scroll or + / − still navigate the plan.`;
           status.textContent = "Disconnected selected walls will be planned as separate installation runs.";
         } else {
           title.textContent = "YOUR INSTALLATION PLAN";
@@ -12164,6 +12192,7 @@
             hit.addEventListener("click", (event) => {
               event.stopPropagation();
               if (selectionPanMode) return;
+              rememberSelectionState();
               if (selectedSegments.has(segment.id)) {
                 selectedSegments.delete(segment.id);
               } else {
@@ -12494,20 +12523,32 @@
         return Math.atan2(cross, dot) * 180 / Math.PI;
       }
 
-      function classifyInternalNode(prev, current, next, faceSide) {
+      function getCornerGeometry(prev, current, next) {
         const signed = signedTurnAngle(prev, current, next);
         const angle = Math.abs(signed);
         const normalized = angle > 180 ? 360 - angle : angle;
-
-        if (normalized <= STRAIGHT_TOLERANCE || Math.abs(normalized - 180) <= STRAIGHT_TOLERANCE) {
-          return "straight";
-        }
-        if (Math.abs(normalized - 90) <= RIGHT_ANGLE_TOLERANCE) {
+        return {
+          signed,
+          normalized,
+          isStraight: normalized <= STRAIGHT_TOLERANCE || Math.abs(normalized - 180) <= STRAIGHT_TOLERANCE,
+          isRightAngle: Math.abs(normalized - 90) <= RIGHT_ANGLE_TOLERANCE,
           // On screen coordinates, a positive turn puts the tight/inside face
           // on the right side of the path; a negative turn puts it on the left.
-          const cornerInsideSide = signed >= 0 ? "right" : "left";
-          return faceSide === cornerInsideSide ? "insideEndStart" : "outsideStartEnd";
+          cornerInsideSide: signed >= 0 ? "right" : "left"
+        };
+      }
+
+      function classifyInternalNode(prev, current, next, faceSide) {
+        const corner = getCornerGeometry(prev, current, next);
+
+        if (corner.isStraight) return "straight";
+        if (corner.isRightAngle) {
+          return faceSide === corner.cornerInsideSide ? "insideEndStart" : "outsideStartEnd";
         }
+
+        // Every specialized corner trim is a nominal 90° condition. Outside the
+        // ±6° tolerance, installation has to stop and restart rather than trying
+        // to force a bent 90° trim around an incompatible angle.
         return "odd";
       }
 
@@ -12715,20 +12756,37 @@
 
             const startPrev = graph.nodes.get(ordered[(ordered.length - 1) % ordered.length]).point;
             const startNext = graph.nodes.get(ordered[1 % ordered.length]).point;
-            const startCornerInsideSide = signedTurnAngle(startPrev, startPoint, startNext) >= 0 ? "right" : "left";
-            const startIsInside = loopFaceSide === startCornerInsideSide;
+            const startCorner = getCornerGeometry(startPrev, startPoint, startNext);
+            const startIsInside = loopFaceSide === startCorner.cornerInsideSide;
 
             const meetPrev = graph.nodes.get(ordered[(meetIndex - 1 + ordered.length) % ordered.length]).point;
             const meetNext = graph.nodes.get(ordered[(meetIndex + 1) % ordered.length]).point;
-            const meetCornerInsideSide = signedTurnAngle(meetPrev, meetPoint, meetNext) >= 0 ? "right" : "left";
-            const meetIsInside = loopFaceSide === meetCornerInsideSide;
+            const meetCorner = getCornerGeometry(meetPrev, meetPoint, meetNext);
+            const meetIsInside = loopFaceSide === meetCorner.cornerInsideSide;
 
-            events.push(startIsInside
-              ? { key: "isStartStart", label: "INSIDE START START", point: copyPoint(startPoint) }
-              : { key: "osStartStart", label: "OUTSIDE START START", point: copyPoint(startPoint) });
-            events.push(meetIsInside
-              ? { key: "isEndEnd", label: "INSIDE END END", point: copyPoint(meetPoint) }
-              : { key: "osEndEnd", label: "OUTSIDE END END", point: copyPoint(meetPoint) });
+            if (startCorner.isRightAngle) {
+              events.push(startIsInside
+                ? { key: "isStartStart", label: "INSIDE START START", point: copyPoint(startPoint) }
+                : { key: "osStartStart", label: "OUTSIDE START START", point: copyPoint(startPoint) });
+            } else {
+              // Two installation directions leave this node. At a non-90° corner
+              // neither START START trim can fit, so each direction gets a STARTER.
+              events.push({ key: "starter", label: "STARTER", point: copyPoint(startPoint) });
+              events.push({ key: "starter", label: "STARTER", point: copyPoint(startPoint) });
+              oddTurnCount += 1;
+            }
+
+            if (meetCorner.isRightAngle) {
+              events.push(meetIsInside
+                ? { key: "isEndEnd", label: "INSIDE END END", point: copyPoint(meetPoint) }
+                : { key: "osEndEnd", label: "OUTSIDE END END", point: copyPoint(meetPoint) });
+            } else {
+              // Both installation directions arrive here. At a non-90° corner the
+              // correct treatment is two independent terminations.
+              events.push({ key: "terminate", label: "TERMINATE", point: copyPoint(meetPoint) });
+              events.push({ key: "terminate", label: "TERMINATE", point: copyPoint(meetPoint) });
+              oddTurnCount += 1;
+            }
             pushFlowForPath(routeA, graph, flowEdges);
             pushFlowForPath(routeB, graph, flowEdges);
 
@@ -12771,7 +12829,7 @@
           ? " Junctions are currently treated as separate installation runs."
           : "";
         const faceLabel = generatedPlan.randomPlankSide === "outside" ? "OUTSIDE" : "INSIDE";
-        status.textContent = `${prefix}Random Plank face: ${faceLabel}. 90° trim conditions are calculated from that face; odd angles terminate and restart.${branchNote}`;
+        status.textContent = `${prefix}Random Plank face: ${faceLabel}. Corner trims are used only within ±${RIGHT_ANGLE_TOLERANCE}° of 90°; other angles resolve to STARTER / TERMINATE conditions based on installation flow.${branchNote}`;
       }
 
       function waitForModelIdle(callback, tries = 0) {
@@ -13066,17 +13124,22 @@
         finishCurrentRun();
         if (!getSegments().length) return;
         selectedSegments.clear();
+        clearSelectionUndoHistory();
         setPhase("select");
       });
 
       backToDrawButton.addEventListener("click", (event) => {
         event.stopPropagation();
+        clearSelectionUndoHistory();
         setPhase("draw");
       });
 
       selectAllButton.addEventListener("click", (event) => {
         event.stopPropagation();
-        selectedSegments = new Set(getSegments().map((segment) => segment.id));
+        const allIds = getSegments().map((segment) => segment.id);
+        if (allIds.length === selectedSegments.size && allIds.every((id) => selectedSegments.has(id))) return;
+        rememberSelectionState();
+        selectedSegments = new Set(allIds);
         renderPlanner();
       });
 
@@ -13084,10 +13147,11 @@
         randomPlankSideButton.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
+          rememberSelectionState();
           randomPlankSide = randomPlankSide === "inside" ? "outside" : "inside";
           updateRandomPlankSideUi();
           if (phase === "select") {
-            hint.textContent = `Selected walls are highlighted red. The Random Plank preview is on the ${randomPlankSide.toUpperCase()} face. Use the RP side button to switch faces. PAN, middle-drag, scroll or + / − still navigate the plan.`;
+            hint.textContent = `Selected walls are highlighted red. The Random Plank preview is on the ${randomPlankSide.toUpperCase()} face. Use the RP side button to switch faces. CTRL+Z undoes selection changes. PAN, middle-drag, scroll or + / − still navigate the plan.`;
           }
           renderPlanner();
         });
@@ -13095,6 +13159,8 @@
 
       clearSelectionButton.addEventListener("click", (event) => {
         event.stopPropagation();
+        if (!selectedSegments.size) return;
+        rememberSelectionState();
         selectedSegments.clear();
         renderPlanner();
       });
@@ -13120,6 +13186,7 @@
         clearMiniWindowSizeStyles();
         document.body.classList.remove("generatedPlanModelMode");
         if (activeMainHotspot || isPlaying) returnGeneratedPlanModelToDefault();
+        clearSelectionUndoHistory();
         setPhase("select");
       });
 
@@ -13445,6 +13512,30 @@
 
       document.addEventListener("keydown", (event) => {
         if (!overlay.classList.contains("open")) return;
+
+        const target = event.target;
+        const isTypingTarget = target && (
+          target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable
+        );
+        const isUndoShortcut = (event.ctrlKey || event.metaKey)
+          && !event.shiftKey
+          && String(event.key).toLowerCase() === "z";
+
+        if (isUndoShortcut && !isTypingTarget) {
+          if (phase === "draw") {
+            event.preventDefault();
+            undoLastPoint();
+            return;
+          }
+          if (phase === "select") {
+            event.preventDefault();
+            undoSelectionChange();
+            return;
+          }
+        }
+
         if (event.key === "Escape") {
           if (phase === "draw" && currentRun && currentRun.points.length) {
             event.preventDefault();
