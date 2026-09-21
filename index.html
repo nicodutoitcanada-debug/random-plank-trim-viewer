@@ -4459,6 +4459,40 @@
       filter: drop-shadow(0 0 7px rgba(118, 239, 99, 0.72));
     }
 
+    /* Prevent accidental double-drawing over an existing wall. The live preview
+       turns red before the click is accepted so the user immediately understands
+       that this path is already occupied. */
+    .generatedPlanPreview.isOverlapBlocked,
+    .generatedPlanArcPreview.isOverlapBlocked,
+    .generatedPlanArcPreview.isCurveBlocked {
+      stroke: #ff4d57;
+      stroke-width: 4;
+      stroke-dasharray: 5 6;
+      filter: drop-shadow(0 0 7px rgba(255, 77, 87, 0.58));
+    }
+
+    /* Curves that fold back on themselves or create an excessively tight local
+       bend are not realistic Random Plank installation geometry. While the user
+       is shaping/editing one, turn both the curve and its handles red just like
+       the overlap guard, then refuse the invalid edit on release. */
+    .generatedPlanWall.isCurveBlocked {
+      stroke: #ff4d57;
+      stroke-width: 6;
+      filter: drop-shadow(0 0 7px rgba(255, 77, 87, 0.58));
+    }
+
+    .generatedPlanBezierHandles.isCurveBlocked .generatedPlanBezierHandleLine {
+      stroke: #ff4d57;
+      stroke-width: 2.5;
+      filter: drop-shadow(0 0 5px rgba(255, 77, 87, 0.48));
+    }
+
+    .generatedPlanBezierHandles.isCurveBlocked .generatedPlanBezierHandleDot {
+      fill: #ff4d57;
+      stroke: rgba(255,255,255,0.92);
+      filter: drop-shadow(0 0 5px rgba(255, 77, 87, 0.48));
+    }
+
     .generatedPlanSnapFeedback {
       pointer-events: none;
     }
@@ -6007,6 +6041,10 @@
           <button class="generatedPlanActionButton generatedPlanDownloadIconButton" id="generatedPlanDownloadFooterButton" type="button" data-show-phase="generated" aria-label="Generate custom PDF installation guide" title="Generate custom PDF installation guide">
             <img src="download pdf.png" alt="" aria-hidden="true" />
             <span class="generatedPlanDownloadLabel">GENERATE CUSTOM INSTALLATION GUIDE</span>
+          </button>
+          <button class="generatedPlanActionButton isAvailable" id="generatedPlanInteractiveGuideButton" type="button" data-show-phase="generated" aria-label="Generate interactive installation guide" title="Generate interactive installation guide">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><rect class="screen" x="3.5" y="5" width="25" height="19" rx="4"></rect><path class="screen" d="M11 27h10"></path><path class="play" d="M14 10.5 22 14.5 14 18.5Z"></path></svg>
+            <span>GENERATE INTERACTIVE GUIDE</span>
           </button>
         </div>
         <div class="generatedPlanDisclaimer" id="generatedPlanDisclaimer">
@@ -10015,6 +10053,9 @@
       const MIN_SEGMENT_LENGTH = 10;
       const RIGHT_ANGLE_TOLERANCE = 6;
       const STRAIGHT_TOLERANCE = 9;
+      const OVERLAP_DISTANCE_TOLERANCE = 2.5;
+      const OVERLAP_DIRECTION_TOLERANCE = 8;
+      const OVERLAP_MIN_LENGTH = 9;
 
       let phase = "draw";
       let runs = [];
@@ -10241,6 +10282,124 @@
         return points;
       }
 
+      function curvePolylineSelfIntersects(points) {
+        if (!points || points.length < 5) return false;
+
+        const orient = (a, b, c) => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+        const intersects = (a, b, c, d) => {
+          const o1 = orient(a, b, c);
+          const o2 = orient(a, b, d);
+          const o3 = orient(c, d, a);
+          const o4 = orient(c, d, b);
+          return ((o1 > 0 && o2 < 0) || (o1 < 0 && o2 > 0))
+            && ((o3 > 0 && o4 < 0) || (o3 < 0 && o4 > 0));
+        };
+
+        for (let i = 0; i < points.length - 1; i += 1) {
+          for (let j = i + 3; j < points.length - 1; j += 1) {
+            // The first and last polyline pieces share the actual Bezier endpoints
+            // only on a closed curve; these wall arches are open, so a proper
+            // crossing anywhere here is invalid.
+            if (intersects(points[i], points[i + 1], points[j], points[j + 1])) return true;
+          }
+        }
+        return false;
+      }
+
+      function circumradius(a, b, c) {
+        const ab = pointDistance(a, b);
+        const bc = pointDistance(b, c);
+        const ca = pointDistance(c, a);
+        const twiceArea = Math.abs((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x));
+        if (twiceArea < 0.0001) return Infinity;
+        // R = abc / (4A); twiceArea = 2A.
+        return (ab * bc * ca) / (2 * twiceArea);
+      }
+
+      function validateInstallableCurve(segment) {
+        if (!segment || segment.type !== "arc" || !segment.a || !segment.b) {
+          return { valid: true, reason: "" };
+        }
+        if (!segment.control1 || !segment.control2) {
+          return { valid: true, reason: "" };
+        }
+
+        const chordLength = pointDistance(segment.a, segment.b);
+        if (chordLength < MIN_SEGMENT_LENGTH) {
+          return { valid: false, reason: "Curve is too short." };
+        }
+
+        // Use a fixed high-resolution sample so the guard reacts consistently
+        // regardless of zoom or the on-screen size of the wall. This is a visual
+        // constructability guard, not a claim about a physical inch-radius spec.
+        const points = sampleCubicBezier(
+          segment.a,
+          segment.control1,
+          segment.control2,
+          segment.b,
+          96
+        );
+
+        if (curvePolylineSelfIntersects(points)) {
+          return { valid: false, reason: "Curve loops back across itself." };
+        }
+
+        const chordDirection = normalizeVector({
+          x: segment.b.x - segment.a.x,
+          y: segment.b.y - segment.a.y
+        });
+        let totalLength = 0;
+        let minRadius = Infinity;
+        let previousDirection = null;
+
+        for (let i = 1; i < points.length; i += 1) {
+          const a = points[i - 1];
+          const b = points[i];
+          const piece = { x: b.x - a.x, y: b.y - a.y };
+          const pieceLength = Math.hypot(piece.x, piece.y);
+          if (pieceLength < 0.0001) continue;
+          totalLength += pieceLength;
+          const direction = { x: piece.x / pieceLength, y: piece.y / pieceLength };
+
+          // A normal architectural arch may sweep quite aggressively near its ends.
+          // Only reject a meaningful backward reversal along the chord — enough to
+          // indicate a true hook/curl rather than a usable tight arch.
+          const forwardProjection = direction.x * chordDirection.x + direction.y * chordDirection.y;
+          if (forwardProjection < -0.48) {
+            return { valid: false, reason: "Curve folds back on itself." };
+          }
+
+          if (previousDirection) {
+            const turn = angleBetweenDirections(previousDirection, direction);
+            if (turn > 56) {
+              return { valid: false, reason: "Curve changes direction too sharply." };
+            }
+          }
+          previousDirection = direction;
+        }
+
+        // An extreme path-length-to-chord ratio is another sign of a loop or
+        // aggressive hook. Keep this intentionally very permissive until an official
+        // Random Plank minimum bend specification is available.
+        if (totalLength > chordLength * 3.20) {
+          return { valid: false, reason: "Curve is too tight for the wall span." };
+        }
+
+        // Catch only genuinely tiny local bend radii even when the curve does not
+        // literally reverse. The temporary visual guard is intentionally loose so
+        // installers can represent fairly tight architectural arches; tighten it
+        // later if an official Random Plank minimum bend specification is available.
+        for (let i = 3; i < points.length - 3; i += 3) {
+          minRadius = Math.min(minRadius, circumradius(points[i - 3], points[i], points[i + 3]));
+        }
+        const minimumVisualRadius = Math.max(6.5, chordLength * 0.030);
+        if (minRadius < minimumVisualRadius) {
+          return { valid: false, reason: "Curve radius is too tight for Random Plank." };
+        }
+
+        return { valid: true, reason: "" };
+      }
+
       function segmentRenderPoints(segment) {
         if (!segment) return [];
         if (segment.type === "arc") {
@@ -10403,8 +10562,17 @@
           pendingArc.control2,
           pendingArc.end
         );
+        const validation = validateInstallableCurve({
+          a: pendingArc.start,
+          b: pendingArc.end,
+          type: "arc",
+          control1: pendingArc.control1,
+          control2: pendingArc.control2
+        });
+        pendingArc.curveValidation = validation;
         arcPreview.setAttribute("d", polylinePathD(sampled));
         arcPreview.setAttribute("visibility", "visible");
+        arcPreview.classList.toggle("isCurveBlocked", !validation.valid);
         previewLine.setAttribute("visibility", "hidden");
         hideAngleGuide();
         updateCurveHandleOverlay();
@@ -10518,8 +10686,17 @@
         bezierStartDot.classList.toggle("isSnapped", startSnapped);
         bezierEndLine.classList.toggle("isSnapped", endSnapped);
         bezierEndDot.classList.toggle("isSnapped", endSnapped);
+        let curveBlocked = false;
+        if (pendingArc) {
+          curveBlocked = Boolean(pendingArc.curveValidation && !pendingArc.curveValidation.valid);
+        } else if (editable) {
+          const validation = validateInstallableCurve({ a, b, type: "arc", control1: c1, control2: c2 });
+          curveBlocked = !validation.valid;
+        }
+
         bezierHandles.classList.toggle("isEditable", editable);
         bezierHandles.classList.toggle("isDragging", Boolean(curveHandleDrag));
+        bezierHandles.classList.toggle("isCurveBlocked", curveBlocked);
         bezierHandles.setAttribute("visibility", "visible");
       }
 
@@ -10567,6 +10744,19 @@
         if (handleName === "start") editData.def.control1 = next;
         else editData.def.control2 = next;
         renderPlanner();
+
+        const validation = validateInstallableCurve({
+          a: editData.a,
+          b: editData.b,
+          type: "arc",
+          control1: editData.def.control1,
+          control2: editData.def.control2
+        });
+        if (!validation.valid && status) {
+          status.textContent = `CURVE LIMIT — ${validation.reason} Open the arch until it returns to white.`;
+        } else if (status) {
+          status.textContent = "CURVE EDIT — Drag the yellow Bezier handles to refine the arch. Handles snap green when aligned with an adjoining wall.";
+        }
       }
 
       function polylineLength(points) {
@@ -10907,6 +11097,7 @@
         previewLine.setAttribute("visibility", "hidden");
         if (arcPreview) arcPreview.setAttribute("visibility", "hidden");
         hideClosingSnapFeedback({ keepConfirmation: keepSnapConfirmation });
+        clearOverlapBlockedFeedback();
         hideAngleGuide();
         if (!currentRun) return;
 
@@ -10954,6 +11145,124 @@
         if (!currentRun.points.length) currentRun = null;
         selectedSegments.clear();
         renderPlanner();
+      }
+
+      function pointToSegmentProjection(point, a, b) {
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const lengthSq = dx * dx + dy * dy;
+        if (lengthSq < 0.000001) {
+          return { point: copyPoint(a), t: 0, distance: pointDistance(point, a), direction: { x: 1, y: 0 } };
+        }
+        const t = Math.max(0, Math.min(1, ((point.x - a.x) * dx + (point.y - a.y) * dy) / lengthSq));
+        const projected = { x: a.x + dx * t, y: a.y + dy * t };
+        return {
+          point: projected,
+          t,
+          distance: pointDistance(point, projected),
+          direction: normalizeVector({ x: dx, y: dy })
+        };
+      }
+
+      function nearestPointOnPolyline(point, polyline) {
+        if (!polyline || polyline.length < 2) return null;
+        let best = null;
+        for (let i = 0; i < polyline.length - 1; i += 1) {
+          const hit = pointToSegmentProjection(point, polyline[i], polyline[i + 1]);
+          if (!best || hit.distance < best.distance) best = hit;
+        }
+        return best;
+      }
+
+      function committedSegmentsForOverlapCheck() {
+        const segments = getSegments().slice();
+        if (currentRun && currentRun.points && currentRun.points.length > 1) {
+          const defs = ensureRunSegments(currentRun);
+          for (let i = 0; i < currentRun.points.length - 1; i += 1) {
+            const def = defs[i] || { type: "line" };
+            const segment = {
+              id: `current-s${i}`,
+              runIndex: -1,
+              segmentIndex: i,
+              a: currentRun.points[i],
+              b: currentRun.points[i + 1],
+              type: def.type || "line",
+              control: def.control ? copyPoint(def.control) : null,
+              control1: def.control1 ? copyPoint(def.control1) : null,
+              control2: def.control2 ? copyPoint(def.control2) : null
+            };
+            segment.renderPoints = segmentRenderPoints(segment);
+            segments.push(segment);
+          }
+        }
+        return segments;
+      }
+
+      function resamplePolylineForOverlap(points, step = 5) {
+        if (!points || points.length < 2) return [];
+        const sampled = [copyPoint(points[0])];
+        for (let i = 0; i < points.length - 1; i += 1) {
+          const a = points[i];
+          const b = points[i + 1];
+          const length = pointDistance(a, b);
+          const pieces = Math.max(1, Math.ceil(length / step));
+          for (let j = 1; j <= pieces; j += 1) {
+            const t = j / pieces;
+            sampled.push({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
+          }
+        }
+        return sampled;
+      }
+
+      function proposedSegmentOverlapsExisting(segment) {
+        if (!segment || !segment.a || !segment.b) return false;
+        const proposedRaw = segmentRenderPoints(segment);
+        const proposed = resamplePolylineForOverlap(proposedRaw, 4.5);
+        if (proposed.length < 2) return false;
+
+        const existing = committedSegmentsForOverlapCheck();
+        if (!existing.length) return false;
+        const existingPolylines = existing.map((item) => item.renderPoints || segmentRenderPoints(item));
+
+        let totalLength = 0;
+        let overlapLength = 0;
+        for (let i = 0; i < proposed.length - 1; i += 1) {
+          const a = proposed[i];
+          const b = proposed[i + 1];
+          const pieceLength = pointDistance(a, b);
+          if (pieceLength < 0.0001) continue;
+          totalLength += pieceLength;
+          const midpoint = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+          const proposedDirection = normalizeVector({ x: b.x - a.x, y: b.y - a.y });
+
+          let overlapsPiece = false;
+          for (const polyline of existingPolylines) {
+            const nearest = nearestPointOnPolyline(midpoint, polyline);
+            if (!nearest || nearest.distance > OVERLAP_DISTANCE_TOLERANCE) continue;
+            const angle = angleBetweenDirections(proposedDirection, nearest.direction);
+            const parallelAngle = Math.min(angle, Math.abs(180 - angle));
+            if (parallelAngle <= OVERLAP_DIRECTION_TOLERANCE) {
+              overlapsPiece = true;
+              break;
+            }
+          }
+          if (overlapsPiece) overlapLength += pieceLength;
+        }
+
+        if (totalLength < 0.0001) return false;
+        const requiredOverlap = Math.max(OVERLAP_MIN_LENGTH, totalLength * 0.18);
+        return overlapLength >= requiredOverlap;
+      }
+
+      function showOverlapBlockedFeedback() {
+        if (status) status.textContent = "That wall is already drawn. Overlapping wall segments are not allowed.";
+        if (previewLine) previewLine.classList.add("isOverlapBlocked");
+        if (arcPreview) arcPreview.classList.add("isOverlapBlocked");
+      }
+
+      function clearOverlapBlockedFeedback() {
+        if (previewLine) previewLine.classList.remove("isOverlapBlocked");
+        if (arcPreview) arcPreview.classList.remove("isOverlapBlocked");
       }
 
       function getSegments() {
@@ -12874,10 +13183,18 @@
 
         segments.forEach((segment) => {
           const selected = selectedSegments.has(segment.id);
+          const isEditedCurve = Boolean(
+            phase === "draw"
+            && curveEdit
+            && segment.type === "arc"
+            && segment.runIndex === curveEdit.runIndex
+            && segment.segmentIndex === curveEdit.segmentIndex
+          );
+          const editedCurveValidation = isEditedCurve ? validateInstallableCurve(segment) : { valid: true };
           const wall = drawPlanSegment(
             viewport,
             segment,
-            `generatedPlanWall${selected ? " isSelected" : ""}`
+            `generatedPlanWall${selected ? " isSelected" : ""}${!editedCurveValidation.valid ? " isCurveBlocked" : ""}`
           );
           wall.dataset.segmentId = segment.id;
 
@@ -13094,6 +13411,222 @@
         viewport.appendChild(group);
       }
 
+      function generatedPlanRectsOverlap(a, b, padding = 0) {
+        return !(
+          a.right + padding <= b.left
+          || a.left - padding >= b.right
+          || a.bottom + padding <= b.top
+          || a.top - padding >= b.bottom
+        );
+      }
+
+      function generatedPlanRectCircleOverlap(rect, circle, padding = 0) {
+        const nearestX = Math.max(rect.left, Math.min(circle.x, rect.right));
+        const nearestY = Math.max(rect.top, Math.min(circle.y, rect.bottom));
+        const dx = circle.x - nearestX;
+        const dy = circle.y - nearestY;
+        const radius = circle.r + padding;
+        return dx * dx + dy * dy < radius * radius;
+      }
+
+      function generatedPlanSegmentIntersectsRect(a, b, rect, padding = 0) {
+        const expanded = {
+          left: rect.left - padding,
+          right: rect.right + padding,
+          top: rect.top - padding,
+          bottom: rect.bottom + padding
+        };
+
+        if (
+          (a.x >= expanded.left && a.x <= expanded.right && a.y >= expanded.top && a.y <= expanded.bottom)
+          || (b.x >= expanded.left && b.x <= expanded.right && b.y >= expanded.top && b.y <= expanded.bottom)
+        ) return true;
+
+        const segmentIntersects = (p1, p2, p3, p4) => {
+          const cross = (u, v, w) => (v.x - u.x) * (w.y - u.y) - (v.y - u.y) * (w.x - u.x);
+          const d1 = cross(p1, p2, p3);
+          const d2 = cross(p1, p2, p4);
+          const d3 = cross(p3, p4, p1);
+          const d4 = cross(p3, p4, p2);
+          return ((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0))
+            && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0));
+        };
+
+        const tl = { x: expanded.left, y: expanded.top };
+        const tr = { x: expanded.right, y: expanded.top };
+        const br = { x: expanded.right, y: expanded.bottom };
+        const bl = { x: expanded.left, y: expanded.bottom };
+        return segmentIntersects(a, b, tl, tr)
+          || segmentIntersects(a, b, tr, br)
+          || segmentIntersects(a, b, br, bl)
+          || segmentIntersects(a, b, bl, tl);
+      }
+
+      // Reposition hotspot title boxes after every generated-plan render. The
+      // first-pass placement still supplies a sensible preferred side, but this
+      // second pass looks at every hotspot circle and every title rectangle and
+      // chooses the nearest collision-free candidate. This keeps labels from
+      // covering nearby buttons or each other even in unusually dense plans.
+      function resolveGeneratedHotspotLabelCollisions() {
+        const groups = Array.from(viewport.querySelectorAll('.generatedPlanHotspot'));
+        if (groups.length < 2) return;
+
+        const items = groups.map((group, index) => {
+          const core = group.querySelector('.generatedPlanHotspotCore');
+          const rect = group.querySelector('.generatedPlanHotspotLabelBg');
+          const text = group.querySelector('.generatedPlanHotspotLabel');
+          const connector = group.querySelector('.generatedPlanHotspotConnector');
+          if (!core || !rect || !text || !connector) return null;
+
+          const x = Number(core.getAttribute('cx'));
+          const y = Number(core.getAttribute('cy'));
+          const radius = Number(core.getAttribute('r')) || 17;
+          const width = Number(rect.getAttribute('width')) || 120;
+          const height = Number(rect.getAttribute('height')) || 29;
+          const currentX = Number(text.getAttribute('x')) || x;
+          const currentY = (Number(text.getAttribute('y')) || y) - 4;
+          const preferredAngle = Math.atan2(currentY - y, currentX - x);
+          return {
+            group, core, rect, text, connector, index,
+            x, y, radius, width, height, preferredAngle,
+            crowd: 0
+          };
+        }).filter(Boolean);
+
+        if (items.length < 2) return;
+
+        const circles = items.map((item) => ({ x: item.x, y: item.y, r: item.radius }));
+        items.forEach((item) => {
+          item.crowd = circles.reduce((count, circle) => {
+            if (circle.x === item.x && circle.y === item.y) return count;
+            return count + (Math.hypot(circle.x - item.x, circle.y - item.y) < 155 ? 1 : 0);
+          }, 0);
+        });
+
+        // Place the most crowded / longest labels first so they get first pick
+        // of the cleanest lanes. Stable index ordering keeps positions from
+        // jumping between renders.
+        const ordered = items.slice().sort((a, b) =>
+          (b.crowd - a.crowd)
+          || (b.width - a.width)
+          || (a.index - b.index)
+        );
+
+        const placed = [];
+        const safeBounds = { left: 20, right: 980, top: 24, bottom: 576 };
+        const angleOffsets = [
+          0,
+          Math.PI / 4, -Math.PI / 4,
+          Math.PI / 2, -Math.PI / 2,
+          3 * Math.PI / 4, -3 * Math.PI / 4,
+          Math.PI
+        ];
+        const extraDistances = [0, 24, 50, 82, 118, 160];
+
+        ordered.forEach((item) => {
+          let best = null;
+
+          const directionCandidates = [];
+          angleOffsets.forEach((offset) => {
+            const angle = item.preferredAngle + offset;
+            directionCandidates.push({ angle, angularPenalty: Math.abs(offset) });
+          });
+          // Also include absolute compass directions so a crowded preferred side
+          // can escape to the opposite quadrant instead of being trapped there.
+          for (let i = 0; i < 8; i += 1) {
+            const angle = -Math.PI + i * Math.PI / 4;
+            let delta = Math.abs(angle - item.preferredAngle) % (Math.PI * 2);
+            if (delta > Math.PI) delta = Math.PI * 2 - delta;
+            directionCandidates.push({ angle, angularPenalty: delta + 0.18 });
+          }
+
+          directionCandidates.forEach(({ angle, angularPenalty }) => {
+            const ux = Math.cos(angle);
+            const uy = Math.sin(angle);
+            const halfW = item.width / 2;
+            const halfH = item.height / 2;
+            // Distance from circle centre to the edge of an axis-aligned title
+            // box in this direction, plus a deliberate visual gap.
+            const boxSupport = Math.abs(ux) * halfW + Math.abs(uy) * halfH;
+            const baseDistance = item.radius + 14 + boxSupport;
+
+            extraDistances.forEach((extraDistance, ringIndex) => {
+              const distance = baseDistance + extraDistance;
+              const labelX = item.x + ux * distance;
+              const labelY = item.y + uy * distance;
+              const candidateRect = {
+                left: labelX - halfW,
+                right: labelX + halfW,
+                top: labelY - halfH,
+                bottom: labelY + halfH
+              };
+
+              let hardCollisions = 0;
+              let softPenalty = 0;
+
+              circles.forEach((circle) => {
+                // A title must not cover any hotspot button, including its own.
+                if (generatedPlanRectCircleOverlap(candidateRect, circle, 9)) hardCollisions += 1;
+              });
+
+              placed.forEach((other) => {
+                if (generatedPlanRectsOverlap(candidateRect, other.rect, 10)) hardCollisions += 1;
+              });
+
+              // Prefer staying inside the nominal 1000x600 drawing area, but do
+              // not make that an absolute rule; FIT PLAN can still frame a title
+              // that has to escape slightly in an exceptionally crowded plan.
+              if (candidateRect.left < safeBounds.left) softPenalty += (safeBounds.left - candidateRect.left) * 18;
+              if (candidateRect.right > safeBounds.right) softPenalty += (candidateRect.right - safeBounds.right) * 18;
+              if (candidateRect.top < safeBounds.top) softPenalty += (safeBounds.top - candidateRect.top) * 18;
+              if (candidateRect.bottom > safeBounds.bottom) softPenalty += (candidateRect.bottom - safeBounds.bottom) * 18;
+
+              const connectorStart = pointOnLabelEdge(
+                labelX, labelY, halfW, halfH, item.x, item.y
+              );
+
+              // Avoid running the leader through a title that has already been
+              // placed whenever another equally clean position exists.
+              placed.forEach((other) => {
+                if (generatedPlanSegmentIntersectsRect(
+                  connectorStart,
+                  { x: item.x, y: item.y },
+                  other.rect,
+                  4
+                )) softPenalty += 1400;
+              });
+
+              const score = hardCollisions * 1000000
+                + softPenalty
+                + ringIndex * 65
+                + angularPenalty * 72;
+
+              if (!best || score < best.score) {
+                best = {
+                  score,
+                  labelX,
+                  labelY,
+                  rect: candidateRect,
+                  connectorStart
+                };
+              }
+            });
+          });
+
+          if (!best) return;
+
+          item.rect.setAttribute('x', best.rect.left);
+          item.rect.setAttribute('y', best.rect.top);
+          item.text.setAttribute('x', best.labelX);
+          item.text.setAttribute('y', best.labelY + 4);
+          item.connector.setAttribute('x1', best.connectorStart.x);
+          item.connector.setAttribute('y1', best.connectorStart.y);
+          item.connector.setAttribute('x2', item.x);
+          item.connector.setAttribute('y2', item.y);
+          placed.push({ item, rect: best.rect });
+        });
+      }
+
       function renderGenerated() {
         if (!generatedPlan) return;
 
@@ -13196,6 +13729,8 @@
             );
           });
         });
+
+        resolveGeneratedHotspotLabelCollisions();
       }
 
       function renderPlanner() {
@@ -14027,6 +14562,24 @@
           if (!currentRun) return;
           const closesToFirstPoint = isClosingSnapPoint(pendingArc.end);
           const acceptedEnd = copyPoint(pendingArc.end);
+          const proposedArcSegment = {
+            a: copyPoint(pendingArc.start),
+            b: copyPoint(pendingArc.end),
+            type: "arc",
+            control1: copyPoint(pendingArc.control1),
+            control2: copyPoint(pendingArc.control2)
+          };
+          const curveValidation = validateInstallableCurve(proposedArcSegment);
+          if (!curveValidation.valid) {
+            if (arcPreview) arcPreview.classList.add("isCurveBlocked");
+            if (status) status.textContent = `CURVE LIMIT — ${curveValidation.reason} Open the arch until it returns to white.`;
+            return;
+          }
+          if (proposedSegmentOverlapsExisting(proposedArcSegment)) {
+            showOverlapBlockedFeedback();
+            return;
+          }
+          clearOverlapBlockedFeedback();
           ensureRunSegments(currentRun);
           currentRun.points.push(copyPoint(pendingArc.end));
           currentRun.segments.push({
@@ -14095,7 +14648,8 @@
             control2: copyPoint(initialControls.control2),
             previousDirection: previousDirection ? copyPoint(previousDirection) : null,
             startSnapped: Boolean(initialControls.startSnapped),
-            signedBulge: 0
+            signedBulge: 0,
+            curveValidation: { valid: true, reason: "" }
           };
           previewPoint = copyPoint(endPoint);
           previewLine.setAttribute("visibility", "hidden");
@@ -14112,6 +14666,13 @@
         const point = applyOrthogonalSnap(rawPoint, event);
         const closesToFirstPoint = isClosingSnapPoint(point);
         if (pointDistance(last, point) < MIN_SEGMENT_LENGTH) return;
+
+        const proposedLineSegment = { a: copyPoint(last), b: copyPoint(point), type: "line" };
+        if (proposedSegmentOverlapsExisting(proposedLineSegment)) {
+          showOverlapBlockedFeedback();
+          return;
+        }
+        clearOverlapBlockedFeedback();
 
         currentRun.points.push(point);
         currentRun.segments.push({ type: "line" });
@@ -14195,6 +14756,24 @@
           if (pendingArc) {
             const pointer = screenToSvg(event);
             updatePendingArcPreview(pointer);
+            const pendingPreviewSegment = {
+              a: copyPoint(pendingArc.start),
+              b: copyPoint(pendingArc.end),
+              type: "arc",
+              control1: copyPoint(pendingArc.control1),
+              control2: copyPoint(pendingArc.control2)
+            };
+            const arcWouldOverlap = proposedSegmentOverlapsExisting(pendingPreviewSegment);
+            const curveValidation = pendingArc.curveValidation || validateInstallableCurve(pendingPreviewSegment);
+            if (arcPreview) {
+              arcPreview.classList.toggle("isOverlapBlocked", arcWouldOverlap);
+              arcPreview.classList.toggle("isCurveBlocked", !curveValidation.valid);
+            }
+            if (!curveValidation.valid && status) {
+              status.textContent = `CURVE LIMIT — ${curveValidation.reason} Open the arch until it returns to white.`;
+            } else if (!arcWouldOverlap && status) {
+              status.textContent = "Draw one or more wall runs. Separate runs are allowed.";
+            }
             if (isClosingSnapPoint(pendingArc.end)) {
               showClosingSnapFeedback(currentRun.points[0]);
               if (arcPreview) arcPreview.classList.add("isClosingSnap");
@@ -14217,6 +14796,9 @@
           previewLine.setAttribute("visibility", "visible");
           if (arcPreview) arcPreview.setAttribute("visibility", "hidden");
 
+          const previewWouldOverlap = proposedSegmentOverlapsExisting({ a: copyPoint(last), b: copyPoint(point), type: "line" });
+          if (previewLine) previewLine.classList.toggle("isOverlapBlocked", previewWouldOverlap);
+
           if (isClosingSnapPoint(point)) {
             showClosingSnapFeedback(currentRun.points[0]);
           } else {
@@ -14234,6 +14816,7 @@
           previewLine.setAttribute("visibility", "hidden");
           if (arcPreview) arcPreview.setAttribute("visibility", "hidden");
           hideClosingSnapFeedback({ keepConfirmation: true });
+          clearOverlapBlockedFeedback();
           hideAngleGuide();
         }
       });
@@ -14311,7 +14894,13 @@
           event.preventDefault();
           event.stopPropagation();
           stopDrawAutoPan(true);
-          curveHandleDrag = { pointerId: event.pointerId, handleName: curveHandleName };
+          const editData = getCurveEditData();
+          curveHandleDrag = {
+            pointerId: event.pointerId,
+            handleName: curveHandleName,
+            originalControl1: editData && editData.def.control1 ? copyPoint(editData.def.control1) : null,
+            originalControl2: editData && editData.def.control2 ? copyPoint(editData.def.control2) : null
+          };
           if (bezierHandles) bezierHandles.classList.add("isDragging");
           try { canvas.setPointerCapture(event.pointerId); } catch (error) {}
           return;
@@ -14405,17 +14994,42 @@
         if (!curveHandleDrag) return;
         if (event && event.pointerId !== curveHandleDrag.pointerId) return;
 
-        // A successful pointer release accepts the new Bezier tangent/length.
-        // Block the synthetic click that follows pointerup for a very short window
-        // so nothing else is created at the release position. Pointer-cancel does
-        // not need the guard because it does not generate a normal click.
+        const dragState = curveHandleDrag;
+        const editData = getCurveEditData();
+        let invalidEdit = false;
+        let invalidReason = "";
+        if (editData) {
+          const validation = validateInstallableCurve({
+            a: editData.a,
+            b: editData.b,
+            type: "arc",
+            control1: editData.def.control1,
+            control2: editData.def.control2
+          });
+          invalidEdit = !validation.valid;
+          invalidReason = validation.reason;
+          if (invalidEdit) {
+            if (dragState.originalControl1) editData.def.control1 = copyPoint(dragState.originalControl1);
+            if (dragState.originalControl2) editData.def.control2 = copyPoint(dragState.originalControl2);
+          }
+        }
+
+        // A successful pointer release accepts a constructible Bezier tangent/length.
+        // If the edit creates a hook or excessively tight radius, restore the last
+        // valid shape instead. In both cases block the synthetic post-drag click.
         if (!event || event.type === "pointerup") {
           suppressCanvasClickUntil = performance.now() + 180;
         }
 
         curveHandleDrag = null;
         if (bezierHandles) bezierHandles.classList.remove("isDragging");
+        renderPlanner();
         updateCurveHandleOverlay();
+        if (invalidEdit && status) {
+          status.textContent = `CURVE LIMIT — ${invalidReason} The previous valid curve was restored.`;
+        } else if (status) {
+          status.textContent = "CURVE EDIT — Curve adjustment accepted. Drag either handle again to refine it.";
+        }
       }
 
       if (bezierStartDot) bezierStartDot.addEventListener("click", (event) => event.stopPropagation());
@@ -16685,6 +17299,9 @@
       console.error("Model-viewer error:", event);
     });
   </script>
+
+  <!-- Optional interactive guide exporter. Kept in a separate file so it cannot break the main viewer. -->
+  <script src="interactive-guide-exporter-v4.js" defer></script>
 
 </body>
 </html>
