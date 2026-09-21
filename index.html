@@ -3789,11 +3789,115 @@
     }
 
     .generatedPlanTutorialVideoWrap {
+      position: relative;
       width: 100%;
       aspect-ratio: 16 / 9;
       min-height: 0;
       background: #050505;
       overflow: hidden;
+    }
+
+    .generatedPlanTutorialVideoLoading {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
+      background: rgba(5, 5, 5, 0.78);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+    }
+
+    .generatedPlanTutorialVideoLoading.isVisible {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.2s ease;
+    }
+
+    .generatedPlanSpinner {
+      width: 46px;
+      height: 46px;
+      border: 4px solid rgba(255, 255, 255, 0.13);
+      border-top-color: #d52b37;
+      border-right-color: rgba(213, 43, 55, 0.62);
+      border-radius: 50%;
+      box-sizing: border-box;
+      filter: drop-shadow(0 0 10px rgba(213, 43, 55, 0.22));
+      animation: generatedPlanSpinnerRotate 0.82s cubic-bezier(0.55, 0.08, 0.45, 0.92) infinite;
+    }
+
+    .generatedPlanTutorialVideoLoading .generatedPlanSpinner {
+      width: 38px;
+      height: 38px;
+      border-width: 3px;
+    }
+
+    .generatedPlanLoadingLabel {
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 10px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    @keyframes generatedPlanSpinnerRotate {
+      to { transform: rotate(360deg); }
+    }
+
+    .generatedPlanBusyOverlay {
+      position: absolute;
+      inset: 0;
+      z-index: 70;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      box-sizing: border-box;
+      background: rgba(7, 7, 7, 0.56);
+      backdrop-filter: blur(9px);
+      -webkit-backdrop-filter: blur(9px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.22s ease, visibility 0s linear 0.22s;
+    }
+
+    .generatedPlanBusyOverlay.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition: opacity 0.22s ease;
+    }
+
+    .generatedPlanBusyCard {
+      min-width: min(300px, calc(100vw - 92px));
+      padding: 26px 30px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 22px;
+      background: rgba(18, 18, 18, 0.95);
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.46);
+    }
+
+    .generatedPlanBusyText {
+      max-width: 360px;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 11px;
+      line-height: 1.35;
+      font-weight: 800;
+      letter-spacing: 0.055em;
+      text-align: center;
+      text-transform: uppercase;
     }
 
     .generatedPlanTutorialVideo {
@@ -6055,6 +6159,10 @@
       <div class="generatedPlanTutorialOverlay" id="generatedPlanTutorialOverlay" aria-hidden="true">
         <div class="generatedPlanTutorialCard" role="dialog" aria-modal="true" aria-describedby="generatedPlanTutorialDescription">
           <div class="generatedPlanTutorialVideoWrap">
+            <div class="generatedPlanTutorialVideoLoading" id="generatedPlanTutorialVideoLoading" aria-hidden="true">
+              <div class="generatedPlanSpinner" aria-hidden="true"></div>
+              <div class="generatedPlanLoadingLabel">LOADING TUTORIAL...</div>
+            </div>
             <video
               class="generatedPlanTutorialVideo"
               id="generatedPlanTutorialVideo"
@@ -6094,6 +6202,13 @@
             <button class="generatedPlanProjectNameButton" id="generatedPlanProjectNameCancelButton" type="button">CANCEL</button>
             <button class="generatedPlanProjectNameButton primary" id="generatedPlanProjectNameGenerateButton" type="button">GENERATE GUIDE</button>
           </div>
+        </div>
+      </div>
+
+      <div class="generatedPlanBusyOverlay" id="generatedPlanBusyOverlay" aria-hidden="true">
+        <div class="generatedPlanBusyCard" role="status" aria-live="polite">
+          <div class="generatedPlanSpinner" aria-hidden="true"></div>
+          <div class="generatedPlanBusyText" id="generatedPlanBusyText">WORKING...</div>
         </div>
       </div>
 
@@ -10038,6 +10153,9 @@
       const tutorialVideo = document.querySelector("#generatedPlanTutorialVideo");
       const tutorialDescription = document.querySelector("#generatedPlanTutorialDescription");
       const tutorialGotItButton = document.querySelector("#generatedPlanTutorialGotItButton");
+      const tutorialVideoLoading = document.querySelector("#generatedPlanTutorialVideoLoading");
+      const busyOverlay = document.querySelector("#generatedPlanBusyOverlay");
+      const busyText = document.querySelector("#generatedPlanBusyText");
       const readyOverlay = document.querySelector("#generatedPlanReadyOverlay");
       const readyGotItButton = document.querySelector("#generatedPlanReadyGotItButton");
       const projectNameOverlay = document.querySelector("#generatedPlanProjectNameOverlay");
@@ -11300,6 +11418,41 @@
         }
       };
 
+      function setTutorialVideoLoading(isLoading) {
+        if (!tutorialVideoLoading) return;
+        tutorialVideoLoading.classList.toggle("isVisible", Boolean(isLoading));
+        tutorialVideoLoading.setAttribute("aria-hidden", isLoading ? "false" : "true");
+      }
+
+      function setGeneratedPlanBusy(isBusy, message = "WORKING...") {
+        if (!busyOverlay) return;
+        if (busyText && message) busyText.textContent = message;
+        busyOverlay.classList.toggle("open", Boolean(isBusy));
+        busyOverlay.setAttribute("aria-hidden", isBusy ? "false" : "true");
+      }
+
+      // Exposed deliberately so the separately-loaded interactive-guide exporter can
+      // use the exact same loading treatment without being moved into the core app.
+      window.LuxPlanBusy = {
+        show(message = "WORKING...") { setGeneratedPlanBusy(true, message); },
+        hide() { setGeneratedPlanBusy(false); },
+        update(message = "WORKING...") {
+          if (busyText) busyText.textContent = message;
+        }
+      };
+
+      if (tutorialVideo) {
+        ["loadstart", "waiting", "stalled"].forEach((eventName) => {
+          tutorialVideo.addEventListener(eventName, () => {
+            if (tutorialOverlay && tutorialOverlay.classList.contains("open")) setTutorialVideoLoading(true);
+          });
+        });
+        ["loadeddata", "canplay", "playing"].forEach((eventName) => {
+          tutorialVideo.addEventListener(eventName, () => setTutorialVideoLoading(false));
+        });
+        tutorialVideo.addEventListener("error", () => setTutorialVideoLoading(false));
+      }
+
       function closePlanTutorial() {
         if (!tutorialOverlay) return;
         tutorialOverlay.classList.remove("open");
@@ -11307,6 +11460,7 @@
         if (tutorialVideo) {
           tutorialVideo.pause();
         }
+        setTutorialVideoLoading(false);
       }
 
       function showPlanTutorial(kind) {
@@ -11317,6 +11471,7 @@
 
         tutorialSeenThisOpen[kind] = true;
         tutorialDescription.textContent = config.description;
+        setTutorialVideoLoading(true);
 
         const nextSrc = config.src;
         const currentSrc = tutorialVideo.getAttribute("src") || "";
@@ -11330,6 +11485,7 @@
 
         tutorialOverlay.classList.add("open");
         tutorialOverlay.setAttribute("aria-hidden", "false");
+        if (tutorialVideo.readyState >= 3) setTutorialVideoLoading(false);
 
         const playPromise = tutorialVideo.play();
         if (playPromise && typeof playPromise.catch === "function") {
@@ -12231,10 +12387,12 @@
         lastCustomGuideProjectName = projectName;
 
         setPdfButtonBusy(true);
+        setGeneratedPlanBusy(true, "PREPARING CUSTOM PDF GUIDE...");
         let downloadUrl = null;
 
         try {
           const pdfLib = await ensureCustomGuidePdfLib();
+          setGeneratedPlanBusy(true, "ASSEMBLING INSTALLATION SECTIONS...");
           const pdfDoc = await pdfLib.PDFDocument.create();
           pdfDoc.setTitle(`${projectName} - Random Plank Custom Installation Guide`);
           pdfDoc.setAuthor("LUX Architectural Products");
@@ -12258,6 +12416,7 @@
           }
 
           await appendCustomGuidePdf(pdfDoc, CUSTOM_GUIDE_FILES.lastPage, pdfLib);
+          setGeneratedPlanBusy(true, "FINALIZING CUSTOM GUIDE...");
 
           // Turn the actual plan intersections into PDF navigation buttons. Each
           // destination is resolved only after the custom document has been built,
@@ -12292,6 +12451,7 @@
         } finally {
           if (downloadUrl) setTimeout(() => URL.revokeObjectURL(downloadUrl), 2500);
           setPdfButtonBusy(false);
+          setGeneratedPlanBusy(false);
         }
       }
 
@@ -17301,7 +17461,7 @@
   </script>
 
   <!-- Optional interactive guide exporter. Kept in a separate file so it cannot break the main viewer. -->
-  <script src="interactive-guide-exporter-v4.js" defer></script>
+  <script src="interactive-guide-exporter-v6.js" defer></script>
 
 </body>
 </html>
