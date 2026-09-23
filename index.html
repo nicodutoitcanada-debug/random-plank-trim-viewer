@@ -7545,13 +7545,19 @@
 
           <button class="generatedPlanActionButton" id="generatedPlanEditWallsButton" type="button" data-show-phase="generated">EDIT WALLS</button>
           <button class="generatedPlanActionButton" id="generatedPlanFitFooterButton" type="button" data-show-phase="generated">FIT PLAN</button>
+          <!--
+            Legacy direct-PDF generator intentionally disabled for now.
+            Keep this markup and the existing PDF generation JavaScript in place
+            so the control can be restored quickly if requested later.
+
           <button class="generatedPlanActionButton generatedPlanDownloadIconButton" id="generatedPlanDownloadFooterButton" type="button" data-show-phase="generated" aria-label="Generate custom PDF installation guide" title="Generate custom PDF installation guide">
             <img src="download pdf.png" alt="" aria-hidden="true" />
             <span class="generatedPlanDownloadLabel">GENERATE CUSTOM INSTALLATION GUIDE</span>
           </button>
-          <button class="generatedPlanActionButton isAvailable" id="generatedPlanInteractiveGuideButton" type="button" data-show-phase="generated" aria-label="Generate interactive installation guide" title="Generate interactive installation guide">
-            <svg viewBox="0 0 32 32" aria-hidden="true"><rect class="screen" x="3.5" y="5" width="25" height="19" rx="4"></rect><path class="screen" d="M11 27h10"></path><path class="play" d="M14 10.5 22 14.5 14 18.5Z"></path></svg>
-            <span>GENERATE INTERACTIVE GUIDE</span>
+          -->
+          <button class="generatedPlanActionButton generatedPlanDownloadIconButton isAvailable" id="generatedPlanInteractiveGuideButton" type="button" data-show-phase="generated" aria-label="Generate custom installation guide" title="Generate custom installation guide">
+            <img src="download pdf.png" alt="" aria-hidden="true" />
+            <span class="generatedPlanDownloadLabel">GENERATE CUSTOM INSTALLATION GUIDE</span>
           </button>
         </div>
         <div class="generatedPlanFlowSummary" id="generatedPlanFlowSummary" aria-live="polite"></div>
@@ -7636,7 +7642,7 @@
         <div class="generatedPlanReadyCard" role="dialog" aria-modal="true" aria-labelledby="generatedPlanReadyTitle" aria-describedby="generatedPlanReadyDescription">
           <div class="generatedPlanReadyTitle" id="generatedPlanReadyTitle">YOUR INSTALLATION PLAN IS READY</div>
           <p class="generatedPlanReadyDescription" id="generatedPlanReadyDescription">Click any marked intersection in the generated plan to see how the trim components come together for that condition.</p>
-          <p class="generatedPlanReadyCustomGuideNote"><strong>You can also generate a custom PDF installation guide tailored specifically to this plan.</strong></p>
+          <p class="generatedPlanReadyCustomGuideNote"><strong>You can also generate a custom installation guide tailored specifically to this plan.</strong></p>
           <div class="generatedPlanReadyActions">
             <button class="generatedPlanReadyButton" id="generatedPlanReadyGotItButton" type="button">GOT IT</button>
           </div>
@@ -12212,7 +12218,7 @@
           selectionTutorialCoach.classList.remove("open", "isNudged");
           selectionTutorialCoach.setAttribute("aria-hidden", "true");
         }
-        setGeneratedPlanHintCollapsed(false);
+        setGeneratedPlanHintCollapsed(true);
         if (restore && savedState) restoreDrawingState(savedState);
         selectionUndoStack = Array.isArray(savedUndo) ? savedUndo.slice() : [];
         selectionToolMode = ["select","flipWall","flipSegment"].includes(savedMode) ? savedMode : "select";
@@ -12543,7 +12549,7 @@
         }
         setTutorialAction("", false);
         if (canvasWrap) canvasWrap.classList.remove("isInteractiveTutorial", "isTutorialDemo", "isTutorialLocked");
-        setGeneratedPlanHintCollapsed(false);
+        setGeneratedPlanHintCollapsed(true);
         if (restore && savedState) {
           restoreDrawingState(savedState);
           drawingUndoStack = Array.isArray(savedUndo) ? savedUndo.slice() : [];
@@ -16531,6 +16537,11 @@
         updateRandomPlankSideUi();
         renderPlanner();
 
+        // Tutorials now carry the primary onboarding, so keep the compact
+        // question-mark help state by default in Drawing, Selection, and the
+        // generated-plan view. Users can still reopen it with the ? button.
+        setGeneratedPlanHintCollapsed(true);
+
         if (nextPhase === "select") {
           requestAnimationFrame(maybeShowSelectionTutorial);
         }
@@ -19011,7 +19022,6 @@
         closeImportPreparation();
         importDragDepth = 0;
         if (importDropCue) importDropCue.classList.remove("isVisible");
-        setGeneratedPlanHintCollapsed(false);
         setPhase(phase === "generated" ? "generated" : phase);
         requestAnimationFrame(() => {
           if (phase === "generated") fitGeneratedPlan();
@@ -22952,7 +22962,7 @@
   </script>
 
   <!-- Optional interactive guide exporter. Kept in a separate file so it cannot break the main viewer. -->
-  <script src="interactive-guide-exporter-v10.js" defer></script>
+  <script src="interactive-guide-exporter-v11.js" defer></script>
 
 </body>
 </html>
