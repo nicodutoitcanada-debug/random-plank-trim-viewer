@@ -4286,6 +4286,19 @@
       font-weight: 900;
     }
 
+    .generatedPlanTutorialChoiceLogo {
+      display: block;
+      width: 112px;
+      max-width: 42%;
+      height: auto;
+      margin: 0 auto 16px;
+      object-fit: contain;
+      background: transparent;
+      border: 0;
+      outline: 0;
+      box-shadow: none;
+    }
+
     .generatedPlanTutorialChoiceTitle {
       margin-bottom: 10px;
       color: #fff;
@@ -4323,6 +4336,84 @@
     .generatedPlanTutorialChoiceButton.primary { background: #d52b37; }
     .generatedPlanTutorialChoiceButton.primary:hover { background: #e33541; }
     .generatedPlanTutorialChoiceButton:hover { transform: translateY(-1px); }
+
+    .generatedPlanViewTutorialButton {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .generatedPlanOverlay.isTutorialMode .generatedPlanViewTutorialButton,
+    .generatedPlanOverlay.isTutorialMode .generatedPlanFitHeaderButton { display: none !important; }
+
+    .generatedPlanTutorialChoiceIconArrow { font-size: 21px; }
+
+    /* The post-drawing prompt deliberately leaves the real BUILD PLAN UI visible
+       so the user can see the red action button being referenced. */
+    #generatedPlanPostDrawingTutorialOverlay {
+      background: rgba(0, 0, 0, 0.24);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    #generatedPlanChooseWallsButton.isPostTutorialAttention {
+      position: relative;
+      z-index: 41;
+      animation: generatedPlanPostTutorialButtonPulse 1.15s ease-in-out infinite;
+      box-shadow:
+        0 0 0 0 rgba(213, 43, 55, 0.58),
+        0 12px 32px rgba(213, 43, 55, 0.34);
+    }
+
+    @keyframes generatedPlanPostTutorialButtonPulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow:
+          0 0 0 0 rgba(213, 43, 55, 0.48),
+          0 12px 32px rgba(213, 43, 55, 0.30);
+      }
+      50% {
+        transform: scale(1.045);
+        box-shadow:
+          0 0 0 9px rgba(213, 43, 55, 0),
+          0 15px 38px rgba(213, 43, 55, 0.48);
+      }
+    }
+
+    .generatedPlanSelectionTutorialLayer { pointer-events: none; }
+    .generatedPlanSelectionTutorialTargetLine {
+      fill: none;
+      stroke: rgba(79,224,124,.36);
+      stroke-width: 18;
+      stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+      filter: drop-shadow(0 0 10px rgba(79,224,124,.42));
+      animation: generatedPlanSelectionTutorialPulse 1.05s ease-in-out infinite;
+    }
+    .generatedPlanSelectionTutorialTargetBox {
+      fill: rgba(79,224,124,.08);
+      stroke: #4fe07c;
+      stroke-width: 2.2;
+      stroke-dasharray: 9 7;
+      rx: 10;
+      vector-effect: non-scaling-stroke;
+      animation: generatedPlanSelectionTutorialPulse 1.05s ease-in-out infinite;
+    }
+    .generatedPlanSelectionTutorialTargetBox.isRemove {
+      fill: rgba(228,59,71,.09);
+      stroke: #e43b47;
+      filter: drop-shadow(0 0 9px rgba(228,59,71,.30));
+    }
+    .generatedPlanSelectionTutorialLabel {
+      fill: rgba(255,255,255,.82);
+      font-size: 11px;
+      font-weight: 900;
+      text-anchor: middle;
+      letter-spacing: .03em;
+    }
+    @keyframes generatedPlanSelectionTutorialPulse {
+      0%,100% { opacity: .50; }
+      50% { opacity: 1; }
+    }
 
     .generatedPlanCanvasWrap.isInteractiveTutorial .generatedPlanEmptyState,
     .generatedPlanCanvasWrap.isInteractiveTutorial .generatedPlanHint,
@@ -7308,6 +7399,7 @@
         </div>
         <div class="generatedPlanHeaderActions">
           <button class="generatedPlanSmallButton generatedPlanFitHeaderButton" id="generatedPlanFitHeaderButton" type="button">FIT PLAN</button>
+          <button class="generatedPlanSmallButton generatedPlanViewTutorialButton" id="generatedPlanViewTutorialButton" type="button">VIEW TUTORIAL</button>
           <button class="generatedPlanSmallButton generatedPlanExpandButton" id="generatedPlanExpandButton" type="button">EXPAND</button>
           <button class="generatedPlanCloseButton" id="generatedPlanCloseButton" type="button" aria-label="Close installation plan builder">×</button>
         </div>
@@ -7317,6 +7409,7 @@
         <svg class="generatedPlanCanvas" id="generatedPlanCanvas" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" aria-label="Installation plan drawing canvas">
           <g class="generatedPlanInteractiveTutorialLayer" id="generatedPlanInteractiveTutorialLayer" visibility="hidden" aria-hidden="true"></g>
           <g id="generatedPlanViewport"></g>
+          <g class="generatedPlanSelectionTutorialLayer" id="generatedPlanSelectionTutorialLayer" visibility="hidden" aria-hidden="true"></g>
           <g class="generatedPlanSnapFeedback" id="generatedPlanSnapFeedback" visibility="hidden" aria-hidden="true">
             <circle class="generatedPlanSnapBurst" id="generatedPlanSnapBurst" cx="0" cy="0" r="18"></circle>
             <circle class="generatedPlanSnapHalo" id="generatedPlanSnapHalo" cx="0" cy="0" r="18"></circle>
@@ -7347,6 +7440,13 @@
           <div class="generatedPlanInteractiveTutorialText" id="generatedPlanInteractiveTutorialText"></div>
           <button class="generatedPlanInteractiveTutorialDone" id="generatedPlanInteractiveTutorialDone" type="button">START DRAWING</button>
           <button class="generatedPlanTutorialAction" id="generatedPlanTutorialAction" type="button">OK</button>
+        </div>
+        <div class="generatedPlanSelectionTutorialCoach generatedPlanInteractiveTutorialCoach" id="generatedPlanSelectionTutorialCoach" aria-hidden="true">
+          <button class="generatedPlanInteractiveTutorialExit" id="generatedPlanSelectionTutorialExit" type="button" aria-label="Exit selection tutorial" title="Exit tutorial">×</button>
+          <div class="generatedPlanInteractiveTutorialProgress" id="generatedPlanSelectionTutorialProgress">SELECTION TUTORIAL</div>
+          <div class="generatedPlanInteractiveTutorialTitle" id="generatedPlanSelectionTutorialTitle">SELECT A WALL</div>
+          <div class="generatedPlanInteractiveTutorialText" id="generatedPlanSelectionTutorialText"></div>
+          <button class="generatedPlanTutorialAction" id="generatedPlanSelectionTutorialAction" type="button">START SELECTING</button>
         </div>
         <div class="generatedPlanTutorialCursorSuccess" id="generatedPlanTutorialCursorSuccess" aria-hidden="true"><span class="tick">✓</span><span class="label">WELL DONE!</span></div>
 
@@ -7474,6 +7574,46 @@
           <div class="generatedPlanImportActions">
             <button class="generatedPlanImportButton" id="generatedPlanImportCancelButton" type="button">CANCEL</button>
             <button class="generatedPlanImportButton primary" id="generatedPlanImportConfirmButton" type="button">BROWSE FOR FILE</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="generatedPlanTutorialOverlay" id="generatedPlanBuilderIntroOverlay" aria-hidden="true">
+        <div class="generatedPlanTutorialCard generatedPlanTutorialChoiceCard" role="dialog" aria-modal="true" aria-labelledby="generatedPlanBuilderIntroTitle" aria-describedby="generatedPlanBuilderIntroDescription">
+          <div class="generatedPlanTutorialBody generatedPlanTutorialChoiceBody">
+            <img class="generatedPlanTutorialChoiceLogo" src="LOGO white.png" alt="" aria-hidden="true" />
+            <div class="generatedPlanTutorialChoiceTitle" id="generatedPlanBuilderIntroTitle">BUILD YOUR PLAN. GENERATE YOUR GUIDE.</div>
+            <p class="generatedPlanTutorialDescription" id="generatedPlanBuilderIntroDescription">Draw or import the walls for your project, choose where Random Plank will be installed, and BUILD PLAN will create an installation plan and project-specific installation guide.</p>
+            <div class="generatedPlanTutorialChoiceActions">
+              <button class="generatedPlanTutorialChoiceButton primary" id="generatedPlanBuilderIntroGotItButton" type="button">GOT IT</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="generatedPlanTutorialOverlay" id="generatedPlanPostDrawingTutorialOverlay" aria-hidden="true">
+        <div class="generatedPlanTutorialCard generatedPlanTutorialChoiceCard" role="dialog" aria-modal="true" aria-labelledby="generatedPlanPostDrawingTutorialTitle" aria-describedby="generatedPlanPostDrawingTutorialDescription">
+          <div class="generatedPlanTutorialBody generatedPlanTutorialChoiceBody">
+            <img class="generatedPlanTutorialChoiceLogo" src="LOGO white.png" alt="" aria-hidden="true" />
+            <div class="generatedPlanTutorialChoiceTitle" id="generatedPlanPostDrawingTutorialTitle">WHEN YOUR WALLS ARE READY</div>
+            <p class="generatedPlanTutorialDescription" id="generatedPlanPostDrawingTutorialDescription">Click the red <strong>SELECT RANDOM PLANK WALLS</strong> button in the bottom-right. This tells BUILD PLAN which walls receive Random Plank so it can calculate installation direction, trim conditions, and your custom guide.</p>
+            <div class="generatedPlanTutorialChoiceActions">
+              <button class="generatedPlanTutorialChoiceButton primary" id="generatedPlanPostDrawingTutorialGotItButton" type="button">GOT IT</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="generatedPlanTutorialOverlay" id="generatedPlanSelectionTutorialChoiceOverlay" aria-hidden="true">
+        <div class="generatedPlanTutorialCard generatedPlanTutorialChoiceCard" role="dialog" aria-modal="true" aria-labelledby="generatedPlanSelectionTutorialChoiceTitle" aria-describedby="generatedPlanSelectionTutorialChoiceDescription">
+          <div class="generatedPlanTutorialBody generatedPlanTutorialChoiceBody">
+            <div class="generatedPlanTutorialChoiceIcon" aria-hidden="true">✓</div>
+            <div class="generatedPlanTutorialChoiceTitle" id="generatedPlanSelectionTutorialChoiceTitle">QUICK RANDOM PLANK SELECTION TUTORIAL?</div>
+            <p class="generatedPlanTutorialDescription" id="generatedPlanSelectionTutorialChoiceDescription">Learn single-wall selection, box selection, ALT removal, and how to flip Random Plank to the correct wall face.</p>
+            <div class="generatedPlanTutorialChoiceActions">
+              <button class="generatedPlanTutorialChoiceButton secondary" id="generatedPlanSelectionTutorialSkipButton" type="button">SKIP TUTORIAL</button>
+              <button class="generatedPlanTutorialChoiceButton primary" id="generatedPlanSelectionTutorialStartButton" type="button">START TUTORIAL</button>
+            </div>
           </div>
         </div>
       </div>
@@ -11456,6 +11596,7 @@
       const closeButton = document.querySelector("#generatedPlanCloseButton");
       const expandButton = document.querySelector("#generatedPlanExpandButton");
       const fitHeaderButton = document.querySelector("#generatedPlanFitHeaderButton");
+      const viewTutorialButton = document.querySelector("#generatedPlanViewTutorialButton");
       const fitFooterButton = document.querySelector("#generatedPlanFitFooterButton");
       const undoButton = document.querySelector("#generatedPlanUndoButton");
       const finishRunButton = document.querySelector("#generatedPlanFinishRunButton");
@@ -11489,6 +11630,20 @@
       const tutorialAction = document.querySelector("#generatedPlanTutorialAction");
       const tutorialFooterSkip = document.querySelector("#generatedPlanTutorialFooterSkip");
       const tutorialCursorSuccess = document.querySelector("#generatedPlanTutorialCursorSuccess");
+      const builderIntroOverlay = document.querySelector("#generatedPlanBuilderIntroOverlay");
+      const builderIntroGotItButton = document.querySelector("#generatedPlanBuilderIntroGotItButton");
+      const postDrawingTutorialOverlay = document.querySelector("#generatedPlanPostDrawingTutorialOverlay");
+      const postDrawingTutorialGotItButton = document.querySelector("#generatedPlanPostDrawingTutorialGotItButton");
+      const selectionTutorialChoiceOverlay = document.querySelector("#generatedPlanSelectionTutorialChoiceOverlay");
+      const selectionTutorialStartButton = document.querySelector("#generatedPlanSelectionTutorialStartButton");
+      const selectionTutorialSkipButton = document.querySelector("#generatedPlanSelectionTutorialSkipButton");
+      const selectionTutorialLayer = document.querySelector("#generatedPlanSelectionTutorialLayer");
+      const selectionTutorialCoach = document.querySelector("#generatedPlanSelectionTutorialCoach");
+      const selectionTutorialProgress = document.querySelector("#generatedPlanSelectionTutorialProgress");
+      const selectionTutorialTitle = document.querySelector("#generatedPlanSelectionTutorialTitle");
+      const selectionTutorialText = document.querySelector("#generatedPlanSelectionTutorialText");
+      const selectionTutorialExit = document.querySelector("#generatedPlanSelectionTutorialExit");
+      const selectionTutorialAction = document.querySelector("#generatedPlanSelectionTutorialAction");
       const busyOverlay = document.querySelector("#generatedPlanBusyOverlay");
       const busyText = document.querySelector("#generatedPlanBusyText");
       const readyOverlay = document.querySelector("#generatedPlanReadyOverlay");
@@ -11634,6 +11789,28 @@
       let lastDrawPointer = null;
       let tutorialSeenThisOpen = { draw: false, select: false };
       let interactiveTutorial = { active: false, step: 0, savedState: null, savedUndo: null, completing: false, lockTools: false, curveEditTimer: null };
+      let selectionTutorial = { active: false, step: 0, savedState: null, savedUndo: null, savedToolMode: "select", savedIndividualFace: "inside", savedSegmentFace: "inside", pollTimer: null };
+      const BUILD_PLAN_INTRO_KEY = "luxBuildPlanIntroSeenV1";
+      const BUILD_PLAN_SELECTION_TUTORIAL_KEY = "luxBuildPlanSelectionTutorialSeenV1";
+      let buildPlanIntroSeenFallback = false;
+      let selectionTutorialSeenFallback = false;
+
+      // Onboarding is remembered only for the current page load. Returning to
+      // BUILD PLAN during the same visit will not interrupt the user again, but
+      // refreshing the page intentionally resets the onboarding so it can be
+      // shown again for demos/training.
+      function readPlannerFlag(key, fallbackValue = false) {
+        if (key === BUILD_PLAN_INTRO_KEY) return buildPlanIntroSeenFallback;
+        if (key === BUILD_PLAN_SELECTION_TUTORIAL_KEY) return selectionTutorialSeenFallback;
+        return fallbackValue;
+      }
+      function writePlannerFlag(key) {
+        if (key === BUILD_PLAN_INTRO_KEY) buildPlanIntroSeenFallback = true;
+        if (key === BUILD_PLAN_SELECTION_TUTORIAL_KEY) selectionTutorialSeenFallback = true;
+      }
+      function hasSeenBuildPlanIntro() { return readPlannerFlag(BUILD_PLAN_INTRO_KEY, buildPlanIntroSeenFallback); }
+      function hasSeenSelectionTutorialChoice() { return readPlannerFlag(BUILD_PLAN_SELECTION_TUTORIAL_KEY, selectionTutorialSeenFallback); }
+      function isPlannerTutorialActive() { return interactiveTutorial.active || selectionTutorial.active; }
       const INTERACTIVE_TUTORIAL_POINTS = {
         p0: { x: 135, y: 475 },
         p1: { x: 335, y: 178 },
@@ -11776,8 +11953,9 @@
       function setDrawingTool(nextTool) {
         if (!nextTool || !["draw", "angle", "arch", "move", "erase", "pan"].includes(nextTool)) return;
 
-        if (interactiveTutorial.active && nextTool === "pan") {
-          nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
+        if (isPlannerTutorialActive() && nextTool === "pan") {
+          if (selectionTutorial.active) nudgeSelectionTutorial("Navigation tools are disabled during the tutorial so the guide stays aligned.");
+          else nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
           return;
         }
         if (interactiveTutorial.active && interactiveTutorial.lockTools) {
@@ -11852,6 +12030,225 @@
         }
       }
 
+      function closeBuilderIntro() {
+        if (!builderIntroOverlay) return;
+        builderIntroOverlay.classList.remove("open");
+        builderIntroOverlay.setAttribute("aria-hidden", "true");
+      }
+
+      function showBuilderIntro() {
+        if (!builderIntroOverlay || !overlay.classList.contains("open") || phase !== "draw") return;
+        builderIntroOverlay.classList.add("open");
+        builderIntroOverlay.setAttribute("aria-hidden", "false");
+        requestAnimationFrame(() => builderIntroGotItButton && builderIntroGotItButton.focus());
+      }
+
+      function closePostDrawingTutorial() {
+        if (!postDrawingTutorialOverlay) return;
+        postDrawingTutorialOverlay.classList.remove("open");
+        postDrawingTutorialOverlay.setAttribute("aria-hidden", "true");
+        if (chooseWallsButton) chooseWallsButton.classList.remove("isPostTutorialAttention");
+      }
+
+      function showPostDrawingTutorial() {
+        if (!postDrawingTutorialOverlay || !overlay.classList.contains("open") || phase !== "draw") return;
+        postDrawingTutorialOverlay.classList.add("open");
+        postDrawingTutorialOverlay.setAttribute("aria-hidden", "false");
+        if (chooseWallsButton) chooseWallsButton.classList.add("isPostTutorialAttention");
+        requestAnimationFrame(() => postDrawingTutorialGotItButton && postDrawingTutorialGotItButton.focus());
+      }
+
+      function closeSelectionTutorialChoice() {
+        if (!selectionTutorialChoiceOverlay) return;
+        selectionTutorialChoiceOverlay.classList.remove("open");
+        selectionTutorialChoiceOverlay.setAttribute("aria-hidden", "true");
+      }
+
+      function showSelectionTutorialChoice(force = false) {
+        if (!selectionTutorialChoiceOverlay || !overlay.classList.contains("open") || phase !== "select" || selectionTutorial.active) return;
+        if (!force && hasSeenSelectionTutorialChoice()) return;
+        selectionTutorialChoiceOverlay.classList.add("open");
+        selectionTutorialChoiceOverlay.setAttribute("aria-hidden", "false");
+        requestAnimationFrame(() => selectionTutorialStartButton && selectionTutorialStartButton.focus());
+      }
+
+      function clearSelectionTutorialToolPulse() {
+        [selectAllButton, clearSelectionButton, selectModeButton, randomPlankSideButton, randomPlankSegmentSideButton].forEach((button) => {
+          if (button) button.classList.remove("isTutorialPulse");
+        });
+      }
+
+      function pulseSelectionTutorialTool(button) {
+        clearSelectionTutorialToolPulse();
+        if (button) button.classList.add("isTutorialPulse");
+      }
+
+      function selectionTutorialContent(step = selectionTutorial.step) {
+        const alt = '<span class="generatedPlanTutorialKey">ALT</span>';
+        const items = {
+          0: ["SELECT A WALL", "The SELECT tool is active and highlighted. Click the pulsing wall to add Random Plank."],
+          1: ["BOX SELECT", "Drag a box through the highlighted group to add several walls at once."],
+          2: ["REMOVE WITH ALT", `Hold ${alt} and box-drag through the highlighted wall to remove it from the selection.`],
+          3: ["FLIP ONE WALL", "Click the pulsing single-wall face tool."],
+          4: ["FLIP THE WALL FACE", "Click the highlighted wall, its Random Plank, or the space between them."],
+          5: ["FLIP A SEGMENT", "Click the pulsing segment face tool."],
+          6: ["FLIP THE WHOLE SEGMENT", "Click the highlighted connected run. Every selected wall in that segment flips together."],
+          7: ["SELECT ALL", "Click the pulsing SELECT ALL button to add Random Plank to every wall."],
+          8: ["DESELECT ALL", "Click the pulsing DESELECT ALL button to clear the selection."],
+          9: ["READY TO SELECT", "That’s it. Your real drawing will return so you can choose the walls for your project."]
+        };
+        return items[step] || items[9];
+      }
+
+      function renderSelectionTutorialGuide() {
+        if (!selectionTutorialLayer || !selectionTutorial.active) return;
+        const step = selectionTutorial.step;
+        let html = "";
+        if (step === 0) {
+          html = '<path class="generatedPlanSelectionTutorialTargetLine" d="M 180 180 L 440 180"></path>';
+        } else if (step === 1) {
+          html = '<rect class="generatedPlanSelectionTutorialTargetBox" x="420" y="160" width="320" height="240" rx="10"></rect><text class="generatedPlanSelectionTutorialLabel" x="580" y="425">DRAG A BOX THROUGH THESE WALLS</text>';
+        } else if (step === 2) {
+          html = '<rect class="generatedPlanSelectionTutorialTargetBox isRemove" x="245" y="162" width="130" height="42" rx="10"></rect><text class="generatedPlanSelectionTutorialLabel" x="310" y="232">ALT + DRAG</text>';
+        } else if (step === 4) {
+          html = '<path class="generatedPlanSelectionTutorialTargetLine" d="M 720 380 L 720 180"></path>';
+        } else if (step === 6) {
+          html = '<path class="generatedPlanSelectionTutorialTargetLine" d="M 440 180 L 440 380 L 720 380 L 720 180"></path>';
+        }
+        selectionTutorialLayer.innerHTML = html;
+        selectionTutorialLayer.setAttribute("visibility", "visible");
+
+        const content = selectionTutorialContent();
+        if (selectionTutorialProgress) selectionTutorialProgress.textContent = step < 9 ? `SELECTION STEP ${step + 1} OF 9` : "SELECTION TUTORIAL";
+        if (selectionTutorialTitle) selectionTutorialTitle.textContent = content[0];
+        if (selectionTutorialText) selectionTutorialText.innerHTML = content[1];
+        if (selectionTutorialCoach) {
+          selectionTutorialCoach.classList.add("open");
+          selectionTutorialCoach.setAttribute("aria-hidden", "false");
+        }
+        if (selectionTutorialAction) {
+          selectionTutorialAction.textContent = "START SELECTING";
+          selectionTutorialAction.classList.toggle("isVisible", step === 9);
+        }
+        clearSelectionTutorialToolPulse();
+        if (step === 0) pulseSelectionTutorialTool(selectModeButton);
+        else if (step === 3) pulseSelectionTutorialTool(randomPlankSideButton);
+        else if (step === 5) pulseSelectionTutorialTool(randomPlankSegmentSideButton);
+        else if (step === 7) pulseSelectionTutorialTool(selectAllButton);
+        else if (step === 8) pulseSelectionTutorialTool(clearSelectionButton);
+      }
+
+      function nudgeSelectionTutorial(message = "") {
+        if (!selectionTutorialCoach) return;
+        if (message && selectionTutorialText) selectionTutorialText.innerHTML = message;
+        selectionTutorialCoach.classList.remove("isNudged");
+        void selectionTutorialCoach.offsetWidth;
+        selectionTutorialCoach.classList.add("isNudged");
+      }
+
+      function selectionTutorialDemoRun() {
+        return {
+          points: [
+            { x: 180, y: 180 },
+            { x: 440, y: 180 },
+            { x: 440, y: 380 },
+            { x: 720, y: 380 },
+            { x: 720, y: 180 }
+          ],
+          segments: [{ type: "line" }, { type: "line" }, { type: "line" }, { type: "line" }]
+        };
+      }
+
+      function startSelectionTutorial() {
+        closeSelectionTutorialChoice();
+        writePlannerFlag(BUILD_PLAN_SELECTION_TUTORIAL_KEY);
+        selectionTutorial.savedState = captureDrawingState();
+        selectionTutorial.savedUndo = selectionUndoStack.slice();
+        selectionTutorial.savedToolMode = selectionToolMode;
+        selectionTutorial.savedIndividualFace = individualFaceIconSide;
+        selectionTutorial.savedSegmentFace = segmentFaceIconSide;
+        selectionTutorial.active = true;
+        selectionTutorial.step = 0;
+        runs = [selectionTutorialDemoRun()];
+        currentRun = null;
+        selectedSegments.clear();
+        segmentRandomPlankSides.clear();
+        selectionUndoStack = [];
+        selectionToolMode = "select";
+        individualFaceIconSide = "inside";
+        segmentFaceIconSide = "inside";
+        selectionPanMode = false;
+        lastDrawPointer = null;
+        resetViewport();
+        updateRandomPlankSideUi();
+        renderPlanner();
+        overlay.classList.add("isTutorialMode");
+        setGeneratedPlanHintCollapsed(true);
+        renderSelectionTutorialGuide();
+        if (selectionTutorial.pollTimer) clearInterval(selectionTutorial.pollTimer);
+        selectionTutorial.pollTimer = window.setInterval(updateSelectionTutorialProgress, 120);
+      }
+
+      function stopSelectionTutorial({ restore = true } = {}) {
+        if (!selectionTutorial.active && !selectionTutorial.savedState) return;
+        if (selectionTutorial.pollTimer) clearInterval(selectionTutorial.pollTimer);
+        selectionTutorial.pollTimer = null;
+        const savedState = selectionTutorial.savedState;
+        const savedUndo = selectionTutorial.savedUndo;
+        const savedMode = selectionTutorial.savedToolMode;
+        const savedIndividual = selectionTutorial.savedIndividualFace;
+        const savedSegment = selectionTutorial.savedSegmentFace;
+        selectionTutorial.active = false;
+        selectionTutorial.step = 0;
+        selectionTutorial.savedState = null;
+        selectionTutorial.savedUndo = null;
+        clearSelectionTutorialToolPulse();
+        overlay.classList.remove("isTutorialMode");
+        if (selectionTutorialLayer) {
+          selectionTutorialLayer.innerHTML = "";
+          selectionTutorialLayer.setAttribute("visibility", "hidden");
+        }
+        if (selectionTutorialCoach) {
+          selectionTutorialCoach.classList.remove("open", "isNudged");
+          selectionTutorialCoach.setAttribute("aria-hidden", "true");
+        }
+        setGeneratedPlanHintCollapsed(false);
+        if (restore && savedState) restoreDrawingState(savedState);
+        selectionUndoStack = Array.isArray(savedUndo) ? savedUndo.slice() : [];
+        selectionToolMode = ["select","flipWall","flipSegment"].includes(savedMode) ? savedMode : "select";
+        individualFaceIconSide = savedIndividual === "outside" ? "outside" : "inside";
+        segmentFaceIconSide = savedSegment === "outside" ? "outside" : "inside";
+        updateRandomPlankSideUi();
+        renderPlanner();
+        requestAnimationFrame(fitGeneratedPlan);
+        if (status) status.textContent = "Select the walls that will receive Random Plank.";
+      }
+
+      function finishSelectionTutorial() {
+        stopSelectionTutorial({ restore: true });
+      }
+
+      function updateSelectionTutorialProgress() {
+        if (!selectionTutorial.active) return;
+        const s0 = "r0s0", s1 = "r0s1", s2 = "r0s2", s3 = "r0s3";
+        let advance = false;
+        switch (selectionTutorial.step) {
+          case 0: advance = selectedSegments.has(s0); break;
+          case 1: advance = [s0,s1,s2,s3].every((id) => selectedSegments.has(id)); break;
+          case 2: advance = !selectedSegments.has(s0) && [s1,s2,s3].every((id) => selectedSegments.has(id)); break;
+          case 3: advance = selectionToolMode === "flipWall"; break;
+          case 4: advance = getSegmentRandomPlankSide(s3) === "outside"; break;
+          case 5: advance = selectionToolMode === "flipSegment"; break;
+          case 6: advance = [s1,s2,s3].every((id) => getSegmentRandomPlankSide(id) === "outside"); break;
+          case 7: advance = [s0,s1,s2,s3].every((id) => selectedSegments.has(id)); break;
+          case 8: advance = selectedSegments.size === 0; break;
+        }
+        if (!advance) return;
+        selectionTutorial.step += 1;
+        if (selectionTutorial.step === 9) showTutorialCursorSuccess();
+        renderSelectionTutorialGuide();
+      }
+
       function createSvg(name, attrs = {}) {
         const element = document.createElementNS(SVG_NS, name);
         Object.entries(attrs).forEach(([key, value]) => {
@@ -11883,12 +12280,19 @@
         return null;
       }
 
+      function tutorialSnapTolerance(step = interactiveTutorial.step) {
+        if (step === 5) return 62;
+        if (step === 0) return 68;
+        if (step === 9) return 92;
+        if (step === 10) return 64;
+        return 54;
+      }
+
       function tutorialSnapTarget(point, step = interactiveTutorial.step) {
         if (!interactiveTutorial.active || !point) return null;
         const target = tutorialPointForStep(step);
         if (!target) return null;
-        const tolerance = step === 5 ? 58 : 42;
-        return pointDistance(point, target) <= tolerance ? target : null;
+        return pointDistance(point, target) <= tutorialSnapTolerance(step) ? target : null;
       }
 
       function tutorialGhostPathD() {
@@ -11966,7 +12370,7 @@
           <g opacity="0">
             <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;.42;.55;.82;1" dur="3.2s" repeatCount="indefinite"></animate>
             <circle class="generatedPlanTutorialEraseDemoIconBg" cx="365" cy="315" r="28"></circle>
-            <text class="generatedPlanTutorialEraseDemoIconText" x="365" y="315">−</text>
+            <image href="erase.png" x="351" y="301" width="28" height="28" preserveAspectRatio="xMidYMid meet"></image>
             <text class="generatedPlanTutorialEraseDemoLabel" x="365" y="358">ERASE ALL SELECTED WALLS</text>
           </g>`;
       }
@@ -12083,6 +12487,8 @@
       }
 
       function startInteractiveDrawingTutorial() {
+        writePlannerFlag(BUILD_PLAN_INTRO_KEY);
+        buildPlanIntroSeenFallback = true;
         closePlanTutorial();
         interactiveTutorial.savedState = captureDrawingState();
         interactiveTutorial.savedUndo = drawingUndoStack.slice();
@@ -12154,8 +12560,9 @@
         if (status) status.textContent = "Draw one or more wall runs. Separate runs are allowed.";
       }
 
-      function finishInteractiveDrawingTutorial() {
+      function finishInteractiveDrawingTutorial({ showNextStep = true } = {}) {
         stopInteractiveDrawingTutorial({ restore: true });
+        if (showNextStep) window.setTimeout(showPostDrawingTutorial, 120);
       }
 
       function completeInteractiveDrawingTrace() {
@@ -12245,7 +12652,7 @@
         const target = tutorialPointForStep(step);
         if (!target) return;
         const raw = screenToSvg(event);
-        const tolerance = step === 5 ? 64 : 50;
+        const tolerance = tutorialSnapTolerance(step) + 8;
         if (pointDistance(raw, target) > tolerance) {
           event.preventDefault();
           event.stopImmediatePropagation();
@@ -14336,6 +14743,12 @@
           return snapToExistingPoint(point);
         }
 
+        // During the tracing tutorial the pulsing guide point represents an
+        // intentional snap target. Let it override the 90° lock when the cursor
+        // enters its tutorial snap radius, exactly like an existing endpoint.
+        const tutorialTarget = tutorialSnapTarget(point);
+        if (tutorialTarget) return tutorialTarget;
+
         const last = currentRun.points[currentRun.points.length - 1];
         // If the user is clearly hovering an existing point, their intent to
         // connect takes priority over the 90° drawing lock. The crossing guard
@@ -15042,17 +15455,30 @@
         tutorialOverlay.setAttribute("aria-hidden", "true");
       }
 
-      function showPlanTutorial(kind) {
-        // The old MP4 tutorials have been retired. For now only the drawing stage
-        // has the new hands-on tutorial; the Random Plank selection tutorial will
-        // be built as a separate interactive walkthrough next.
+      function showPlanTutorial(kind, force = false) {
+        if (kind === "select") {
+          showSelectionTutorialChoice(Boolean(force));
+          return;
+        }
         if (kind !== "draw" || !tutorialOverlay || !tutorialDescription) return;
-        if (!overlay.classList.contains("open") || tutorialSeenThisOpen.draw || interactiveTutorial.active) return;
+        if (!overlay.classList.contains("open") || interactiveTutorial.active || selectionTutorial.active) return;
+        if (!force && tutorialSeenThisOpen.draw) return;
         tutorialSeenThisOpen.draw = true;
         tutorialDescription.textContent = "Trace a simple wall shape and learn the main drawing and editing tools in about one minute.";
         tutorialOverlay.classList.add("open");
         tutorialOverlay.setAttribute("aria-hidden", "false");
         requestAnimationFrame(() => tutorialStartButton && tutorialStartButton.focus());
+      }
+
+      function maybeShowBuildPlanIntro() {
+        if (!overlay.classList.contains("open") || phase !== "draw" || isPlannerTutorialActive()) return;
+        if (hasSeenBuildPlanIntro()) return;
+        showBuilderIntro();
+      }
+
+      function maybeShowSelectionTutorial() {
+        if (!overlay.classList.contains("open") || phase !== "select" || isPlannerTutorialActive()) return;
+        showSelectionTutorialChoice(false);
       }
 
       function showFaceToolNotice() {
@@ -16063,6 +16489,7 @@
 
       function setPhase(nextPhase) {
         if (nextPhase !== "draw" && interactiveTutorial.active) stopInteractiveDrawingTutorial({ restore: true });
+        if (nextPhase !== "select" && selectionTutorial.active) stopSelectionTutorial({ restore: true });
         if (nextPhase !== "select") closeFaceToolNotice();
         if (nextPhase !== "draw") stopDrawAutoPan(true);
         hideClosingSnapFeedback({ keepConfirmation: false });
@@ -16095,12 +16522,17 @@
           setGeneratedPlanHintText("Use PAN or drag to move the plan. Scroll, pinch, or use + / − to zoom. The planner prefers STARTER and avoids INSIDE START START when possible.");
         }
 
+        if (viewTutorialButton) {
+          viewTutorialButton.style.display = nextPhase === "generated" ? "none" : "inline-flex";
+          viewTutorialButton.textContent = "VIEW TUTORIAL";
+          viewTutorialButton.setAttribute("aria-label", nextPhase === "select" ? "View Random Plank selection tutorial" : "View drawing tutorial");
+        }
         updateDrawingToolUi();
         updateRandomPlankSideUi();
         renderPlanner();
 
-        if (nextPhase === "draw") {
-          requestAnimationFrame(() => showPlanTutorial("draw"));
+        if (nextPhase === "select") {
+          requestAnimationFrame(maybeShowSelectionTutorial);
         }
       }
 
@@ -16108,6 +16540,7 @@
         const transform = `matrix(${viewScale} 0 0 ${viewScale} ${viewPanX} ${viewPanY})`;
         viewport.setAttribute("transform", transform);
         if (tutorialTraceLayer) tutorialTraceLayer.setAttribute("transform", transform);
+        if (selectionTutorialLayer) selectionTutorialLayer.setAttribute("transform", transform);
         // Keep the live preview and angle guide locked to the same zoom/pan
         // transform as the wall geometry while drawing.
         if (previewLine) previewLine.setAttribute("transform", transform);
@@ -18582,12 +19015,17 @@
         setPhase(phase === "generated" ? "generated" : phase);
         requestAnimationFrame(() => {
           if (phase === "generated") fitGeneratedPlan();
+          else if (phase === "draw") maybeShowBuildPlanIntro();
         });
       }
 
       function closePlanner() {
         if (interactiveTutorial.active) stopInteractiveDrawingTutorial({ restore: true });
+        if (selectionTutorial.active) stopSelectionTutorial({ restore: true });
         closePlanTutorial();
+        closeBuilderIntro();
+        closePostDrawingTutorial();
+        closeSelectionTutorialChoice();
         closeGeneratedPlanReadyPopup();
         closeImportPreparation();
         importDragDepth = 0;
@@ -18732,6 +19170,62 @@
         }
       });
 
+      if (builderIntroGotItButton) {
+        builderIntroGotItButton.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          writePlannerFlag(BUILD_PLAN_INTRO_KEY);
+          buildPlanIntroSeenFallback = true;
+          closeBuilderIntro();
+          window.setTimeout(() => showPlanTutorial("draw", true), 120);
+        });
+      }
+      if (postDrawingTutorialGotItButton) {
+        postDrawingTutorialGotItButton.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          closePostDrawingTutorial();
+        });
+      }
+      if (selectionTutorialStartButton) {
+        selectionTutorialStartButton.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          startSelectionTutorial();
+        });
+      }
+      if (selectionTutorialSkipButton) {
+        selectionTutorialSkipButton.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          writePlannerFlag(BUILD_PLAN_SELECTION_TUTORIAL_KEY);
+          selectionTutorialSeenFallback = true;
+          closeSelectionTutorialChoice();
+        });
+      }
+      if (selectionTutorialExit) {
+        selectionTutorialExit.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          finishSelectionTutorial();
+        });
+      }
+      if (selectionTutorialAction) {
+        selectionTutorialAction.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          if (selectionTutorial.active && selectionTutorial.step === 9) finishSelectionTutorial();
+        });
+      }
+      if (viewTutorialButton) {
+        viewTutorialButton.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          if (phase === "select") showPlanTutorial("select", true);
+          else if (phase === "draw") showPlanTutorial("draw", true);
+        });
+      }
+
       if (tutorialStartButton) {
         tutorialStartButton.addEventListener("click", (event) => {
           event.preventDefault();
@@ -18780,7 +19274,8 @@
         tutorialFooterSkip.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
-          finishInteractiveDrawingTutorial();
+          if (interactiveTutorial.active) stopInteractiveDrawingTutorial({ restore: true });
+          else if (selectionTutorial.active) finishSelectionTutorial();
         });
       }
 
@@ -18841,8 +19336,9 @@
 
       fitHeaderButton.addEventListener("click", (event) => {
         event.stopPropagation();
-        if (interactiveTutorial.active) {
-          nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
+        if (isPlannerTutorialActive()) {
+          if (selectionTutorial.active) nudgeSelectionTutorial("Navigation tools are disabled during the tutorial so the guide stays aligned.");
+          else nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
           return;
         }
         fitGeneratedPlan();
@@ -18850,8 +19346,9 @@
 
       fitFooterButton.addEventListener("click", (event) => {
         event.stopPropagation();
-        if (interactiveTutorial.active) {
-          nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
+        if (isPlannerTutorialActive()) {
+          if (selectionTutorial.active) nudgeSelectionTutorial("Navigation tools are disabled during the tutorial so the guide stays aligned.");
+          else nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
           return;
         }
         fitGeneratedPlan();
@@ -19002,8 +19499,9 @@
         planZoomOutButton.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
-          if (interactiveTutorial.active) {
-            nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
+          if (isPlannerTutorialActive()) {
+            if (selectionTutorial.active) nudgeSelectionTutorial("Navigation tools are disabled during the tutorial so the guide stays aligned.");
+            else nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
             return;
           }
           zoomPlannerFromButton("out");
@@ -19014,8 +19512,9 @@
         planZoomInButton.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
-          if (interactiveTutorial.active) {
-            nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
+          if (isPlannerTutorialActive()) {
+            if (selectionTutorial.active) nudgeSelectionTutorial("Navigation tools are disabled during the tutorial so the guide stays aligned.");
+            else nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
             return;
           }
           zoomPlannerFromButton("in");
@@ -19149,8 +19648,11 @@
         // First click establishes the run's first node. Existing wall nodes snap
         // visibly so a user can confidently continue an older run or repair a gap.
         if (!currentRun.points.length) {
-          const nearbyEndpoint = findNearbyCommittedEndpoint(rawPoint);
-          const firstPoint = nearbyEndpoint || snapToExistingPoint(rawPoint);
+          const tutorialStartPoint = interactiveTutorial.active && interactiveTutorial.step === 0
+            ? tutorialSnapTarget(rawPoint, 0)
+            : null;
+          const nearbyEndpoint = tutorialStartPoint ? null : findNearbyCommittedEndpoint(rawPoint);
+          const firstPoint = tutorialStartPoint || nearbyEndpoint || snapToExistingPoint(rawPoint);
           const startsOnExistingNode = Boolean(findCommittedNodeAt(firstPoint));
           if (startsOnExistingNode && existingConnectionCountAtPoint(firstPoint) >= 2) {
             showBlockedJunctionFeedback(firstPoint);
@@ -19160,7 +19662,10 @@
           currentRun.points.push(firstPoint);
           previewPoint = firstPoint;
           renderPlanner();
-          if (nearbyEndpoint) {
+          if (tutorialStartPoint) {
+            confirmStartSnapFeedback(firstPoint);
+            if (status) status.textContent = "TUTORIAL START — correct starting point.";
+          } else if (nearbyEndpoint) {
             confirmStartSnapFeedback(firstPoint);
             if (status) status.textContent = "CONTINUE FROM ENDPOINT — draw the next wall from this existing end point; the run will stay connected.";
           } else if (startsOnExistingNode) {
@@ -19448,10 +19953,15 @@
               }
             }
             hideCurveEditHover();
-            const startEndpoint = findNearbyCommittedEndpoint(idlePointer);
+            const tutorialStartPoint = interactiveTutorial.active && interactiveTutorial.step === 0
+              ? tutorialSnapTarget(idlePointer, 0)
+              : null;
+            const startEndpoint = tutorialStartPoint || findNearbyCommittedEndpoint(idlePointer);
             if (startEndpoint) {
               showStartSnapFeedback(startEndpoint);
-              if (status) status.textContent = "CONTINUE FROM ENDPOINT — click the highlighted point to keep drawing from this existing wall.";
+              if (status) status.textContent = tutorialStartPoint
+                ? "START HERE — click when the white snap indicator locks onto the pulsing point."
+                : "CONTINUE FROM ENDPOINT — click the highlighted point to keep drawing from this existing wall.";
             } else {
               hideClosingSnapFeedback();
             }
@@ -19532,12 +20042,20 @@
           const previewWouldOverlap = proposedSegmentOverlapsExisting(previewSegment);
           if (previewLine) previewLine.classList.toggle("isOverlapBlocked", Boolean(previewWouldOverlap || lineCrossing || blockedJunction));
 
+          const tutorialPreviewTarget = interactiveTutorial.active
+            ? tutorialSnapTarget(rawPreviewPoint)
+            : null;
+
           if (blockedJunction) {
             showBlockedJunctionFeedback(blockedJunction);
           } else if (lineCrossing) {
             const resolvedTarget = resolvedExistingSnapPoint(point);
             if (resolvedTarget) showBlockedSnapFeedback(resolvedTarget, lineCrossing);
             else showBlockedCrossingFeedback(lineCrossing);
+          } else if (tutorialPreviewTarget && pointDistance(point, tutorialPreviewTarget) < 0.9) {
+            // Give tutorial targets the same green snap feedback as a real node,
+            // so users know the cursor is genuinely locked before they click.
+            showClosingSnapFeedback(tutorialPreviewTarget);
           } else if (isClosingSnapPoint(point)) {
             showClosingSnapFeedback(currentRun.points[0]);
           } else if (findCommittedNodeAt(point)) {
@@ -20019,9 +20537,10 @@
 
         const isMiddleButton = isMouse && event.button === 1;
         const isPrimaryButton = !isMouse || event.button === 0;
-        if (interactiveTutorial.active && (isMiddleButton || drawingTool === "pan")) {
+        if (isPlannerTutorialActive() && (isMiddleButton || drawingTool === "pan" || selectionPanMode)) {
           event.preventDefault();
-          nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
+          if (selectionTutorial.active) nudgeSelectionTutorial("Navigation tools are disabled during the tutorial so the guide stays aligned.");
+          else nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
           return;
         }
         const generatedPrimaryPan = phase === "generated" && isPrimaryButton;
@@ -20156,7 +20675,7 @@
             interactiveTutorial.lockTools = false;
             clearTutorialToolPulse();
             renderInteractiveTutorialGuide();
-          }, 2000);
+          }, 1000);
         }
       }
 
@@ -20178,8 +20697,9 @@
 
       canvas.addEventListener("wheel", (event) => {
         event.preventDefault();
-        if (interactiveTutorial.active) {
-          nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
+        if (isPlannerTutorialActive()) {
+          if (selectionTutorial.active) nudgeSelectionTutorial("Navigation tools are disabled during the tutorial so the guide stays aligned.");
+          else nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
           return;
         }
         cancelPanInertia();
