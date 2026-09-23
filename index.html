@@ -11794,7 +11794,7 @@
       let drawAutoPanLastTime = 0;
       let lastDrawPointer = null;
       let tutorialSeenThisOpen = { draw: false, select: false };
-      let interactiveTutorial = { active: false, step: 0, savedState: null, savedUndo: null, completing: false, lockTools: false, curveEditTimer: null };
+      let interactiveTutorial = { active: false, step: 0, savedState: null, savedUndo: null, completing: false, lockTools: false, curveEditTimer: null, curveToolAcknowledged: false };
       let selectionTutorial = { active: false, step: 0, savedState: null, savedUndo: null, savedToolMode: "select", savedIndividualFace: "inside", savedSegmentFace: "inside", pollTimer: null };
       const BUILD_PLAN_INTRO_KEY = "luxBuildPlanIntroSeenV1";
       const BUILD_PLAN_SELECTION_TUTORIAL_KEY = "luxBuildPlanSelectionTutorialSeenV1";
@@ -12437,7 +12437,7 @@
         if (interactiveTutorial.step === 3) pulseTutorialTool("arch");
         else if (interactiveTutorial.step === 6) pulseTutorialTool("angle");
         else if (interactiveTutorial.step === 8) pulseTutorialTool("draw");
-        else if (interactiveTutorial.step === 13) pulseTutorialTool("arch");
+        else if (interactiveTutorial.step === 13 && !interactiveTutorial.curveToolAcknowledged) pulseTutorialTool("arch");
         else if (interactiveTutorial.step === 15) pulseTutorialTool("move");
         else clearTutorialToolPulse();
 
@@ -12486,6 +12486,7 @@
         if (!interactiveTutorial.active) return;
         interactiveTutorial.step = 13;
         interactiveTutorial.lockTools = false;
+        interactiveTutorial.curveToolAcknowledged = false;
         drawingTool = "arch";
         updateDrawingToolUi();
         renderPlanner();
@@ -12502,6 +12503,7 @@
         interactiveTutorial.step = 0;
         interactiveTutorial.completing = false;
         interactiveTutorial.lockTools = false;
+        interactiveTutorial.curveToolAcknowledged = false;
         if (interactiveTutorial.curveEditTimer) clearTimeout(interactiveTutorial.curveEditTimer);
         interactiveTutorial.curveEditTimer = null;
         runs = [];
@@ -12532,6 +12534,7 @@
         interactiveTutorial.active = false;
         interactiveTutorial.completing = false;
         interactiveTutorial.lockTools = false;
+        interactiveTutorial.curveToolAcknowledged = false;
         interactiveTutorial.step = 0;
         interactiveTutorial.savedState = null;
         interactiveTutorial.savedUndo = null;
@@ -19501,7 +19504,12 @@
         button.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
-          setDrawingTool(button.dataset.generatedPlanTool);
+          const clickedTool = button.dataset.generatedPlanTool;
+          setDrawingTool(clickedTool);
+          if (interactiveTutorial.active && interactiveTutorial.step === 13 && clickedTool === "arch") {
+            interactiveTutorial.curveToolAcknowledged = true;
+            button.classList.remove("isTutorialPulse");
+          }
         });
       });
 
