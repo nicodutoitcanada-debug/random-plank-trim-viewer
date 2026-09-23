@@ -4261,6 +4261,419 @@
       transform: translateY(0) scale(0.98);
     }
 
+
+    .generatedPlanTutorialChoiceCard {
+      width: min(520px, calc(100vw - 96px));
+    }
+
+    .generatedPlanTutorialChoiceBody {
+      padding: 30px 30px 28px;
+    }
+
+    .generatedPlanTutorialChoiceIcon {
+      width: 50px;
+      height: 50px;
+      margin: 0 auto 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.24);
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-size: 25px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .generatedPlanTutorialChoiceTitle {
+      margin-bottom: 10px;
+      color: #fff;
+      font-size: 19px;
+      line-height: 1.15;
+      font-weight: 900;
+      letter-spacing: 0.035em;
+      text-align: center;
+    }
+
+    .generatedPlanTutorialChoiceActions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .generatedPlanTutorialChoiceButton {
+      min-height: 44px;
+      padding: 0 20px;
+      border: 0;
+      border-radius: 999px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.055em;
+      text-transform: uppercase;
+      transition: transform .18s ease, background .18s ease;
+    }
+
+    .generatedPlanTutorialChoiceButton.secondary { background: rgba(255,255,255,0.12); }
+    .generatedPlanTutorialChoiceButton.secondary:hover { background: rgba(255,255,255,0.2); }
+    .generatedPlanTutorialChoiceButton.primary { background: #d52b37; }
+    .generatedPlanTutorialChoiceButton.primary:hover { background: #e33541; }
+    .generatedPlanTutorialChoiceButton:hover { transform: translateY(-1px); }
+
+    .generatedPlanCanvasWrap.isInteractiveTutorial .generatedPlanEmptyState,
+    .generatedPlanCanvasWrap.isInteractiveTutorial .generatedPlanHint,
+    .generatedPlanCanvasWrap.isInteractiveTutorial .generatedPlanHintHelpButton {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    .generatedPlanInteractiveTutorialLayer {
+      pointer-events: none;
+    }
+
+    .generatedPlanTutorialGhostPath {
+      fill: none;
+      stroke: rgba(255,255,255,0.22);
+      stroke-width: 7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 12 10;
+      filter: drop-shadow(0 0 7px rgba(255,255,255,0.05));
+      transition: stroke .28s ease, filter .28s ease, opacity .28s ease;
+    }
+
+    .generatedPlanInteractiveTutorialLayer.isComplete .generatedPlanTutorialGhostPath {
+      stroke: rgba(71, 222, 113, 0.9);
+      filter: drop-shadow(0 0 12px rgba(71,222,113,0.45));
+      animation: generatedPlanTutorialCompleteGlow 1.1s ease-in-out infinite alternate;
+    }
+
+    .generatedPlanTutorialGuidePoint {
+      fill: rgba(255,255,255,0.08);
+      stroke: rgba(255,255,255,0.22);
+      stroke-width: 2;
+    }
+
+    .generatedPlanTutorialTargetHalo {
+      fill: rgba(63, 222, 112, 0.12);
+      stroke: #4fe07c;
+      stroke-width: 3;
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: generatedPlanTutorialTargetPulse 1.05s ease-in-out infinite;
+      filter: drop-shadow(0 0 9px rgba(79,224,124,0.52));
+    }
+
+    .generatedPlanTutorialTargetCore {
+      fill: #fff;
+      stroke: #4fe07c;
+      stroke-width: 3;
+    }
+
+    .generatedPlanTutorialBulgeTarget {
+      fill: rgba(213,43,55,0.12);
+      stroke: #e43b47;
+      stroke-width: 3;
+      stroke-dasharray: 5 5;
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: generatedPlanTutorialTargetPulse 1.05s ease-in-out infinite;
+      filter: drop-shadow(0 0 9px rgba(213,43,55,0.48));
+    }
+
+    @keyframes generatedPlanTutorialTargetPulse {
+      0%,100% { opacity: .56; transform: scale(.84); }
+      50% { opacity: 1; transform: scale(1.16); }
+    }
+
+    @keyframes generatedPlanTutorialCompleteGlow {
+      from { opacity: .58; }
+      to { opacity: 1; }
+    }
+
+    .generatedPlanInteractiveTutorialCoach {
+      position: absolute;
+      z-index: 24;
+      top: 18px;
+      right: 20px;
+      width: min(360px, calc(100% - 40px));
+      box-sizing: border-box;
+      padding: 17px 42px 17px 18px;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 18px;
+      background: rgba(8,8,8,0.82);
+      color: #fff;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.34);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transform: translateY(-5px);
+      transition: opacity .22s ease, transform .22s ease, visibility 0s linear .22s;
+    }
+
+    .generatedPlanInteractiveTutorialCoach.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0);
+      transition: opacity .22s ease, transform .22s ease;
+    }
+
+    .generatedPlanInteractiveTutorialCoach.isNudged {
+      animation: generatedPlanTutorialCoachNudge .32s ease;
+    }
+
+    @keyframes generatedPlanTutorialCoachNudge {
+      0%,100% { transform: translateX(0); }
+      30% { transform: translateX(-6px); }
+      65% { transform: translateX(5px); }
+    }
+
+    .generatedPlanInteractiveTutorialExit {
+      position: absolute;
+      top: 10px;
+      right: 11px;
+      width: 27px;
+      height: 27px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.09);
+      color: rgba(255,255,255,0.82);
+      cursor: pointer;
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    .generatedPlanInteractiveTutorialProgress {
+      margin-bottom: 5px;
+      color: #e43b47;
+      font-size: 9px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: .085em;
+      text-transform: uppercase;
+    }
+
+    .generatedPlanInteractiveTutorialTitle {
+      margin-bottom: 6px;
+      color: #fff;
+      font-size: 13px;
+      line-height: 1.2;
+      font-weight: 900;
+      letter-spacing: .035em;
+      text-transform: uppercase;
+    }
+
+    .generatedPlanInteractiveTutorialText {
+      color: rgba(255,255,255,0.76);
+      font-size: 11px;
+      line-height: 1.46;
+      font-weight: 500;
+    }
+
+    .generatedPlanTutorialKey {
+      display: inline-flex;
+      align-items: center;
+      min-height: 20px;
+      padding: 0 7px;
+      margin: 0 2px;
+      border: 1px solid rgba(255,255,255,0.34);
+      border-radius: 6px;
+      background: rgba(255,255,255,0.09);
+      color: #fff;
+      font-size: 9px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: .04em;
+    }
+
+    .generatedPlanInteractiveTutorialDone {
+      display: none;
+      min-height: 38px;
+      margin-top: 13px;
+      padding: 0 17px;
+      border: 0;
+      border-radius: 999px;
+      background: #d52b37;
+      color: #fff;
+      cursor: pointer;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: .055em;
+      text-transform: uppercase;
+    }
+
+    .generatedPlanInteractiveTutorialCoach.isComplete .generatedPlanInteractiveTutorialDone { display: inline-flex; align-items: center; justify-content: center; }
+    .generatedPlanInteractiveTutorialCoach.isComplete .generatedPlanInteractiveTutorialExit { display: none; }
+
+    .generatedPlanTutorialAside {
+      display: inline-block;
+      margin-top: 5px;
+      color: rgba(255,255,255,0.48);
+      font-size: 9.5px;
+      font-weight: 500;
+    }
+
+    .generatedPlanTutorialFooterSkip {
+      display: none;
+      min-height: 40px;
+      padding: 0 22px;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      color: #fff;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .055em;
+      text-transform: uppercase;
+    }
+
+    .generatedPlanOverlay.isTutorialMode .generatedPlanFooter {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 72px;
+    }
+    .generatedPlanOverlay.isTutorialMode .generatedPlanStatus,
+    .generatedPlanOverlay.isTutorialMode .generatedPlanActions,
+    .generatedPlanOverlay.isTutorialMode .generatedPlanFlowSummary,
+    .generatedPlanOverlay.isTutorialMode .generatedPlanDisclaimer {
+      display: none !important;
+    }
+    .generatedPlanOverlay.isTutorialMode .generatedPlanTutorialFooterSkip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .generatedPlanCanvasWrap.isTutorialDemo #generatedPlanViewport {
+      opacity: .10;
+      transition: opacity .25s ease;
+    }
+    .generatedPlanCanvasWrap.isTutorialDemo .generatedPlanDrawTools {
+      opacity: .34;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+    .generatedPlanCanvasWrap.isTutorialLocked .generatedPlanDrawTools {
+      pointer-events: none;
+    }
+
+    .generatedPlanTutorialAction {
+      display: none;
+      min-height: 38px;
+      margin-top: 13px;
+      padding: 0 17px;
+      border: 0;
+      border-radius: 999px;
+      background: #d52b37;
+      color: #fff;
+      cursor: pointer;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: .055em;
+      text-transform: uppercase;
+    }
+    .generatedPlanTutorialAction.isVisible { display: inline-flex; align-items: center; justify-content: center; }
+
+    .generatedPlanTutorialCursorSuccess {
+      position: absolute;
+      z-index: 35;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 11px;
+      border: 1px solid rgba(86,232,126,.72);
+      border-radius: 999px;
+      background: rgba(6,22,11,.92);
+      color: #fff;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translate(14px, 14px) scale(.82);
+      transform-origin: left top;
+      box-shadow: 0 0 24px rgba(79,224,124,.24);
+    }
+    .generatedPlanTutorialCursorSuccess.isVisible {
+      opacity: 1;
+      visibility: visible;
+      animation: generatedPlanTutorialSuccessPop 1.35s ease both;
+    }
+    .generatedPlanTutorialCursorSuccess .tick {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #4fe07c;
+      color: #07130b;
+      font-size: 15px;
+      font-weight: 1000;
+      box-shadow: 0 0 13px rgba(79,224,124,.72);
+    }
+    .generatedPlanTutorialCursorSuccess .label {
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    @keyframes generatedPlanTutorialSuccessPop {
+      0% { opacity: 0; transform: translate(14px,14px) scale(.72); }
+      18%,72% { opacity: 1; transform: translate(14px,14px) scale(1); }
+      100% { opacity: 0; transform: translate(14px,14px) scale(.94); }
+    }
+
+    .generatedPlanTutorialDemoHandleLine {
+      stroke: #f0d91b;
+      stroke-width: 2.2;
+      vector-effect: non-scaling-stroke;
+      opacity: .95;
+    }
+    .generatedPlanTutorialDemoHandleDot {
+      fill: #f0d91b;
+      stroke: #fff;
+      stroke-width: 1.3;
+      filter: drop-shadow(0 0 6px rgba(240,217,27,.5));
+    }
+    .generatedPlanTutorialDemoCurve {
+      fill: none;
+      stroke: rgba(255,255,255,.90);
+      stroke-width: 7;
+      stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+    }
+    .generatedPlanTutorialEraseDemoBox {
+      fill: rgba(213,43,55,.10);
+      stroke: #e43b47;
+      stroke-width: 2.2;
+      stroke-dasharray: 7 5;
+      vector-effect: non-scaling-stroke;
+    }
+    .generatedPlanTutorialEraseDemoIconBg { fill: rgba(12,12,12,.94); stroke: rgba(255,255,255,.22); stroke-width: 1.3; }
+    .generatedPlanTutorialEraseDemoIconText { fill: #fff; font-size: 22px; font-weight: 900; text-anchor: middle; dominant-baseline: central; }
+    .generatedPlanTutorialEraseDemoLabel { fill: rgba(255,255,255,.88); font-size: 11px; font-weight: 900; text-anchor: middle; letter-spacing: .03em; }
+
+    .generatedPlanToolButton.isTutorialPulse {
+      position: relative;
+      z-index: 3;
+      border-color: rgba(255,255,255,0.92) !important;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.16), 0 0 18px rgba(255,255,255,0.7) !important;
+      animation: generatedPlanTutorialToolPulse 1.05s ease-in-out infinite;
+    }
+
+    @keyframes generatedPlanTutorialToolPulse {
+      0%,100% { filter: brightness(1.05); transform: scale(1); }
+      50% { filter: brightness(1.48); transform: scale(1.08); }
+    }
+
     .generatedPlanReadyOverlay {
       position: absolute;
       inset: 0;
@@ -6902,6 +7315,7 @@
 
       <div class="generatedPlanCanvasWrap" id="generatedPlanCanvasWrap">
         <svg class="generatedPlanCanvas" id="generatedPlanCanvas" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" aria-label="Installation plan drawing canvas">
+          <g class="generatedPlanInteractiveTutorialLayer" id="generatedPlanInteractiveTutorialLayer" visibility="hidden" aria-hidden="true"></g>
           <g id="generatedPlanViewport"></g>
           <g class="generatedPlanSnapFeedback" id="generatedPlanSnapFeedback" visibility="hidden" aria-hidden="true">
             <circle class="generatedPlanSnapBurst" id="generatedPlanSnapBurst" cx="0" cy="0" r="18"></circle>
@@ -6925,6 +7339,16 @@
             <text class="generatedPlanAngleText" id="generatedPlanAngleText" x="0" y="0"></text>
           </g>
         </svg>
+
+        <div class="generatedPlanInteractiveTutorialCoach" id="generatedPlanInteractiveTutorialCoach" aria-hidden="true">
+          <button class="generatedPlanInteractiveTutorialExit" id="generatedPlanInteractiveTutorialExit" type="button" aria-label="Exit tutorial" title="Exit tutorial">×</button>
+          <div class="generatedPlanInteractiveTutorialProgress" id="generatedPlanInteractiveTutorialProgress">STEP 1 OF 11</div>
+          <div class="generatedPlanInteractiveTutorialTitle" id="generatedPlanInteractiveTutorialTitle">START HERE</div>
+          <div class="generatedPlanInteractiveTutorialText" id="generatedPlanInteractiveTutorialText"></div>
+          <button class="generatedPlanInteractiveTutorialDone" id="generatedPlanInteractiveTutorialDone" type="button">START DRAWING</button>
+          <button class="generatedPlanTutorialAction" id="generatedPlanTutorialAction" type="button">OK</button>
+        </div>
+        <div class="generatedPlanTutorialCursorSuccess" id="generatedPlanTutorialCursorSuccess" aria-hidden="true"><span class="tick">✓</span><span class="label">WELL DONE!</span></div>
 
         <div class="generatedPlanSegmentSwitcher" id="generatedPlanSegmentSwitcher" aria-label="Installation segments"></div>
 
@@ -7010,6 +7434,7 @@
       </div>
 
       <div class="generatedPlanFooter">
+        <button class="generatedPlanTutorialFooterSkip" id="generatedPlanTutorialFooterSkip" type="button">SKIP TUTORIAL</button>
         <div class="generatedPlanStatus" id="generatedPlanStatus">Draw one or more wall runs. Separate runs are allowed.</div>
         <div class="generatedPlanActions">
           <button class="generatedPlanActionButton" id="generatedPlanClearButton" type="button" data-show-phase="draw">CLEAR</button>
@@ -7054,24 +7479,15 @@
       </div>
 
       <div class="generatedPlanTutorialOverlay" id="generatedPlanTutorialOverlay" aria-hidden="true">
-        <div class="generatedPlanTutorialCard" role="dialog" aria-modal="true" aria-describedby="generatedPlanTutorialDescription">
-          <div class="generatedPlanTutorialVideoWrap">
-            <div class="generatedPlanTutorialVideoLoading" id="generatedPlanTutorialVideoLoading" aria-hidden="true">
-              <div class="generatedPlanSpinner" aria-hidden="true"></div>
-              <div class="generatedPlanLoadingLabel">LOADING TUTORIAL...</div>
+        <div class="generatedPlanTutorialCard generatedPlanTutorialChoiceCard" role="dialog" aria-modal="true" aria-labelledby="generatedPlanTutorialTitle" aria-describedby="generatedPlanTutorialDescription">
+          <div class="generatedPlanTutorialBody generatedPlanTutorialChoiceBody">
+            <div class="generatedPlanTutorialChoiceIcon" aria-hidden="true">?</div>
+            <div class="generatedPlanTutorialChoiceTitle" id="generatedPlanTutorialTitle">QUICK 1-MINUTE DRAWING TUTORIAL?</div>
+            <p class="generatedPlanTutorialDescription" id="generatedPlanTutorialDescription">Trace a simple wall shape and learn the main drawing and editing tools in about one minute.</p>
+            <div class="generatedPlanTutorialChoiceActions">
+              <button class="generatedPlanTutorialChoiceButton secondary" id="generatedPlanTutorialSkipButton" type="button">SKIP TUTORIAL</button>
+              <button class="generatedPlanTutorialChoiceButton primary" id="generatedPlanTutorialStartButton" type="button">START TUTORIAL</button>
             </div>
-            <video
-              class="generatedPlanTutorialVideo"
-              id="generatedPlanTutorialVideo"
-              muted
-              loop
-              playsinline
-              preload="metadata"
-            ></video>
-          </div>
-          <div class="generatedPlanTutorialBody">
-            <p class="generatedPlanTutorialDescription" id="generatedPlanTutorialDescription"></p>
-            <button class="generatedPlanTutorialGotItButton" id="generatedPlanTutorialGotItButton" type="button">GOT IT</button>
           </div>
         </div>
       </div>
@@ -11056,13 +11472,23 @@
       const generateButton = document.querySelector("#generatedPlanGenerateButton");
       const editWallsButton = document.querySelector("#generatedPlanEditWallsButton");
       const drawToolButtons = Array.from(document.querySelectorAll("[data-generated-plan-tool]"));
+      const drawTools = document.querySelector("#generatedPlanDrawTools");
       const planZoomOutButton = document.querySelector("#generatedPlanZoomOutButton");
       const planZoomInButton = document.querySelector("#generatedPlanZoomInButton");
       const tutorialOverlay = document.querySelector("#generatedPlanTutorialOverlay");
-      const tutorialVideo = document.querySelector("#generatedPlanTutorialVideo");
       const tutorialDescription = document.querySelector("#generatedPlanTutorialDescription");
-      const tutorialGotItButton = document.querySelector("#generatedPlanTutorialGotItButton");
-      const tutorialVideoLoading = document.querySelector("#generatedPlanTutorialVideoLoading");
+      const tutorialStartButton = document.querySelector("#generatedPlanTutorialStartButton");
+      const tutorialSkipButton = document.querySelector("#generatedPlanTutorialSkipButton");
+      const tutorialTraceLayer = document.querySelector("#generatedPlanInteractiveTutorialLayer");
+      const tutorialCoach = document.querySelector("#generatedPlanInteractiveTutorialCoach");
+      const tutorialCoachProgress = document.querySelector("#generatedPlanInteractiveTutorialProgress");
+      const tutorialCoachTitle = document.querySelector("#generatedPlanInteractiveTutorialTitle");
+      const tutorialCoachText = document.querySelector("#generatedPlanInteractiveTutorialText");
+      const tutorialCoachExit = document.querySelector("#generatedPlanInteractiveTutorialExit");
+      const tutorialCoachDone = document.querySelector("#generatedPlanInteractiveTutorialDone");
+      const tutorialAction = document.querySelector("#generatedPlanTutorialAction");
+      const tutorialFooterSkip = document.querySelector("#generatedPlanTutorialFooterSkip");
+      const tutorialCursorSuccess = document.querySelector("#generatedPlanTutorialCursorSuccess");
       const busyOverlay = document.querySelector("#generatedPlanBusyOverlay");
       const busyText = document.querySelector("#generatedPlanBusyText");
       const readyOverlay = document.querySelector("#generatedPlanReadyOverlay");
@@ -11207,6 +11633,17 @@
       let drawAutoPanLastTime = 0;
       let lastDrawPointer = null;
       let tutorialSeenThisOpen = { draw: false, select: false };
+      let interactiveTutorial = { active: false, step: 0, savedState: null, savedUndo: null, completing: false, lockTools: false, curveEditTimer: null };
+      const INTERACTIVE_TUTORIAL_POINTS = {
+        p0: { x: 135, y: 475 },
+        p1: { x: 335, y: 178 },
+        p2: { x: 585, y: 178 },
+        p3: { x: 785, y: 178 },
+        bulge: { x: 685, y: 332 },
+        p4: { x: 900, y: 325 },
+        p5: { x: 900, y: 475 },
+        moveTarget: { x: 950, y: 325 }
+      };
       let pendingImportFile = null;
       let importDragDepth = 0;
 
@@ -11339,6 +11776,15 @@
       function setDrawingTool(nextTool) {
         if (!nextTool || !["draw", "angle", "arch", "move", "erase", "pan"].includes(nextTool)) return;
 
+        if (interactiveTutorial.active && nextTool === "pan") {
+          nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
+          return;
+        }
+        if (interactiveTutorial.active && interactiveTutorial.lockTools) {
+          nudgeInteractiveTutorial("Watch this quick demonstration first, then the tools will unlock.");
+          return;
+        }
+
         if (nextTool === "pan" && phase === "select") {
           selectionPanMode = !selectionPanMode;
           updateDrawingToolUi();
@@ -11370,6 +11816,7 @@
         }
 
         drawingTool = nextTool;
+        if (interactiveTutorial.active) requestAnimationFrame(updateInteractiveTutorialProgress);
         if (eraseCursorBadge && drawingTool !== "erase") eraseCursorBadge.classList.remove("isVisible");
         if (flipCursorBadge) flipCursorBadge.classList.remove("isVisible");
         if (nextTool !== "erase") {
@@ -11415,6 +11862,395 @@
 
       function pointDistance(a, b) {
         return Math.hypot(a.x - b.x, a.y - b.y);
+      }
+
+
+      function tutorialPointForStep(step = interactiveTutorial.step) {
+        const p = INTERACTIVE_TUTORIAL_POINTS;
+        const map = { 0: p.p0, 1: p.p1, 2: p.p2, 4: p.p3, 5: p.bulge, 7: p.p4, 9: p.p5, 10: p.p0, 16: p.p4 };
+        return map[step] ? copyPoint(map[step]) : null;
+      }
+
+      function tutorialRequiredTool(step = interactiveTutorial.step) {
+        if ([0,1,2].includes(step)) return "angle";
+        if ([4,5,13].includes(step)) return "arch";
+        if (step === 7) return "angle";
+        if ([9,10].includes(step)) return "draw";
+        if (step === 3) return "arch";
+        if (step === 6) return "angle";
+        if (step === 8) return "draw";
+        if ([15,16].includes(step)) return "move";
+        return null;
+      }
+
+      function tutorialSnapTarget(point, step = interactiveTutorial.step) {
+        if (!interactiveTutorial.active || !point) return null;
+        const target = tutorialPointForStep(step);
+        if (!target) return null;
+        const tolerance = step === 5 ? 58 : 42;
+        return pointDistance(point, target) <= tolerance ? target : null;
+      }
+
+      function tutorialGhostPathD() {
+        const p = INTERACTIVE_TUTORIAL_POINTS;
+        return `M ${p.p0.x} ${p.p0.y} L ${p.p1.x} ${p.p1.y} L ${p.p2.x} ${p.p2.y} C ${p.p2.x} ${p.bulge.y}, ${p.p3.x} ${p.bulge.y}, ${p.p3.x} ${p.p3.y} L ${p.p4.x} ${p.p4.y} L ${p.p5.x} ${p.p5.y} L ${p.p0.x} ${p.p0.y}`;
+      }
+
+      function tutorialStepContent(step = interactiveTutorial.step) {
+        const shift = '<span class="generatedPlanTutorialKey">SHIFT</span>';
+        const items = {
+          0: ["START HERE", 'Click the pulsing point to start.<br><span class="generatedPlanTutorialAside">(The FREE ANGLE tool is already selected.)</span>'],
+          1: ["DRAW THE ANGLED WALL", "Click the next pulsing point."],
+          2: ["LOCK TO 90°", `Hold ${shift}, move to the next pulsing point and click.`],
+          3: ["SELECT CURVE", "Click the pulsing CURVE tool."],
+          4: ["SET THE ARCH ENDPOINT", `Hold ${shift} and click the pulsing point to align the arch ends.`],
+          5: ["SHAPE THE ARCH", "Move toward the red guide until the curve follows the faded outline, then click."],
+          6: ["FREE ANGLE", "Click the pulsing FREE ANGLE tool."],
+          7: ["DRAW THE ANGLE", "Click the next pulsing point."],
+          8: ["90° TOOL", "Click the pulsing 90° drawing tool."],
+          9: ["DRAW STRAIGHT DOWN", "Click the pulsing point below."],
+          10: ["CLOSE THE SHAPE", "Move to the starting point and click when it snaps green."],
+          11: ["WELL DONE!", "You completed the traced wall shape. Next we’ll quickly edit the curve."],
+          12: ["EDITING CURVES", "Bezier handles control how a curved wall enters and leaves its endpoints. Watch how moving a yellow handle changes the arch."],
+          13: ["YOUR TURN", "The CURVE tool is active. Click either end of the arch to show its yellow handles, then drag one handle to reshape it."],
+          14: ["GREAT!", "You changed the arch. Ready for the last step?"],
+          15: ["SELECT / MOVE", "Click the pulsing SELECT / MOVE tool."],
+          16: ["MOVE A CONNECTION", `Drag the pulsing connection point sideways to the green target. ${shift} can be used for axis assistance.`],
+          17: ["MULTI-WALL ERASE", "With ERASE selected, drag a box across several walls. Review the highlighted group, then use the center erase button. This demo will repeat."],
+          18: ["READY TO BUILD", "You now know the main drawing and editing tools. Your tutorial drawing will be cleared so you can start your own plan."]
+        };
+        return items[step] || items[18];
+      }
+
+      function clearTutorialToolPulse() {
+        drawToolButtons.forEach((button) => button.classList.remove("isTutorialPulse"));
+      }
+
+      function pulseTutorialTool(tool) {
+        clearTutorialToolPulse();
+        if (!tool) return;
+        const button = drawToolButtons.find((item) => item.dataset.generatedPlanTool === tool);
+        if (button) button.classList.add("isTutorialPulse");
+      }
+
+      function tutorialCurveDemoMarkup() {
+        const p = INTERACTIVE_TUTORIAL_POINTS;
+        const d1 = `M ${p.p2.x} ${p.p2.y} C ${p.p2.x} 245, ${p.p3.x} ${p.bulge.y}, ${p.p3.x} ${p.p3.y}`;
+        const d2 = `M ${p.p2.x} ${p.p2.y} C 640 365, 770 300, ${p.p3.x} ${p.p3.y}`;
+        return `
+          <path class="generatedPlanTutorialDemoCurve" d="${d1}">
+            <animate attributeName="d" values="${d1};${d2};${d1}" dur="2.8s" repeatCount="indefinite"></animate>
+          </path>
+          <line class="generatedPlanTutorialDemoHandleLine" x1="${p.p2.x}" y1="${p.p2.y}" x2="${p.p2.x}" y2="245">
+            <animate attributeName="x2" values="${p.p2.x};640;${p.p2.x}" dur="2.8s" repeatCount="indefinite"></animate>
+            <animate attributeName="y2" values="245;365;245" dur="2.8s" repeatCount="indefinite"></animate>
+          </line>
+          <circle class="generatedPlanTutorialDemoHandleDot" cx="${p.p2.x}" cy="245" r="7">
+            <animate attributeName="cx" values="${p.p2.x};640;${p.p2.x}" dur="2.8s" repeatCount="indefinite"></animate>
+            <animate attributeName="cy" values="245;365;245" dur="2.8s" repeatCount="indefinite"></animate>
+          </circle>
+          <line class="generatedPlanTutorialDemoHandleLine" x1="${p.p3.x}" y1="${p.p3.y}" x2="${p.p3.x}" y2="${p.bulge.y}"></line>
+          <circle class="generatedPlanTutorialDemoHandleDot" cx="${p.p3.x}" cy="${p.bulge.y}" r="7"></circle>`;
+      }
+
+      function tutorialEraseDemoMarkup() {
+        const p = INTERACTIVE_TUTORIAL_POINTS;
+        return `
+          <rect class="generatedPlanTutorialEraseDemoBox" x="105" y="145" width="1" height="1" rx="8">
+            <animate attributeName="x" values="105;105;105;105" dur="3.2s" repeatCount="indefinite"></animate>
+            <animate attributeName="y" values="440;145;145;440" dur="3.2s" repeatCount="indefinite"></animate>
+            <animate attributeName="width" values="1;520;520;1" dur="3.2s" repeatCount="indefinite"></animate>
+            <animate attributeName="height" values="1;345;345;1" dur="3.2s" repeatCount="indefinite"></animate>
+            <animate attributeName="opacity" values="0;1;1;0" dur="3.2s" repeatCount="indefinite"></animate>
+          </rect>
+          <g opacity="0">
+            <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;.42;.55;.82;1" dur="3.2s" repeatCount="indefinite"></animate>
+            <circle class="generatedPlanTutorialEraseDemoIconBg" cx="365" cy="315" r="28"></circle>
+            <text class="generatedPlanTutorialEraseDemoIconText" x="365" y="315">−</text>
+            <text class="generatedPlanTutorialEraseDemoLabel" x="365" y="358">ERASE ALL SELECTED WALLS</text>
+          </g>`;
+      }
+
+      function setTutorialAction(label = "", visible = false) {
+        if (!tutorialAction) return;
+        tutorialAction.textContent = label;
+        tutorialAction.classList.toggle("isVisible", Boolean(visible));
+      }
+
+      function renderInteractiveTutorialGuide() {
+        if (!tutorialTraceLayer) return;
+        if (!interactiveTutorial.active) {
+          tutorialTraceLayer.innerHTML = "";
+          tutorialTraceLayer.setAttribute("visibility", "hidden");
+          tutorialTraceLayer.classList.remove("isComplete");
+          clearTutorialToolPulse();
+          setTutorialAction("", false);
+          return;
+        }
+        const p = INTERACTIVE_TUTORIAL_POINTS;
+        tutorialTraceLayer.setAttribute("visibility", "visible");
+        tutorialTraceLayer.classList.toggle("isComplete", interactiveTutorial.step >= 11 && interactiveTutorial.step < 12);
+        const points = [p.p0,p.p1,p.p2,p.p3,p.p4,p.p5];
+        let html = `<path class="generatedPlanTutorialGhostPath" d="${tutorialGhostPathD()}"></path>`;
+        points.forEach((pt) => { html += `<circle class="generatedPlanTutorialGuidePoint" cx="${pt.x}" cy="${pt.y}" r="5.2"></circle>`; });
+        const target = tutorialPointForStep();
+        if (target && interactiveTutorial.step !== 5 && interactiveTutorial.step !== 16) {
+          html += `<circle class="generatedPlanTutorialTargetHalo" cx="${target.x}" cy="${target.y}" r="16"></circle>`;
+          html += `<circle class="generatedPlanTutorialTargetCore" cx="${target.x}" cy="${target.y}" r="5.4"></circle>`;
+        } else if (target && interactiveTutorial.step === 5) {
+          html += `<circle class="generatedPlanTutorialBulgeTarget" cx="${target.x}" cy="${target.y}" r="18"></circle>`;
+        }
+        if (interactiveTutorial.step === 12) html += tutorialCurveDemoMarkup();
+        if (interactiveTutorial.step === 16) {
+          html += `<circle class="generatedPlanTutorialTargetHalo" cx="${p.p4.x}" cy="${p.p4.y}" r="17"></circle>`;
+          html += `<circle class="generatedPlanTutorialTargetCore" cx="${p.moveTarget.x}" cy="${p.moveTarget.y}" r="8"></circle>`;
+          html += `<path d="M ${p.p4.x+18} ${p.p4.y} L ${p.moveTarget.x-14} ${p.moveTarget.y}" stroke="#4fe07c" stroke-width="2.2" stroke-dasharray="5 5" fill="none"></path>`;
+        }
+        if (interactiveTutorial.step === 17) html += tutorialEraseDemoMarkup();
+        tutorialTraceLayer.innerHTML = html;
+
+        const content = tutorialStepContent();
+        if (tutorialCoachProgress) tutorialCoachProgress.textContent = interactiveTutorial.step <= 10 ? `STEP ${interactiveTutorial.step + 1} OF 11` : "EDITING TOOLS";
+        if (tutorialCoachTitle) tutorialCoachTitle.textContent = content[0];
+        if (tutorialCoachText) tutorialCoachText.innerHTML = content[1];
+        if (tutorialCoach) {
+          tutorialCoach.classList.add("open");
+          tutorialCoach.classList.remove("isComplete");
+          tutorialCoach.setAttribute("aria-hidden", "false");
+        }
+        if (canvasWrap) {
+          canvasWrap.classList.add("isInteractiveTutorial");
+          canvasWrap.classList.toggle("isTutorialDemo", [12,17].includes(interactiveTutorial.step));
+          canvasWrap.classList.toggle("isTutorialLocked", Boolean(interactiveTutorial.lockTools));
+        }
+
+        if (interactiveTutorial.step === 3) pulseTutorialTool("arch");
+        else if (interactiveTutorial.step === 6) pulseTutorialTool("angle");
+        else if (interactiveTutorial.step === 8) pulseTutorialTool("draw");
+        else if (interactiveTutorial.step === 13) pulseTutorialTool("arch");
+        else if (interactiveTutorial.step === 15) pulseTutorialTool("move");
+        else clearTutorialToolPulse();
+
+        setTutorialAction("", false);
+        if (interactiveTutorial.step === 12) setTutorialAction("OK", true);
+        else if (interactiveTutorial.step === 14) setTutorialAction("NEXT STEP", true);
+        else if (interactiveTutorial.step === 17) setTutorialAction("START DRAWING", true);
+      }
+
+      function nudgeInteractiveTutorial(message = "") {
+        if (!tutorialCoach) return;
+        if (message && tutorialCoachText) tutorialCoachText.innerHTML = message;
+        tutorialCoach.classList.remove("isNudged");
+        void tutorialCoach.offsetWidth;
+        tutorialCoach.classList.add("isNudged");
+      }
+
+      function showTutorialCursorSuccess() {
+        if (!tutorialCursorSuccess || !canvasWrap) return;
+        const wrap = canvasWrap.getBoundingClientRect();
+        let x = wrap.width * .50;
+        let y = wrap.height * .55;
+        if (lastDrawPointer) {
+          x = lastDrawPointer.clientX - wrap.left;
+          y = lastDrawPointer.clientY - wrap.top;
+        }
+        tutorialCursorSuccess.style.left = `${Math.max(18, Math.min(wrap.width - 150, x))}px`;
+        tutorialCursorSuccess.style.top = `${Math.max(18, Math.min(wrap.height - 60, y))}px`;
+        tutorialCursorSuccess.classList.remove("isVisible");
+        void tutorialCursorSuccess.offsetWidth;
+        tutorialCursorSuccess.classList.add("isVisible");
+        window.setTimeout(() => tutorialCursorSuccess.classList.remove("isVisible"), 1450);
+      }
+
+      function enterTutorialCurveDemo() {
+        if (!interactiveTutorial.active) return;
+        interactiveTutorial.step = 12;
+        interactiveTutorial.lockTools = true;
+        stopDrawAutoPan(true);
+        previewLine.setAttribute("visibility", "hidden");
+        if (arcPreview) arcPreview.setAttribute("visibility", "hidden");
+        renderInteractiveTutorialGuide();
+      }
+
+      function enterTutorialCurveEdit() {
+        if (!interactiveTutorial.active) return;
+        interactiveTutorial.step = 13;
+        interactiveTutorial.lockTools = false;
+        drawingTool = "arch";
+        updateDrawingToolUi();
+        renderPlanner();
+        renderInteractiveTutorialGuide();
+      }
+
+      function startInteractiveDrawingTutorial() {
+        closePlanTutorial();
+        interactiveTutorial.savedState = captureDrawingState();
+        interactiveTutorial.savedUndo = drawingUndoStack.slice();
+        interactiveTutorial.active = true;
+        interactiveTutorial.step = 0;
+        interactiveTutorial.completing = false;
+        interactiveTutorial.lockTools = false;
+        if (interactiveTutorial.curveEditTimer) clearTimeout(interactiveTutorial.curveEditTimer);
+        interactiveTutorial.curveEditTimer = null;
+        runs = [];
+        currentRun = null;
+        pendingArc = null;
+        curveEdit = null;
+        curveHandleDrag = null;
+        selectedSegments.clear();
+        segmentRandomPlankSides.clear();
+        drawingUndoStack = [];
+        generatedPlan = null;
+        drawingTool = "angle";
+        updateDrawingToolUi();
+        resetViewport();
+        renderPlanner();
+        overlay.classList.add("isTutorialMode");
+        setGeneratedPlanHintCollapsed(true);
+        renderInteractiveTutorialGuide();
+        if (status) status.textContent = "INTERACTIVE TUTORIAL — follow the pulsing point and tool prompts.";
+      }
+
+      function stopInteractiveDrawingTutorial({ restore = true } = {}) {
+        if (!interactiveTutorial.active && !interactiveTutorial.savedState) return;
+        const savedState = interactiveTutorial.savedState;
+        const savedUndo = interactiveTutorial.savedUndo;
+        if (interactiveTutorial.curveEditTimer) clearTimeout(interactiveTutorial.curveEditTimer);
+        interactiveTutorial.curveEditTimer = null;
+        interactiveTutorial.active = false;
+        interactiveTutorial.completing = false;
+        interactiveTutorial.lockTools = false;
+        interactiveTutorial.step = 0;
+        interactiveTutorial.savedState = null;
+        interactiveTutorial.savedUndo = null;
+        clearTutorialToolPulse();
+        overlay.classList.remove("isTutorialMode");
+        if (tutorialCursorSuccess) tutorialCursorSuccess.classList.remove("isVisible");
+        if (tutorialTraceLayer) {
+          tutorialTraceLayer.innerHTML = "";
+          tutorialTraceLayer.setAttribute("visibility", "hidden");
+          tutorialTraceLayer.classList.remove("isComplete");
+        }
+        if (tutorialCoach) {
+          tutorialCoach.classList.remove("open", "isComplete", "isNudged");
+          tutorialCoach.setAttribute("aria-hidden", "true");
+        }
+        setTutorialAction("", false);
+        if (canvasWrap) canvasWrap.classList.remove("isInteractiveTutorial", "isTutorialDemo", "isTutorialLocked");
+        setGeneratedPlanHintCollapsed(false);
+        if (restore && savedState) {
+          restoreDrawingState(savedState);
+          drawingUndoStack = Array.isArray(savedUndo) ? savedUndo.slice() : [];
+        } else {
+          runs = [];
+          currentRun = null;
+          pendingArc = null;
+          drawingUndoStack = [];
+          resetViewport();
+          renderPlanner();
+        }
+        drawingTool = "angle";
+        updateDrawingToolUi();
+        if (status) status.textContent = "Draw one or more wall runs. Separate runs are allowed.";
+      }
+
+      function finishInteractiveDrawingTutorial() {
+        stopInteractiveDrawingTutorial({ restore: true });
+      }
+
+      function completeInteractiveDrawingTrace() {
+        if (!interactiveTutorial.active || interactiveTutorial.completing) return;
+        interactiveTutorial.completing = true;
+        interactiveTutorial.step = 11;
+        clearTutorialToolPulse();
+        showTutorialCursorSuccess();
+        renderInteractiveTutorialGuide();
+        if (status) status.textContent = "TRACE COMPLETE — well done.";
+        window.setTimeout(() => {
+          if (!interactiveTutorial.active) return;
+          interactiveTutorial.completing = false;
+          enterTutorialCurveDemo();
+        }, 1500);
+      }
+
+      function tutorialPointMatches(point, target, tolerance = 2.5) {
+        return Boolean(point && target && pointDistance(point, target) <= tolerance);
+      }
+
+      function updateInteractiveTutorialProgress() {
+        if (!interactiveTutorial.active || interactiveTutorial.completing) return;
+        const p = INTERACTIVE_TUTORIAL_POINTS;
+        const lastPoint = currentRun && currentRun.points.length ? currentRun.points[currentRun.points.length - 1] : null;
+        const defs = currentRun ? ensureRunSegments(currentRun) : [];
+        let advance = false;
+        switch (interactiveTutorial.step) {
+          case 0: advance = Boolean(currentRun && currentRun.points.length >= 1 && tutorialPointMatches(currentRun.points[0], p.p0)); break;
+          case 1: advance = Boolean(lastPoint && tutorialPointMatches(lastPoint, p.p1)); break;
+          case 2: advance = Boolean(lastPoint && tutorialPointMatches(lastPoint, p.p2)); break;
+          case 3: advance = drawingTool === "arch"; break;
+          case 4: advance = Boolean(pendingArc && tutorialPointMatches(pendingArc.end, p.p3)); break;
+          case 5: advance = Boolean(!pendingArc && lastPoint && tutorialPointMatches(lastPoint, p.p3) && defs.some((def) => def && def.type === "arc")); break;
+          case 6: advance = drawingTool === "angle"; break;
+          case 7: advance = Boolean(lastPoint && tutorialPointMatches(lastPoint, p.p4)); break;
+          case 8: advance = drawingTool === "draw"; break;
+          case 9: advance = Boolean(lastPoint && tutorialPointMatches(lastPoint, p.p5)); break;
+          case 10:
+            advance = runs.some((run) => run.points && run.points.length >= 7 && tutorialPointMatches(run.points[0], p.p0) && tutorialPointMatches(run.points[run.points.length - 1], p.p0));
+            break;
+          case 15: advance = drawingTool === "move"; break;
+          case 16:
+            advance = runs.some((run) => (run.points || []).some((pt) => pointDistance(pt, p.moveTarget) <= 20));
+            break;
+        }
+        if (!advance) return;
+        if (interactiveTutorial.step === 10) {
+          completeInteractiveDrawingTrace();
+          return;
+        }
+        interactiveTutorial.step += 1;
+        if (interactiveTutorial.step === 17) {
+          interactiveTutorial.lockTools = true;
+        }
+        renderInteractiveTutorialGuide();
+      }
+
+      function guardInteractiveTutorialCanvasClick(event) {
+        if (!interactiveTutorial.active || phase !== "draw" || event.button !== 0) return;
+        const step = interactiveTutorial.step;
+        if (interactiveTutorial.lockTools) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          return;
+        }
+        if ([3,6,8,15].includes(step)) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          nudgeInteractiveTutorial("Select the pulsing tool below before continuing.");
+          return;
+        }
+        if ([12,14,17,18].includes(step)) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          return;
+        }
+        const requiredTool = tutorialRequiredTool(step);
+        if (requiredTool && drawingTool !== requiredTool) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          pulseTutorialTool(requiredTool);
+          nudgeInteractiveTutorial("Use the highlighted tool for this step.");
+          return;
+        }
+        if (step >= 11) return;
+        const target = tutorialPointForStep(step);
+        if (!target) return;
+        const raw = screenToSvg(event);
+        const tolerance = step === 5 ? 64 : 50;
+        if (pointDistance(raw, target) > tolerance) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          nudgeInteractiveTutorial(step === 5 ? "Move toward the pulsing arch guide, then click to accept the curve." : "Click the pulsing guide point to continue.");
+        }
       }
 
       function copyPoint(point) {
@@ -12873,6 +13709,8 @@
 
       function updatePendingArcPreview(pointer) {
         if (!pendingArc || !arcPreview) return;
+        const tutorialBulge = tutorialSnapTarget(pointer, 5);
+        if (tutorialBulge && interactiveTutorial.active && interactiveTutorial.step === 5) pointer = tutorialBulge;
         const controls = cubicArcControlsFromPointer(
           pendingArc.start,
           pendingArc.end,
@@ -13200,6 +14038,8 @@
       }
 
       function snapToExistingPoint(point) {
+        const tutorialTarget = tutorialSnapTarget(point);
+        if (tutorialTarget) return tutorialTarget;
         let best = null;
         let bestDistance = SNAP_DISTANCE;
         explicitSnapPoints().forEach((candidate) => {
@@ -14150,6 +14990,9 @@
         hideClosingSnapFeedback({ keepConfirmation: false });
         if (status) status.textContent = "Geometry moved. Select another wall/intersection or choose a drawing tool to continue.";
         renderPlanner();
+        if (interactiveTutorial.active && interactiveTutorial.step === 16 && finishedDrag.hasMoved) {
+          requestAnimationFrame(updateInteractiveTutorialProgress);
+        }
       }
 
       function getSegments() {
@@ -14176,23 +15019,6 @@
         return segments;
       }
 
-      const PLAN_TUTORIALS = {
-        draw: {
-          src: "draw.mp4",
-          description: "You are drawing in a top-down plan view, as though you are looking down at the walls from above. Drawing starts in free-angle mode; hold SHIFT whenever you want the next wall or curve endpoint locked to 90°. Use CTRL for a curved wall (CTRL+SHIFT locks its endpoint to 90°), SELECT/MOVE to reposition walls or intersections (hold SHIFT while moving to constrain the motion horizontally or vertically), ERASE to remove one wall, and CTRL+Z to undo the last actual edit. Existing wall points will snap green so you can continue a run or reconnect a gap with confidence. You can also import a simple DXF or SVG wall-centerline plan."
-        },
-        select: {
-          src: "select.mp4",
-          description: "Select the walls that will receive Random Plank. Every wall starts on the inside face. On desktop you can box-drag at any time to add walls, or hold ALT while dragging to remove them. For the face tools, click the wall, the Random Plank, or the space between them."
-        }
-      };
-
-      function setTutorialVideoLoading(isLoading) {
-        if (!tutorialVideoLoading) return;
-        tutorialVideoLoading.classList.toggle("isVisible", Boolean(isLoading));
-        tutorialVideoLoading.setAttribute("aria-hidden", isLoading ? "false" : "true");
-      }
-
       function setGeneratedPlanBusy(isBusy, message = "WORKING...") {
         if (!busyOverlay) return;
         if (busyText && message) busyText.textContent = message;
@@ -14210,56 +15036,23 @@
         }
       };
 
-      if (tutorialVideo) {
-        ["loadstart", "waiting", "stalled"].forEach((eventName) => {
-          tutorialVideo.addEventListener(eventName, () => {
-            if (tutorialOverlay && tutorialOverlay.classList.contains("open")) setTutorialVideoLoading(true);
-          });
-        });
-        ["loadeddata", "canplay", "playing"].forEach((eventName) => {
-          tutorialVideo.addEventListener(eventName, () => setTutorialVideoLoading(false));
-        });
-        tutorialVideo.addEventListener("error", () => setTutorialVideoLoading(false));
-      }
-
       function closePlanTutorial() {
         if (!tutorialOverlay) return;
         tutorialOverlay.classList.remove("open");
         tutorialOverlay.setAttribute("aria-hidden", "true");
-        if (tutorialVideo) {
-          tutorialVideo.pause();
-        }
-        setTutorialVideoLoading(false);
       }
 
       function showPlanTutorial(kind) {
-        const config = PLAN_TUTORIALS[kind];
-        if (!config || !tutorialOverlay || !tutorialVideo || !tutorialDescription) return;
-        if (!overlay.classList.contains("open")) return;
-        if (tutorialSeenThisOpen[kind]) return;
-
-        tutorialSeenThisOpen[kind] = true;
-        tutorialDescription.textContent = config.description;
-        setTutorialVideoLoading(true);
-
-        const nextSrc = config.src;
-        const currentSrc = tutorialVideo.getAttribute("src") || "";
-        if (currentSrc !== nextSrc) {
-          tutorialVideo.pause();
-          tutorialVideo.setAttribute("src", nextSrc);
-          tutorialVideo.load();
-        } else {
-          try { tutorialVideo.currentTime = 0; } catch (error) {}
-        }
-
+        // The old MP4 tutorials have been retired. For now only the drawing stage
+        // has the new hands-on tutorial; the Random Plank selection tutorial will
+        // be built as a separate interactive walkthrough next.
+        if (kind !== "draw" || !tutorialOverlay || !tutorialDescription) return;
+        if (!overlay.classList.contains("open") || tutorialSeenThisOpen.draw || interactiveTutorial.active) return;
+        tutorialSeenThisOpen.draw = true;
+        tutorialDescription.textContent = "Trace a simple wall shape and learn the main drawing and editing tools in about one minute.";
         tutorialOverlay.classList.add("open");
         tutorialOverlay.setAttribute("aria-hidden", "false");
-        if (tutorialVideo.readyState >= 3) setTutorialVideoLoading(false);
-
-        const playPromise = tutorialVideo.play();
-        if (playPromise && typeof playPromise.catch === "function") {
-          playPromise.catch(() => {});
-        }
+        requestAnimationFrame(() => tutorialStartButton && tutorialStartButton.focus());
       }
 
       function showFaceToolNotice() {
@@ -15269,6 +16062,7 @@
       };
 
       function setPhase(nextPhase) {
+        if (nextPhase !== "draw" && interactiveTutorial.active) stopInteractiveDrawingTutorial({ restore: true });
         if (nextPhase !== "select") closeFaceToolNotice();
         if (nextPhase !== "draw") stopDrawAutoPan(true);
         hideClosingSnapFeedback({ keepConfirmation: false });
@@ -15305,14 +16099,15 @@
         updateRandomPlankSideUi();
         renderPlanner();
 
-        if (nextPhase === "draw" || nextPhase === "select") {
-          requestAnimationFrame(() => showPlanTutorial(nextPhase));
+        if (nextPhase === "draw") {
+          requestAnimationFrame(() => showPlanTutorial("draw"));
         }
       }
 
       function updateViewportTransform() {
         const transform = `matrix(${viewScale} 0 0 ${viewScale} ${viewPanX} ${viewPanY})`;
         viewport.setAttribute("transform", transform);
+        if (tutorialTraceLayer) tutorialTraceLayer.setAttribute("transform", transform);
         // Keep the live preview and angle guide locked to the same zoom/pan
         // transform as the wall geometry while drawing.
         if (previewLine) previewLine.setAttribute("transform", transform);
@@ -15529,6 +16324,10 @@
       }
 
       function ensureDrawAutoPan() {
+        if (interactiveTutorial.active) {
+          stopDrawAutoPan(true);
+          return;
+        }
         if (drawAutoPanFrame !== null) return;
         drawAutoPanLastTime = performance.now();
 
@@ -17772,6 +18571,7 @@
         document.body.classList.add("generatedPlanBuilderOpen");
         document.body.classList.remove("generatedPlanModelMode");
         tutorialSeenThisOpen = { draw: false, select: false };
+        if (interactiveTutorial.active) stopInteractiveDrawingTutorial({ restore: true });
         closePlanTutorial();
         closeGeneratedPlanReadyPopup();
         closeProjectNamePrompt(null);
@@ -17786,6 +18586,7 @@
       }
 
       function closePlanner() {
+        if (interactiveTutorial.active) stopInteractiveDrawingTutorial({ restore: true });
         closePlanTutorial();
         closeGeneratedPlanReadyPopup();
         closeImportPreparation();
@@ -17931,11 +18732,55 @@
         }
       });
 
-      if (tutorialGotItButton) {
-        tutorialGotItButton.addEventListener("click", (event) => {
+      if (tutorialStartButton) {
+        tutorialStartButton.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          startInteractiveDrawingTutorial();
+        });
+      }
+      if (tutorialSkipButton) {
+        tutorialSkipButton.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
           closePlanTutorial();
+        });
+      }
+      if (tutorialCoachExit) {
+        tutorialCoachExit.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          stopInteractiveDrawingTutorial({ restore: true });
+        });
+      }
+      if (tutorialCoachDone) {
+        tutorialCoachDone.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          finishInteractiveDrawingTutorial();
+        });
+      }
+      if (tutorialAction) {
+        tutorialAction.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          if (!interactiveTutorial.active) return;
+          if (interactiveTutorial.step === 12) {
+            enterTutorialCurveEdit();
+          } else if (interactiveTutorial.step === 14) {
+            interactiveTutorial.step = 15;
+            interactiveTutorial.lockTools = false;
+            renderInteractiveTutorialGuide();
+          } else if (interactiveTutorial.step === 17) {
+            finishInteractiveDrawingTutorial();
+          }
+        });
+      }
+      if (tutorialFooterSkip) {
+        tutorialFooterSkip.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          finishInteractiveDrawingTutorial();
         });
       }
 
@@ -17996,11 +18841,19 @@
 
       fitHeaderButton.addEventListener("click", (event) => {
         event.stopPropagation();
+        if (interactiveTutorial.active) {
+          nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
+          return;
+        }
         fitGeneratedPlan();
       });
 
       fitFooterButton.addEventListener("click", (event) => {
         event.stopPropagation();
+        if (interactiveTutorial.active) {
+          nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
+          return;
+        }
         fitGeneratedPlan();
       });
 
@@ -18149,6 +19002,10 @@
         planZoomOutButton.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
+          if (interactiveTutorial.active) {
+            nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
+            return;
+          }
           zoomPlannerFromButton("out");
         });
       }
@@ -18157,6 +19014,10 @@
         planZoomInButton.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
+          if (interactiveTutorial.active) {
+            nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
+            return;
+          }
           zoomPlannerFromButton("in");
         });
       }
@@ -18171,6 +19032,17 @@
         if (event.ctrlKey || pendingArc) return;
         finishCurrentRun();
       });
+
+      canvas.addEventListener("click", guardInteractiveTutorialCanvasClick, true);
+
+      if (drawTools) {
+        drawTools.addEventListener("click", (event) => {
+          if (!interactiveTutorial.active || !interactiveTutorial.lockTools) return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          nudgeInteractiveTutorial("Watch this quick demonstration first, then the tools will unlock.");
+        }, true);
+      }
 
       canvas.addEventListener("click", (event) => {
         if (phase !== "draw") return;
@@ -18383,6 +19255,10 @@
           renderPlanner();
           hideClosingSnapFeedback();
         }
+      });
+
+      canvas.addEventListener("click", () => {
+        if (interactiveTutorial.active) requestAnimationFrame(updateInteractiveTutorialProgress);
       });
 
       function updateEraseCursorBadge(event) {
@@ -19143,6 +20019,11 @@
 
         const isMiddleButton = isMouse && event.button === 1;
         const isPrimaryButton = !isMouse || event.button === 0;
+        if (interactiveTutorial.active && (isMiddleButton || drawingTool === "pan")) {
+          event.preventDefault();
+          nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
+          return;
+        }
         const generatedPrimaryPan = phase === "generated" && isPrimaryButton;
         const selectionToolPan = phase === "select" && selectionPanMode && isPrimaryButton;
         const drawToolPan = phase === "draw" && drawingTool === "pan" && isPrimaryButton;
@@ -19267,6 +20148,16 @@
         } else if (status) {
           status.textContent = "CURVE EDIT — Curve adjustment accepted. Drag either handle again to refine it.";
         }
+        if (interactiveTutorial.active && interactiveTutorial.step === 13 && !invalidEdit && dragState.hasMoved) {
+          if (interactiveTutorial.curveEditTimer) clearTimeout(interactiveTutorial.curveEditTimer);
+          interactiveTutorial.curveEditTimer = window.setTimeout(() => {
+            if (!interactiveTutorial.active || interactiveTutorial.step !== 13) return;
+            interactiveTutorial.step = 14;
+            interactiveTutorial.lockTools = false;
+            clearTutorialToolPulse();
+            renderInteractiveTutorialGuide();
+          }, 2000);
+        }
       }
 
       if (bezierStartDot) bezierStartDot.addEventListener("click", (event) => event.stopPropagation());
@@ -19287,6 +20178,10 @@
 
       canvas.addEventListener("wheel", (event) => {
         event.preventDefault();
+        if (interactiveTutorial.active) {
+          nudgeInteractiveTutorial("Navigation tools are disabled during the tutorial so the tracing guide stays aligned.");
+          return;
+        }
         cancelPanInertia();
 
         const anchor = screenToCanvas(event);
