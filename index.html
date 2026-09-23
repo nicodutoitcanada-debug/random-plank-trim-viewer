@@ -12093,7 +12093,7 @@
         const alt = '<span class="generatedPlanTutorialKey">ALT</span>';
         const items = {
           0: ["SELECT A WALL", "The SELECT tool is active and highlighted. Click the pulsing wall to add Random Plank."],
-          1: ["BOX SELECT", "Drag a box through the highlighted group to add several walls at once."],
+          1: ["BOX SELECT", "Drag a box around the highlighted group to add several walls at once."],
           2: ["REMOVE WITH ALT", `Hold ${alt} and box-drag through the highlighted wall to remove it from the selection.`],
           3: ["FLIP ONE WALL", "Click the pulsing single-wall face tool."],
           4: ["FLIP THE WALL FACE", "Click the highlighted wall, its Random Plank, or the space between them."],
@@ -19978,6 +19978,20 @@
             return;
           }
           hideCurveEditHover();
+
+          // Tutorial-only: while a step is explicitly asking the user to choose
+          // CURVE, FREE ANGLE, or 90° DRAW, do not show a live wall preview or
+          // angle guide from the previously active tool. The normal drawing
+          // behavior outside the tutorial is unchanged.
+          if (interactiveTutorial.active && [3, 6, 8].includes(interactiveTutorial.step)) {
+            lastDrawPointer = null;
+            stopDrawAutoPan(false);
+            previewLine.setAttribute("visibility", "hidden");
+            if (arcPreview) arcPreview.setAttribute("visibility", "hidden");
+            hideClosingSnapFeedback();
+            hideAngleGuide();
+            return;
+          }
 
           lastDrawPointer = {
             clientX: event.clientX,
